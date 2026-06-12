@@ -458,7 +458,7 @@ OpenShift Virtualization 4.21+</pre>
 <p>MachineConfig を作成して、すべてのワーカーノードでディレクトリーが存在し、リブート後にも存在し続けるようにします:</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$hostpath-provisioner/hpp-machineconfig.yaml" class="xref unresolved">hpp-machineconfig.yaml をダウンロード</a></p>
+<p><a href="_attachments/hostpath-provisioner/hpp-machineconfig.yaml" class="xref attachment">hpp-machineconfig.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -577,7 +577,7 @@ drwxr-xr-x. 22 root root system_u:object_r:var_t:s0          4096 Mar 19 10:00 .
 <p>HostPathProvisioner カスタムリソースを使用して、CSI ドライバーを構成します:</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$hostpath-provisioner/hpp-hostpathprovisioner.yaml" class="xref unresolved">hpp-hostpathprovisioner.yaml をダウンロード</a></p>
+<p><a href="_attachments/hostpath-provisioner/hpp-hostpathprovisioner.yaml" class="xref attachment">hpp-hostpathprovisioner.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -671,7 +671,7 @@ hostpath-provisioner-csi-zzzzz                 4/4     Running   0          2m</
 <p>HostPath Provisioner を使用する StorageClass を作成します:</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$hostpath-provisioner/hpp-storageclass.yaml" class="xref unresolved">hpp-storageclass.yaml をダウンロード</a></p>
+<p><a href="_attachments/hostpath-provisioner/hpp-storageclass.yaml" class="xref attachment">hpp-storageclass.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -753,7 +753,7 @@ oc patch storageclass &lt;existing-default&gt; -p '{"metadata": {"annotations":{
 <p>HPP が機能していることを確認するためのテスト PVC を作成します:</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$hostpath-provisioner/hpp-test-pvc.yaml" class="xref unresolved">hpp-test-pvc.yaml をダウンロード</a></p>
+<p><a href="_attachments/hostpath-provisioner/hpp-test-pvc.yaml" class="xref attachment">hpp-test-pvc.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -873,7 +873,7 @@ oc delete pvc hpp-test-pvc</code></pre>
 <p>警告: この例の cloud-init パスワードは、デモのためのものです。実際のプロダクション環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$hostpath-provisioner/hpp-test-vm.yaml" class="xref unresolved">hpp-test-vm.yaml をダウンロード</a></p>
+<p><a href="_attachments/hostpath-provisioner/hpp-test-vm.yaml" class="xref attachment">hpp-test-vm.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock execute">
 <div class="content">

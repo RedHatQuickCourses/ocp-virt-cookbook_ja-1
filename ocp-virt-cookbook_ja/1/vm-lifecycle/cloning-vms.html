@@ -513,7 +513,7 @@
 <p>注意: この例の cloud-init パスワードは、デモのためのものです。実際のプロダクション環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$cloning-vms/source-webserver-vm.yaml" class="xref unresolved">source-webserver-vm.yaml をダウンロード</a></p>
+<p><a href="_attachments/cloning-vms/source-webserver-vm.yaml" class="xref attachment">source-webserver-vm.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -611,9 +611,9 @@ spec:
 <ol class="arabic">
 <li>
 <p><strong>仮想化</strong> → <strong>仮想マシン</strong> に移動します</p>
-<div class="imageblock unresolved">
+<div class="imageblock">
 <div class="content">
-<img src="clone-vm-list.png" alt="仮想マシンのリストが source-webserver VM を示しています">
+<img src="_images/clone-vm-list.png" alt="仮想マシンのリストが source-webserver VM を示しています">
 </div>
 </div>
 </li>
@@ -622,9 +622,9 @@ spec:
 </li>
 <li>
 <p>VM の <strong>⋮</strong> (アクションメニュー) 側にある <strong>クローン</strong> をクリックします</p>
-<div class="imageblock unresolved">
+<div class="imageblock">
 <div class="content">
-<img src="clone-vm-actions-menu.png" alt="クローンオプションが強調表示されたアクションメニュー">
+<img src="_images/clone-vm-actions-menu.png" alt="クローンオプションが強調表示されたアクションメニュー">
 </div>
 </div>
 </li>
@@ -646,9 +646,9 @@ spec:
 </li>
 <li>
 <p><strong>クローン</strong> をクリックします</p>
-<div class="imageblock unresolved">
+<div class="imageblock">
 <div class="content">
-<img src="clone-vm-dialog.png" alt="名前と構成を示すクローン仮想マシンダイアログ">
+<img src="_images/clone-vm-dialog.png" alt="名前と構成を示すクローン仮想マシンダイアログ">
 </div>
 </div>
 </li>
@@ -676,9 +676,9 @@ spec:
 <div class="paragraph">
 <p>仮想マシンのリストでクローンの進捗を監視します。PVC クローンが完了するまで、クローンは "プロビジョニング" に表示されます。</p>
 </div>
-<div class="imageblock unresolved">
+<div class="imageblock">
 <div class="content">
-<img src="clone-vm-dialog-full.png" alt="クローン仮想マシンダイアログでリクエストの進捗を示しています">
+<img src="_images/clone-vm-dialog-full.png" alt="クローン仮想マシンダイアログでリクエストの進捗を示しています">
 </div>
 </div>
 </div>
@@ -736,7 +736,7 @@ source-webserver-disk   Bound    pvc-1234abcd-5678-efgh-9012-ijklmnop3456   30Gi
 <p>ソース PVC をクローンするスタンドアロン DataVolumeを作成します。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$cloning-vms/clone-datavolume.yaml" class="xref unresolved">clone-datavolume.yaml をダウンロード</a></p>
+<p><a href="_attachments/cloning-vms/clone-datavolume.yaml" class="xref attachment">clone-datavolume.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -808,7 +808,7 @@ webserver-clone-2-disk   Succeeded                           100.0%             
 <p>DataVolume が <code>Succeeded</code> になったら、クローンされたディスクを使用する新しい VMを作成します。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$cloning-vms/vm-from-cloned-pvc.yaml" class="xref unresolved">vm-from-cloned-pvc.yaml をダウンロード</a></p>
+<p><a href="_attachments/cloning-vms/vm-from-cloned-pvc.yaml" class="xref attachment">vm-from-cloned-pvc.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1057,7 +1057,7 @@ EOF</code></pre>
 <p>クラウドイニシエイターのカスタマイズを使用して VM を作成します。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$cloning-vms/cloned-vm-with-cloudinit.yaml" class="xref unresolved">cloned-vm-with-cloudinit.yaml をダウンロード</a></p>
+<p><a href="_attachments/cloning-vms/cloned-vm-with-cloudinit.yaml" class="xref attachment">cloned-vm-with-cloudinit.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1189,7 +1189,7 @@ curl localhost
 <p>ターゲット名前空間のサービスアカウントがソース名前空間の PVC にアクセスできるようにするために、RBAC を設定します。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$cloning-vms/cross-namespace-clone-rbac.yaml" class="xref unresolved">cross-namespace-clone-rbac.yaml をダウンロード</a></p>
+<p><a href="_attachments/cloning-vms/cross-namespace-clone-rbac.yaml" class="xref attachment">cross-namespace-clone-rbac.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1236,7 +1236,7 @@ subjects:
 <p>プロダクション名空間にある DataVolume を作成し、デモ名空間からクローンします。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$cloning-vms/cross-namespace-clone-datavolume.yaml" class="xref unresolved">cross-namespace-clone-datavolume.yaml をダウンロード</a></p>
+<p><a href="_attachments/cloning-vms/cross-namespace-clone-datavolume.yaml" class="xref attachment">cross-namespace-clone-datavolume.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1280,7 +1280,7 @@ spec:
 <p>プロダクション VM を作成します。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$cloning-vms/cloned-webserver-production.yaml" class="xref unresolved">cloned-webserver-production.yaml をダウンロード</a></p>
+<p><a href="_attachments/cloning-vms/cloned-webserver-production.yaml" class="xref attachment">cloned-webserver-production.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock">
 <div class="content">

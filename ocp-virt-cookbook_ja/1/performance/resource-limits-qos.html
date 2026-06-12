@@ -412,7 +412,7 @@
 <p>警告: この例では、cloud-init パスワードはデモ目的でのみ使用されます。実際の環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$resource-limits-qos/vm-burstable.yaml" class="xref unresolved">vm-burstable.yaml をダウンロード</a></p>
+<p><a href="_attachments/resource-limits-qos/vm-burstable.yaml" class="xref attachment">vm-burstable.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -470,7 +470,7 @@ EOF</code></pre>
 <p>CPU とメモリーの要求と制限が等しい仮想マシンは、ガーランテッド QoS を受け取ります。これらの VM は、スケジューリング優先度が最高で、メモリー圧力下で最後に除外されます。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$resource-limits-qos/vm-guaranteed.yaml" class="xref unresolved">vm-guaranteed.yaml をダウンロード</a></p>
+<p><a href="_attachments/resource-limits-qos/vm-guaranteed.yaml" class="xref attachment">vm-guaranteed.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -535,7 +535,7 @@ EOF</code></pre>
 <p>リソース要求と制限が設定されていない仮想マシンは、ベストエフォート QoS を受け取ります。これらの仮想マシンは、リソース圧力下で最初に除外されます。これは、実際の環境で推奨されない一般的な構成です。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$resource-limits-qos/vm-besteffort.yaml" class="xref unresolved">vm-besteffort.yaml をダウンロード</a></p>
+<p><a href="_attachments/resource-limits-qos/vm-besteffort.yaml" class="xref attachment">vm-besteffort.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -698,7 +698,7 @@ vm-guaranteed    45s   Running   True</pre>
 <p>リソースクォータは、名前空間内のすべての VM と Pod の合計リソース制限をエンフォースします。リソースクォータに制限が含まれている場合、KubeVirt は自動的に仮想マシンにリソース制限を設定します。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$resource-limits-qos/resource-quota.yaml" class="xref unresolved">resource-quota.yaml をダウンロード</a></p>
+<p><a href="_attachments/resource-limits-qos/resource-quota.yaml" class="xref attachment">resource-quota.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -752,7 +752,7 @@ EOF</code></pre>
 <p>制限レンジは、名前空間内の各 Pod にリソースのデフォルト値と上限値を設定し、すべての VM が最小リソース割り当てを確保します。</p>
 </div>
 <div class="paragraph">
-<p><a href="#attachment$resource-limits-qos/limit-range.yaml" class="xref unresolved">limit-range.yaml をダウンロード</a></p>
+<p><a href="_attachments/resource-limits-qos/limit-range.yaml" class="xref attachment">limit-range.yaml をダウンロード</a></p>
 </div>
 <div class="listingblock execute">
 <div class="content">
