@@ -1,6 +1,6 @@
 {
-  "totalSeconds": 2597,
-  "pageCount": 29,
+  "totalSeconds": 6160,
+  "pageCount": 53,
   "pages": [
     {
       "module": "ROOT",
@@ -83,14 +83,134 @@
       "seconds": 59
     },
     {
+      "module": "networking",
+      "page": "static-ip-configuration.adoc",
+      "seconds": 278
+    },
+    {
+      "module": "networking",
+      "page": "cloud-init-troubleshooting.adoc",
+      "seconds": 51
+    },
+    {
+      "module": "networking",
+      "page": "udn-primary-networks.adoc",
+      "seconds": 83
+    },
+    {
+      "module": "networking",
+      "page": "localnet-secondary.adoc",
+      "seconds": 50
+    },
+    {
+      "module": "networking",
+      "page": "localnet-vlan.adoc",
+      "seconds": 77
+    },
+    {
+      "module": "networking",
+      "page": "cudn-localnet-vlan.adoc",
+      "seconds": 164
+    },
+    {
+      "module": "networking",
+      "page": "layer2-secondary.adoc",
+      "seconds": 138
+    },
+    {
+      "module": "networking",
+      "page": "linux-bridges.adoc",
+      "seconds": 189
+    },
+    {
+      "module": "networking",
+      "page": "sriov-secondary.adoc",
+      "seconds": 217
+    },
+    {
+      "module": "networking",
+      "page": "vm-ingress-routes.adoc",
+      "seconds": 74
+    },
+    {
+      "module": "networking",
+      "page": "ovs-bridge-troubleshooting.adoc",
+      "seconds": 201
+    },
+    {
       "module": "vm-configuration",
       "page": "index.adoc",
       "seconds": 40
     },
     {
+      "module": "vm-configuration",
+      "page": "internal-dns-for-vms.adoc",
+      "seconds": 125
+    },
+    {
+      "module": "vm-configuration",
+      "page": "remote-access-linux-vms.adoc",
+      "seconds": 116
+    },
+    {
+      "module": "vm-configuration",
+      "page": "remote-access-linux-troubleshooting.adoc",
+      "seconds": 51
+    },
+    {
+      "module": "vm-configuration",
+      "page": "remote-access-windows-vms.adoc",
+      "seconds": 73
+    },
+    {
+      "module": "vm-configuration",
+      "page": "windows-vm-virtio-drivers.adoc",
+      "seconds": 98
+    },
+    {
+      "module": "vm-configuration",
+      "page": "infrastructure-node-placement.adoc",
+      "seconds": 142
+    },
+    {
+      "module": "vm-configuration",
+      "page": "node-placement-affinity.adoc",
+      "seconds": 205
+    },
+    {
+      "module": "vm-configuration",
+      "page": "hotplug-volumes-interfaces.adoc",
+      "seconds": 69
+    },
+    {
+      "module": "vm-configuration",
+      "page": "vm-templates.adoc",
+      "seconds": 418
+    },
+    {
       "module": "performance",
       "page": "index.adoc",
       "seconds": 26
+    },
+    {
+      "module": "performance",
+      "page": "resource-limits-qos.adoc",
+      "seconds": 135
+    },
+    {
+      "module": "performance",
+      "page": "cpu-pinning.adoc",
+      "seconds": 151
+    },
+    {
+      "module": "performance",
+      "page": "numa-hugepages.adoc",
+      "seconds": 240
+    },
+    {
+      "module": "performance",
+      "page": "realtime-vms.adoc",
+      "seconds": 218
     },
     {
       "module": "vm-lifecycle",

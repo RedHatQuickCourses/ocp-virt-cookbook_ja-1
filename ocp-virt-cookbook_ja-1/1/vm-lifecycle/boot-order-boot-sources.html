@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>VM ブート順序とブートソースの構成 :: OpenShift Virtualization cookbook</title>
+    <link rel="prev" href="vm-snapshots.html">
+    <link rel="next" href="../manifests/index.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">OpenShift Virtualization cookbook</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/ocp-virt-cookbook_ja/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja-1" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../getting-started/index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../storage/index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/static-ip-configuration.html">静的IP構成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/cloud-init-troubleshooting.html">クラウドインィット トラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/udn-primary-networks.html">UDN プライマリーネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/localnet-secondary.html">CUDN を使用したローカルネット 2 番目のネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/localnet-vlan.html">VLAN を使用した NAD を使用したローカルネットワークのセカンダリーネットワークの構成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/cudn-localnet-vlan.html">CUDN を使用したローカルネットワーク VLAN</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/layer2-secondary.html">2層セカンダリネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/linux-bridges.html">Linux ブリッジ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/sriov-secondary.html">SR-IOV 二次ネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM イングレスとルート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ローカルネットワークのトラブルシューティング</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-configuration/index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/internal-dns-for-vms.html">VM の内部 DNS</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-vms.html">リモートアクセスを通じたLinux VMへのアクセス</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-troubleshooting.html">リモートアクセスのLinux VMのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-windows-vms.html">RDP を介した Windows VM へのリモートアクセス</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/windows-vm-virtio-drivers.html">Windows VMs with VirtIO Drivers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/infrastructure-node-placement.html">インフラストラクチャーノード配置</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/node-placement-affinity.html">ノード配置とアフィニティ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/hotplug-volumes-interfaces.html">ボットプラグボリュームとインターフェース</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/vm-templates.html">仮想マシンテンプレート</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/resource-limits-qos.html">リソース制限とQoS</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/cpu-pinning.html">仮想マシン用専用CPU配置</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/numa-hugepages.html">NUMA とヒュージページ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/realtime-vms.html">リアルタイム VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">Glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="index.html">VM ライフサイクル管理</a></li>
+    <li><a href="boot-order-boot-sources.html">VM ブート順序とブートソース</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">VM ブート順序とブートソースの構成</h1>
+<div class="sect1">
+<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルでは、OpenShift Virtualization で VM のブート順序、ブートソース、およびブートオプションを構成する方法を示します。ブート構成の理解は、カスタム OS インストール、リカバリー・シナリオ、マルチブート環境、およびセキュリティーコンプライアンス要件をサポートするために不可欠です。</p>
+</div>
+<div class="paragraph">
+<p>ブート構成により、VM がブートを試みるデバイスの順序を制御し、使用するファームウェアモード (BIOS または UEFI) を指定できます。OpenShift Virtualization は、永続ボリューム、コンテナーイメージ、およびネットワークベースのソースなど、さまざまなブートソースをサポートしています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>OpenShift 4.18 以上に OpenShift Virtualization オペレーターがインストールされている</p>
+</li>
+<li>
+<p>CLI ツール: <code>oc</code>, <code>virtctl</code>, <code>kubectl</code></p>
+</li>
+<li>
+<p>VM ブートプロセスの基本的な理解</p>
+</li>
+<li>
+<p>永続ボリューム用のストレージクラスが設定されている</p>
+</li>
+<li>
+<p>コンテナーレジストリーの例 (Quay.io、Docker Hub、または内部レジストリー) へのアクセス権限 (コンテナーレジストリーの例)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_openshift_virtualization_でのブートソースタイプ"><a class="anchor" href="#_openshift_virtualization_でのブートソースタイプ"></a>OpenShift Virtualization でのブートソースタイプ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShift Virtualization は、以下のブートソースタイプをサポートしています。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 40%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">ブートソースタイプ</th>
+<th class="tableblock halign-left valign-top">説明</th>
+<th class="tableblock halign-left valign-top">使用例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>PersistentVolumeClaim (PVC)</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">永続ディスクに基づいてブートする</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">生産 VM、状態フルワークロード、カスタム OS インストール</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>ContainerDisk</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">コンテナー形式でパッケージされたディスクイメージからブートする</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エピシーマル VM、テスト、CI/CD、不変性ワークロード</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>DataVolume</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Containerized Data Importer (CDI) を使用してプロビジョニングされたディスクからブートする</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTTP、S3、またはレジストリー源からのイメージのインポート</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>CloudInitNoCloud</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブートディスクと共に頻繁に使用される初期化ディスク (ブート可能ではない)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VM の構成と初期化</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ファームウェアモード"><a class="anchor" href="#_ファームウェアモード"></a>ファームウェアモード</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShift Virtualization は、以下の 2 つのファームウェアモードをサポートしています。</p>
+</div>
+<div class="sect2">
+<h3 id="_bios_レガシーモード"><a class="anchor" href="#_bios_レガシーモード"></a>BIOS (レガシーモード)</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>伝統的な PC BIOS ファームウェア</p>
+</li>
+<li>
+<p>オルダーのオペレーティングシステムと互換性がある</p>
+</li>
+<li>
+<p>ブートデバイスのサイズが制限されている (MBR による場合、2TB)</p>
+</li>
+<li>
+<p>起動時間が短くなる</p>
+</li>
+<li>
+<p>ほとんどの Linux ディストリビューションのデフォルト</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_uefi_統一可拡張ファームウェアインターフェース"><a class="anchor" href="#_uefi_統一可拡張ファームウェアインターフェース"></a>UEFI (統一可拡張ファームウェアインターフェース)</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>モダンなファームウェアインターフェース</p>
+</li>
+<li>
+<p>Secure Boot を必要とする</p>
+</li>
+<li>
+<p>GPT パーティションテーブルと大きなディスクをサポートする</p>
+</li>
+<li>
+<p>Windows 11 と現代の Windows Server バージョンに必要</p>
+</li>
+<li>
+<p>セキュリティー機能が向上する</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ブートデバイスの順序の理解"><a class="anchor" href="#_ブートデバイスの順序の理解"></a>ブートデバイスの順序の理解</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ブートデバイスの順序は、VM ファームウェアがブート可能なコンテンツを検索するデバイスの順序を決定します。KubeVirt で、ブート順序はディスクおよびインターフェースの <code>bootOrder</code> フィールドを使用して制御されます。</p>
+</div>
+<div class="paragraph">
+<p><strong>重要な概念:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>bootOrder</code> の数値が小さいほど優先度が高くなる (1 が 2 よりも先にブートする)</p>
+</li>
+<li>
+<p>ブート順序を指定できるのはディスクおよびインターフェースのみ</p>
+</li>
+<li>
+<p><code>bootOrder</code> が指定されていない場合、ファームウェアが決定する</p>
+</li>
+<li>
+<p>通常、主ブートディスクに <code>bootOrder: 1</code> を割り当てる</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_シナリオ_1_persistentvolumeclaim_最も一般的な"><a class="anchor" href="#_シナリオ_1_persistentvolumeclaim_最も一般的な"></a>シナリオ 1: PersistentVolumeClaim (最も一般的な)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>これは、永続ストレージを使用する生産 VM の標準構成です。</p>
+</div>
+<div class="paragraph">
+<p>テスト用の名前空間を作成します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc create namespace boot-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>警告: この例のクラウド-init パスワードは、デモのためのものです。実際の生産環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。</p>
+</div>
+<div class="paragraph">
+<p><a href="_attachments/boot-order-boot-sources/vm-boot-from-pvc.yaml" class="xref attachment">vm-boot-from-pvc.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: kubevirt.io/v1</code></pre>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="vm-snapshots.html">VM スナップショット</a></span>
+  <span class="next"><a href="../manifests/index.html">マニフェスト</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

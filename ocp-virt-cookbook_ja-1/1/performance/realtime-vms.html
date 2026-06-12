@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>リアルタイム仮想マシン :: OpenShift Virtualization cookbook</title>
+    <link rel="prev" href="numa-hugepages.html">
+    <link rel="next" href="../vm-lifecycle/index.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">OpenShift Virtualization cookbook</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/ocp-virt-cookbook_ja/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja-1" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../getting-started/index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../storage/index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/static-ip-configuration.html">静的IP構成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/cloud-init-troubleshooting.html">クラウドインィット トラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/udn-primary-networks.html">UDN プライマリーネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/localnet-secondary.html">CUDN を使用したローカルネット 2 番目のネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/localnet-vlan.html">VLAN を使用した NAD を使用したローカルネットワークのセカンダリーネットワークの構成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/cudn-localnet-vlan.html">CUDN を使用したローカルネットワーク VLAN</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/layer2-secondary.html">2層セカンダリネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/linux-bridges.html">Linux ブリッジ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/sriov-secondary.html">SR-IOV 二次ネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM イングレスとルート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ローカルネットワークのトラブルシューティング</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-configuration/index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/internal-dns-for-vms.html">VM の内部 DNS</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-vms.html">リモートアクセスを通じたLinux VMへのアクセス</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-troubleshooting.html">リモートアクセスのLinux VMのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-windows-vms.html">RDP を介した Windows VM へのリモートアクセス</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/windows-vm-virtio-drivers.html">Windows VMs with VirtIO Drivers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/infrastructure-node-placement.html">インフラストラクチャーノード配置</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/node-placement-affinity.html">ノード配置とアフィニティ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/hotplug-volumes-interfaces.html">ボットプラグボリュームとインターフェース</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/vm-templates.html">仮想マシンテンプレート</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="resource-limits-qos.html">リソース制限とQoS</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="cpu-pinning.html">仮想マシン用専用CPU配置</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="numa-hugepages.html">NUMA とヒュージページ</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="realtime-vms.html">リアルタイム VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">Glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="index.html">VM パフォーマンスチューニング</a></li>
+    <li><a href="realtime-vms.html">リアルタイム VM</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">リアルタイム仮想マシン</h1>
+<div class="sect1">
+<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルでは、OpenShift Virtualization でリアルタイム仮想マシンを構成する方法を示します。リアルタイム仮想マシンは、厳格な、制限されたレイテンシー要件を持つワークロードに最適化されています：5G RAN (vDU/vCU)、工業制御システム、金融のトレードから取引までのリアルタイム処理、高速なテレメトリー。</p>
+</div>
+<div class="paragraph">
+<p>共有 CPU ホスト上の標準仮想マシンは、他のワークロードからの CPU 窃取によるスケジューリング遅延のピークが数十ミリ秒になる可能性があります。適切に構成されたリアルタイム仮想マシンは、複数のレイヤーのチューニングを組み合わせて、最悪のレイテンシーを低微秒レベルに低下させます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 28.5714%;">
+<col style="width: 42.8571%;">
+<col style="width: 28.5715%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">構成層</th>
+<th class="tableblock halign-left valign-top">ジッター源の除去</th>
+<th class="tableblock halign-left valign-top">構成場所</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">専用 CPU 配置</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">他のワークロードからの CPU 窃取</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">仮想マシン仕様 (<code>dedicatedCpuPlacement</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エミュレータースレッドの分離</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vCPU コア上の QEMU の家庭用作業</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">仮想マシン仕様 (<code>isolateEmulatorThread</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NUMA パススルー</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クロス NUMA メモリーアクセス遅延</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">仮想マシン仕様 (<code>guestMappingPassthrough</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ハイパーページ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TLB ミスとページテーブルウォーク</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">仮想マシン仕様 (<code>memory.hugepages</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ホスト上の RT カーネル</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">カーネル事前予約遅延、タイマージッター</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">パフォーマンスプロファイル (<code>realTimeKernel</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ホスト上の CPU 隔離</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IRQ とカーネルスレッドの干渉</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">パフォーマンスプロファイル (<code>cpu.isolated</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ゲスト内スケジューリング</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ゲスト vCPU のスケジューリング優先度</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">仮想マシン仕様 (<code>cpu.realtime</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">バルーン/グラフィックスの無効化</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">不要なデバイス中断</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">仮想マシン仕様 (<code>autoattachMemBalloon: false</code>)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>このチュートリアルは、パフォーマンスシリーズの第 3 部です。<a href="cpu-pinning.html" class="xref page">専用 CPU 配置</a> と <a href="numa-hugepages.html" class="xref page">NUMA/ハイパーページ</a> チュートリアルから直接構築されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>OpenShift 4.18+ に OpenShift Virtualization オペレーターがインストールされていること (テスト済みバージョン: 4.21)</p>
+</li>
+<li>
+<p>クラスター管理者権限 (<code>system:admin</code> または等価)</p>
+</li>
+<li>
+<p><code>oc</code> と <code>virtctl</code> CLI がインストールされていること</p>
+</li>
+<li>
+<p>8 つ以上の物理 CPU コアと 16Gi RAM を持つワーカーノード</p>
+</li>
+<li>
+<p>CPU マネージャーの静的ポリシーが有効になっていること (<a href="cpu-pinning.html" class="xref page">専用 CPU 配置</a> チュートリアルを参照)</p>
+</li>
+<li>
+<p>NUMA トポロジーとハイパーページについての理解 (<a href="numa-hugepages.html" class="xref page">NUMA とハイパーページ</a> チュートリアルを参照)</p>
+</li>
+<li>
+<p>ノードチューニングオペレーターがインストールされていること (OpenShift でデフォルトでインストールされている)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_リアルタイム要件の理解"><a class="anchor" href="#_リアルタイム要件の理解"></a>リアルタイム要件の理解</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>仮想化のコンテキストでは、リアルタイムは「制限された最悪レイテンシー」を意味します。平均応答時間の速さではありません。リアルタイム仮想マシンは、負荷を受けても、特定の操作が確定時間枠内で完了することを保証します。</p>
+</div>
+<div class="paragraph">
+<p>これを実現するには、ホスト カーネル、ハイパーバイザー、ゲスト カーネル、およびアプリケーションの間のすべてのジッター源を除去する必要があります。構成表は、各仮想マシン仕様フィールドがどのジッター源を取り扱うかをマッピングしています。</p>
+</div>
+<div class="paragraph">
+<p>重要: リアルタイム仮想マシンは、その弱い層に依存します。単一の層を省略する (例えば、RT カーネルを使用するが CPU を隔離しない) は、ジッター源をアクティブに残し、目的を果たさないことを意味します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_1_リアルタイムマシン設定プールの準備"><a class="anchor" href="#_ステップ_1_リアルタイムマシン設定プールの準備"></a>ステップ 1: リアルタイムマシン設定プールの準備</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>リアルタイムノードは、パフォーマンスプロファイルが RT カーネル、CPU 隔離、ハイパーページ構成を適用するのを妨げないように、専用のマシン設定プールが必要です。</p>
+</div>
+<div class="paragraph">
+<p>まず、ターゲットワーカーノードに <code>worker-rt</code> ロールをラベル付けします:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc label node &lt;node-name&gt; node-role.kubernetes.io/worker-rt=</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>worker</code> と <code>worker-rt</code> の両方のロールを選択するマシン設定プールを作成します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfigPool
+metadata:
+  name: worker-rt
+  labels:
+    machineconfiguration.openshift.io/role: worker-rt
+spec:
+  machineConfigSelector:
+    matchExpressions:
+    - key: machineconfiguration.openshift.io/role
+      operator: In
+      values:
+      - worker
+      - worker-rt
+  nodeSelector:
+    matchLabels:
+      node-role.kubernetes.io/worker-rt: ""
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プールが作成され、ノードがリストされていることを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get mcp worker-rt</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>NAME        CONFIG   UPDATED   UPDATING   DEGRADED   MACHINECOUNT   READYMACHINECOUNT
+worker-rt            True      False      False      1              1</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_2_パフォーマンスプロファイルの適用"><a class="anchor" href="#_ステップ_2_パフォーマンスプロファイルの適用"></a>ステップ 2: パフォーマンスプロファイルの適用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>パフォーマンスプロファイルリソースは、ノードチューニングオペレーターを構成して、次のことを行います:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>リアルタイムカーネル (<code>kernel-rt</code>) のインストール</p>
+</li>
+<li>
+<p>2-7 の CPU をワークロード用に隔離 (これらの CPU 上にカーネルスレッドや IRQ がスケジュールされない)</p>
+</li>
+<li>
+<p>0-1 の CPU をシステムサービス用に予約</p>
+</li>
+<li>
+<p>4 個の 1Gi ハイパーページの事前割り当て</p>
+</li>
+<li>
+<p>遅延を最小限に抑えるためのカーネルブートパラメーターの適用</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><a href="_attachments/realtime-vms/performance-profile.yaml" class="xref attachment">performance-profile.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: performance.openshift.io/v2
+kind: PerformanceProfile
+metadata:
+  name: realtime-workers
+spec:
+  cpu:
+    isolated: "2-7"
+    reserved: "0-1"
+  hugepages:
+    defaultHugepagesSize: 1G
+    pages:
+    - size: 1G
+      count: 4
+  realTimeKernel:
+    enabled: true
+  additionalKernelArgs:
+  - nmi_watchdog=0
+  - audit=0
+  - mce=off
+  - processor.max_cstate=1
+  - idle=poll
+  - intel_idle.max_cstate=0
+  nodeSelector:
+    node-role.kubernetes.io/worker-rt: ""
+  machineConfigPoolSelector:
+    machineconfiguration.openshift.io/role: worker-rt
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>注: 単一ノード OpenShift (SNO) の場合、ステップ 1 で作成するマシン設定プールをスキップします。代わりに、<code>nodeSelector</code> を <code>node-role.kubernetes.io/master: ""</code> に、<code>machineConfigPoolSelector</code> を <code>pools.operator.machineconfiguration.openshift.io/master: ""</code> に設定します。これにより、既存のマスタープールを直接ターゲットにします。<code>machineConfigPoolSelector</code> は、MCP の自身の <code>metadata.labels</code> にあるラベルと一致する必要があります。MCP の内部的に使用する <code>machineConfigSelector</code> では一致する必要はありません。まだ、<code>worker-rt</code> ロールラベル (ステップ 1 で <code>oc label node &lt;node-name&gt; node-role.kubernetes.io/worker-rt=</code> を実行する必要があります)。VM 仕様がこのラベルを使用するためです。</p>
+</div>
+<div class="paragraph">
+<p>重要: パフォーマンスプロファイル API は、SI 単位 (<code>1G</code>, <code>2M</code>) を使用してハイパーページサイズを表現します (<code>1Gi</code>, <code>2Mi</code>)。これは、VM 仕様で使用される Kubernetes リソース構文 (使用される <code>1Gi</code> と <code>2Mi</code>) とは異なります。</p>
+</div>
+<div class="paragraph">
+<p>パフォーマンスプロファイルは、いくつかの基礎となるリソースを生成します: <code>Tuned</code> プロファイル、カーネル引数用の <code>MachineConfig</code>、CPU マネージャー設定用の <code>KubeletConfig</code>。その後、マシン設定オペレーターはターゲットノードを再起動します。</p>
+</div>
+<div class="paragraph">
+<p>警告: パフォーマンスプロファイルを適用すると、RT カーネルをインストールし、カーネルパラメーターを適用するためにターゲットノードを再起動します。影響を受けるノードでのダウンタイムを計画してください。</p>
+</div>
+<div class="paragraph">
+<p>ロールアウトを監視します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get mcp worker-rt -w</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>SNO の場合、マスタープールを監視します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get mcp master -w</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>UPDATED</code> が <code>True</code> で、<code>READYMACHINECOUNT</code> が <code>MACHINECOUNT</code> と一致するまで待ちます。これは、RT カーネルをダウンロードし、再起動し、クラスターに再参加するのに 10-20 分かかる場合があります。MCP は、再起動が完了した後も <code>UPDATING: True</code> 状態を維持し、ノードが構成を再調整し、クラスターに準備状態を報告するのに時間がかかります。ロールアウトが完全に完了する前に進めないでください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_3_リアルタイムノードの準備ができたことの確認"><a class="anchor" href="#_ステップ_3_リアルタイムノードの準備ができたことの確認"></a>ステップ 3: リアルタイムノードの準備ができたことの確認</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>マシン設定プールのロールアウトが完了した後、ノード構成を確認します。</p>
+</div>
+<div class="paragraph">
+<p>カーネルバージョンを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc debug node/&lt;node-name&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デバッグシェル内で:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">chroot /host uname -r</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>カーネルバージョンには <code>rt</code> が含まれている必要があります。例えば:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>5.14.0-427.55.1.el9_4.x86_64+rt</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CPU 隔離が構成されていることを確認するために、カーネルブートパラメーターを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">chroot /host cat /proc/cmdline | grep -o 'isolcpus=managed_irq,[^ ]*'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>isolcpus=managed_irq,2-7</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>隔離された CPU でのノイズレス (nohz) モードがアクティブであることを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">chroot /host cat /sys/devices/system/cpu/nohz_full</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>PerformanceProfile で指定されたものと一致する予期される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>2-7</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デフォルトの IRQ 割り当てマスクを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">chroot /host cat /proc/irq/default_smp_affinity</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>managed_irq</code> モードでは、割り当てマスクがすべての CPU を示す可能性があります。IRQ ステアリングは、<code>irqbalance</code> ヒントによって動的に処理されるため、静的割り当てマスクではありません。</p>
+</div>
+<div class="paragraph">
+<p>ハイパーページ割り当てを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">chroot /host grep -i hugepages /proc/meminfo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>要求されたカウント (1Gi ページの場合: 4) と一致する <code>HugePages_Total</code> を確認します。</p>
+</div>
+<div class="paragraph">
+<p><code>kubevirt.io/realtime</code> ラベルが存在することを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">exit</code></pre>
+</div>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get node &lt;node-name&gt; -L kubevirt.io/realtime</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>KubeVirt は、<code>kernel.sched_rt_runtime_us</code> が -1 (リアルタイムスケジューリングを制限なしで) に設定されているノードに <code>kubevirt.io/realtime</code> ラベルを自動的に付け加えます。ラベルが欠落している場合は、設定を確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc debug node/&lt;node-name&gt; -- chroot /host sysctl kernel.sched_rt_runtime_us</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>kernel.sched_rt_runtime_us = -1</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_4_ネットワークを作成"><a class="anchor" href="#_ステップ_4_ネットワークを作成"></a>ステップ 4: ネットワークを作成</h2>
+<div class="sectionbody">
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc create namespace realtime-demo</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_5_リアルタイム仮想マシンのデプロイ"><a class="anchor" href="#_ステップ_5_リアルタイム仮想マシンのデプロイ"></a>ステップ 5: リアルタイム仮想マシンのデプロイ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>以下の仮想マシンマニフェストは、すべてのリアルタイムチューニング層を組み合わせています。標準の Fedora コンテナディスクを使用します。目的構築された RT ゲストイメージ (リアルタイムカーネルを搭載) は、最適な結果を提供しますが、標準のイメージは、ホスト側の構成を示すためおよび検証するために十分です。</p>
+</div>
+<div class="paragraph">
+<p>重要な構成フィールド:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>cpu.model: host-passthrough</code>&#8201;&#8212;&#8201;ゲストにすべてのホスト CPU 機能を公開し、マスクしません</p>
+</li>
+<li>
+<p><code>cpu.dedicatedCpuPlacement: true</code>&#8201;&#8212;&#8201;vCPU を隔離された物理 CPU にピン固定します</p>
+</li>
+<li>
+<p><code>cpu.isolateEmulatorThread: true</code>&#8201;&#8212;&#8201;QEMU エミュレータースレッドに専用の CPU を予約します</p>
+</li>
+<li>
+<p><code>cpu.ioThreadsPolicy: auto</code>&#8201;&#8212;&#8201;I/O スレッドをエミュレータースレッドと共に配置します</p>
+</li>
+<li>
+<p><code>cpu.numa.guestMappingPassthrough: {}</code>&#8201;&#8212;&#8201;ホスト NUMA トポロジーをゲストにパススルーします</p>
+</li>
+<li>
+<p><code>cpu.realtime.mask: "0"</code>&#8201;&#8212;&#8201;vCPU 0 を SCHED_FIFO スケジューリングに構成し、ハウスキーピングタスクを処理する vCPU 1 をデフォルトスケジューリングに残します</p>
+</li>
+<li>
+<p><code>memory.hugepages.pageSize: 1Gi</code>&#8201;&#8212;&#8201;1Gi ハイパーページプールからメモリーを割り当てます</p>
+</li>
+<li>
+<p><code>autoattachMemBalloon: false</code>&#8201;&#8212;&#8201;バルーンデバイスを無効にして、メモリー管理中の中断を避けます</p>
+</li>
+<li>
+<p><code>autoattachGraphicsDevice: false</code>&#8201;&#8212;&#8201;グラフィックスデバイスを無効にして、中断源を減らします</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>注意: この例のクラウドインイメージのパスワードは、デモ目的でのみ使用されます。実稼働環境では、SSH キー認証または強力で一意のパスワードを使用してください。</p>
+</div>
+<div class="paragraph">
+<p><a href="_attachments/realtime-vms/vm-realtime.yaml" class="xref attachment">vm-realtime.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vm-realtime
+  namespace: realtime-demo
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: vm-realtime
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/worker-rt: ""
+      domain:
+        cpu:
+          model: host-passthrough
+          sockets: 1
+          cores: 2
+          threads: 1
+          dedicatedCpuPlacement: true
+          isolateEmulatorThread: true
+          ioThreadsPolicy: auto
+          numa:
+            guestMappingPassthrough: {}
+          realtime:
+            mask: "0"
+        memory:
+          hugepages:
+            pageSize: 1Gi
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: 2
+          limits:
+            memory: 2Gi
+            cpu: 2
+        devices:
+          autoattachSerialConsole: true
+          autoattachMemBalloon: false
+          autoattachGraphicsDevice: false
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+      networks:
+      - name: default
+        pod: {}
+      terminationGracePeriodSeconds: 0
+      volumes:
+      - name: rootdisk
+        containerDisk:
+          image: quay.io/containerdisks/fedora:latest
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            password: redhat
+            chpasswd:
+              expire: false
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>実行中の状態に到達するまで待ちます:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vm vm-realtime -n realtime-demo -w</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>NAME          AGE   STATUS    READY
+vm-realtime   90s   Running   True</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>注: VM は、<code>kubevirt.io/realtime</code> と <code>cpumanager=true</code> のラベルを持つノードにのみスケジュールされます。KubeVirt は、VM 仕様で <code>realtime</code> を指定すると、これらのセレクターを自動的に追加します。VM が <code>Scheduling</code> 状態に残る場合は、ターゲットノードが両方のラベルを持っているかを確認してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_6_ホスト上のリアルタイムチューニングの確認"><a class="anchor" href="#_ステップ_6_ホスト上のリアルタイムチューニングの確認"></a>ステップ 6: ホスト上のリアルタイムチューニングの確認</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpu_固定の確認"><a class="anchor" href="#_cpu_固定の確認"></a>CPU 固定の確認</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>実行中の VM のノードを見つけます:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vmi vm-realtime -n realtime-demo -o wide</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そのノードでデバッグセッションを開きます:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc debug node/&lt;node-name&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CPU マネージャーの状態を確認して、割り当てられた物理 CPU を確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">chroot /host cat /var/lib/kubelet/cpu_manager_state</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>entries</code> マップは、<code>compute</code> コンテナーに 2 vCPU ID プラス 1 エミュレータースレッド CPU (3 つの総数) を示す必要があります。すべての割り当てされた CPU は、PerformanceProfile で指定された隔離範囲内 (2-7) にある必要があります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ハイパーページの確認"><a class="anchor" href="#_ハイパーページの確認"></a>ハイパーページの確認</h2>
+<div class="sectionbody">
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">chroot /host grep HugePages /proc/meminfo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>VM が 2 ページ (2Gi VM および 1Gi ハイパーページ) を消費した場合、<code>HugePages_Free</code> は <code>HugePages_Total</code> より少なくなければなりません。</p>
+</div>
+<div class="paragraph">
+<p>注: <code>guestMappingPassthrough</code> を使用する場合、各 NUMA ノードで vCPU がスケジュールされる場合にハイパーページが利用可能であることを確認してください。PerformanceProfile がハイパーページを NUMA ノード間で均等に配分する場合、要求されたメモリーの量が単一のノードの割り当て量を超えると、割り当てに失敗する可能性があります。VM のメモリー要求量は、各 NUMA ノードのハイパーページ割り当ての割り当て量と同じに保つ必要があります。</p>
+</div>
+<div class="paragraph">
+<p>デバッグシェルを終了します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">exit</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_7_vm_内のリアルタイム構成の確認"><a class="anchor" href="#_ステップ_7_vm_内のリアルタイム構成の確認"></a>ステップ 7: VM 内のリアルタイム構成の確認</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>コンソールに接続します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl console vm-realtime -n realtime-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>fedora</code> ユーザーとして <code>redhat</code> パスワードでログインします。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_カーネルタイプの確認"><a class="anchor" href="#_カーネルタイプの確認"></a>カーネルタイプの確認</h2>
+<div class="sectionbody">
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">uname -r</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ゲストが標準カーネル ( <code>rt</code> シフィックスがない) を実行している場合、ホストレベルで vCPU のリアルタイムスケジューリングはまだアクティブです。目的構築されたゲストイメージに RT カーネルを搭載することで、追加のイングストレス予約が提供され、生産ワークロードのための推奨事項です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpu_コアの確認"><a class="anchor" href="#_cpu_コアの確認"></a>CPU コアの確認</h2>
+<div class="sectionbody">
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">lscpu | grep -E "^CPU\(s\)|^Socket|^Core|^Thread"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>CPU(s):                  2
+Thread(s) per core:      1
+Core(s) per socket:      2
+Socket(s):               1</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_スケジューリングポリシーの確認_ホストの視点"><a class="anchor" href="#_スケジューリングポリシーの確認_ホストの視点"></a>スケジューリングポリシーの確認 (ホストの視点)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ゲストコンソールから離脱します (<code>Ctrl+]</code>)。</p>
+</div>
+<div class="paragraph">
+<p>ホストレベルのリアルタイムスケジューリングは、KubeVirt が QEMU vCPU スレッドで構成されます。これをホストデバッグセッションで確認できます。VM のノードでデバッグセッションを開きます:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc debug node/&lt;node-name&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>QEMU プロセス ID を見つけます:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">chroot /host pgrep qemu-kvm</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>その PID を使用して、そのプロセスのすべてのスレッドを表示します ( <code>&lt;qemu-pid&gt;</code> を前のコマンドからの PID に置き換えます):</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">chroot /host ps -T -o tid,cls,rtprio,comm -p &lt;qemu-pid&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>    TID CLS RTPRIO COMMAND
+  70898  TS      - qemu-kvm
+  70900  TS      - call_rcu
+  70901  TS      - TC tc-ram-node0
+  70941  TS      - IO mon_iothread
+  70942  FF      1 CPU 0/KVM
+  70943  TS      - CPU 1/KVM</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>CLS</code> 列は、スケジューリングクラスを示します: <code>FF</code> は <code>SCHED_FIFO</code>、<code>TS</code> は <code>SCHED_OTHER</code> です。<code>RTPRIO</code> 列は、リアルタイム優先度を示します。スレッド <code>CPU 0/KVM</code> は <code>FF</code> で優先度 <code>1</code> を示し、<code>realtime.mask: "0"</code> で指定されたように <code>SCHED_FIFO</code> でスケジュールされていることを確認します。スレッド <code>CPU 1/KVM</code> は <code>TS</code> を示し、ハウスキーピングタスクのためにデフォルトスケジューリングに残されていることを確認します。</p>
+</div>
+<div class="paragraph">
+<p>デバッグシェルを終了します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">exit</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_8_ラテンシーの測定とベースラインの設定"><a class="anchor" href="#_ステップ_8_ラテンシーの測定とベースラインの設定"></a>ステップ 8: ラテンシーの測定とベースラインの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>正しいラテンシーベースラインを得るために、<code>cyclictest</code> は標準的なツールです。これは、リアルタイムスレッドの最悪の起動遅延を測定します。</p>
+</div>
+<div class="paragraph">
+<p>コンソールに接続します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl console vm-realtime -n realtime-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ログインし、 <code>realtime-tests</code> ( <code>cyclictest</code> を提供) をインストールします:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">sudo dnf install -y realtime-tests</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>3 つのスレッドで 60 秒間の短い <code>cyclictest</code> を実行して、ラテンシーを測定します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">sudo cyclictest --mlockall --smp --priority=80 --interval=200 --distance=0 --duration=60</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>例出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre># /dev/cpu_dma_latency set to 0us
+policy: fifo: loadavg: 0.92 0.42 0.18 1/148 1599
+
+T: 0 ( 1597) P:80 I:200 C: 156868 Min:      3 Act:    5 Avg:  191 Max:    9501
+T: 1 ( 1598) P:80 I:200 C: 277750 Min:      3 Act:    7 Avg:   36 Max:    1406</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Max</code> 列は、マイクロ秒単位での最悪の遅延を示します。ゲスト内の標準カーネル ( <code>rt</code> シフィックスがない) を実行している場合、ゲスト内のスケジューリングが予測不可能な予約なしで実行されているため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハンドル中断がないため、ハ</p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="numa-hugepages.html">NUMA とヒュージページ</a></span>
+  <span class="next"><a href="../vm-lifecycle/index.html">VM ライフサイクル管理</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

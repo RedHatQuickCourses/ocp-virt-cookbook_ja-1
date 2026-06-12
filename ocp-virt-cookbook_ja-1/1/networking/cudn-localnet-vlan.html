@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>クラスター用定義されたネットワーク (CUDN) を使用した OpenShift ビジュアライゼーションのローカルネットワーク VLAN の設定 :: OpenShift Virtualization cookbook</title>
+    <link rel="prev" href="localnet-vlan.html">
+    <link rel="next" href="layer2-secondary.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">OpenShift Virtualization cookbook</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/ocp-virt-cookbook_ja/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja-1" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../getting-started/index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../storage/index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="static-ip-configuration.html">静的IP構成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="cloud-init-troubleshooting.html">クラウドインィット トラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="udn-primary-networks.html">UDN プライマリーネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="localnet-secondary.html">CUDN を使用したローカルネット 2 番目のネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="localnet-vlan.html">VLAN を使用した NAD を使用したローカルネットワークのセカンダリーネットワークの構成</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="cudn-localnet-vlan.html">CUDN を使用したローカルネットワーク VLAN</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="layer2-secondary.html">2層セカンダリネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="linux-bridges.html">Linux ブリッジ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="sriov-secondary.html">SR-IOV 二次ネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="vm-ingress-routes.html">VM イングレスとルート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ovs-bridge-troubleshooting.html">ローカルネットワークのトラブルシューティング</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-configuration/index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/internal-dns-for-vms.html">VM の内部 DNS</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-vms.html">リモートアクセスを通じたLinux VMへのアクセス</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-troubleshooting.html">リモートアクセスのLinux VMのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-windows-vms.html">RDP を介した Windows VM へのリモートアクセス</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/windows-vm-virtio-drivers.html">Windows VMs with VirtIO Drivers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/infrastructure-node-placement.html">インフラストラクチャーノード配置</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/node-placement-affinity.html">ノード配置とアフィニティ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/hotplug-volumes-interfaces.html">ボットプラグボリュームとインターフェース</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/vm-templates.html">仮想マシンテンプレート</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/resource-limits-qos.html">リソース制限とQoS</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/cpu-pinning.html">仮想マシン用専用CPU配置</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/numa-hugepages.html">NUMA とヒュージページ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/realtime-vms.html">リアルタイム VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">Glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="index.html">ネットワーク構成</a></li>
+    <li><a href="cudn-localnet-vlan.html">CUDN を使用したローカルネットワーク VLAN</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">クラスター用定義されたネットワーク (CUDN) を使用した OpenShift ビジュアライゼーションのローカルネットワーク VLAN の設定</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルでは、OpenShift ビジュアライゼーションのクラスター用定義されたネットワーク (CUDN) を使用してローカルネットワーク VLAN を設定する方法を示します。このアプローチにより、VLAN セグメンテーションを複数の名前空間で実行し、仮想マシン (VM) が特定の VLAN タグ付きネットワークに直接アクセスできるようになり、ポッドネットワーク接続を維持します。CUDN は、中央集権的な管理と名前空間間のネットワーク可用性を提供し、VLAN ベースのネットワークインフラストラクチャーを必要とするエンタープライズ環境に適しています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><strong>NMState Operator</strong>: クラスター内でインストールおよび実行されている必要があります</p>
+</li>
+<li>
+<p><strong>NMState CR</strong>: オペレーターが実行されている後に nmstate インスタンスを作成する必要があります</p>
+</li>
+<li>
+<p><strong>ワーカーノード</strong>: ブリッジマッピングがワーカーノードに適用されます</p>
+</li>
+<li>
+<p><strong>VLAN インフラストラクチャー</strong>: 物理ネットワークインフラストラクチャーが VLAN タグ付けをサポートする必要があります</p>
+</li>
+<li>
+<p><strong>スイッチ構成</strong>: OpenShift ワーカーノードに接続されている物理スイッチポートが <strong>トランク モード</strong> で構成されている必要があります。これにより、複数の VLAN タグ付きトラフィックストリームを処理できます</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>テスト済みバージョン:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>OpenShift 4.19</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ネットワーク構成要件"><a class="anchor" href="#_ネットワーク構成要件"></a>ネットワーク構成要件</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_物理スイッチ構成_トランク_モード"><a class="anchor" href="#_物理スイッチ構成_トランク_モード"></a>物理スイッチ構成: トランク モード</h3>
+<div class="paragraph">
+<p>OpenShift ワーカーノードに接続されている物理スイッチポートは、ローカルネットワーク VLAN の設定が正しく動作するために <strong>トランク モード</strong> で構成する必要があります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>トランク モード</strong>: スイッチポートが複数の VLAN のトラフィックを運ぶことを許可します</p>
+</li>
+<li>
+<p><strong>VLAN タグ付け</strong>: 各 VLAN は、一意の VLAN ID (例: 100、200、300) で識別されます</p>
+</li>
+<li>
+<p><strong>複数のネットワーク</strong>: 複数の VLAN ベースのセカンダリー ネットワークをサポートするために不可欠です</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_1_vm_名前空間の作成"><a class="anchor" href="#_ステップ_1_vm_名前空間の作成"></a>ステップ 1: VM 名前空間の作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ローカルネットワーク VLAN 設定を使用する VM に対して名前空間を作成します。CUDN は、同じネットワークを複数の名前空間で使用できるようにします。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 最初の名前空間の作成
+oc apply -f - &lt;&lt;EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vm-guests-vlan-prod
+EOF
+
+# 2 番目の名前空間の作成
+oc apply -f - &lt;&lt;EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vm-guests-vlan-dev
+EOF</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_2_追加の_nic_上のカスタム_ovs_ブリッジの作成"><a class="anchor" href="#_ステップ_2_追加の_nic_上のカスタム_ovs_ブリッジの作成"></a>ステップ 2: 追加の NIC 上のカスタム OVS ブリッジの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、追加の物理ネットワークインターフェース (NIC) 上にカスタム OVS ブリッジを作成して、VLAN トラフィックを主クラスター ネットワークから分離します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: br-vlan-creation
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/worker: ''
+  desiredState:
+    interfaces:
+    - name: enp11s0f0np0  # 物理インターフェース名を置き換えてください
+      type: ethernet
+      state: up
+      ipv4:
+        enabled: false
+      ipv6:
+        enabled: false
+      description: "VLAN ローカルネットワーク用の物理インターフェース"
+    - name: br-vlan
+      type: ovs-bridge
+      state: up
+      bridge:
+        port:
+        - name: enp11s0f0np0
+      description: "VLAN トラフィック用の OVS ブリッジ"
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>注: <code>enp11s0f0np0</code> を、実際の追加物理インターフェース名に置き換えてください。利用可能なインターフェースを見つけるには、以下のコマンドを実行できます:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc debug node/&lt;node-name&gt; -- ip link show</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ブリッジの作成を確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get nncp br-vlan-creation
+# 期待される出力: STATUS: Available</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_3_ブリッジマッピングの構成"><a class="anchor" href="#_ステップ_3_ブリッジマッピングの構成"></a>ステップ 3: ブリッジマッピングの構成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ローカルネットワーク VLAN 設定で、logical network interface name <code>localnet-vlan</code> を <code>br-vlan</code> OVS ブリッジにマッピングします。このマッピングは、OVN-Kubernetes が VLAN サポートを持つローカルネットワーク トラフィックを処理する物理ブリッジ インターフェースを示します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: cudn-localnet-vlan-bridge-mapping
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/worker: ''
+  desiredState:
+    ovn:
+      bridge-mappings:
+      - localnet: localnet-vlan
+        bridge: br-vlan
+        state: present
+EOF</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_4_vlan_を持つ_cudn_の作成"><a class="anchor" href="#_ステップ_4_vlan_を持つ_cudn_の作成"></a>ステップ 4: VLAN を持つ CUDN の作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>複数の名前空間でローカルネットワーク トポロジーを設定し、VLAN タグ付けを持つセカンダリー ネットワーク接続を可能にする ClusterUserDefinedNetwork を作成します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: k8s.ovn.org/v1
+kind: ClusterUserDefinedNetwork
+metadata:
+  name: cudn-localnet-vlan-100
+spec:
+  namespaceSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values: ["vm-guests-vlan-prod", "vm-guests-vlan-dev"]
+  network:
+    topology: Localnet
+    localnet:
+      role: Secondary
+      physicalNetworkName: localnet-vlan
+      vlanID: 100
+      ipam:
+        mode: Disabled
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>構成詳細</strong>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>vlanID: 100</code>: ネットワーク セグメンテーションに VLAN タグ 100 を指定します</p>
+</li>
+<li>
+<p><code>physicalNetworkName</code>: ブリッジ マッピングの logical network interface name (<code>localnet-vlan</code>) を参照します</p>
+</li>
+<li>
+<p><code>role: Secondary</code>: このネットワークをセカンダリー ネットワークとして定義します (VM はポッド ネットワークを主ネットワークとして維持します)</p>
+</li>
+<li>
+<p><code>namespaceSelector</code>: このネットワークを使用できる名前空間を指定します</p>
+</li>
+<li>
+<p><strong>IPAM 無効</strong>: 静的 IP アドレスは、cloud-init (静的) または外部 DHCP サーバーによって構成する必要があります</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_5_vlan_ネットワーク接続と静的_ip_を持つ_vm_のデプロイ"><a class="anchor" href="#_ステップ_5_vlan_ネットワーク接続と静的_ip_を持つ_vm_のデプロイ"></a>ステップ 5: VLAN ネットワーク接続と静的 IP を持つ VM のデプロイ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>1 つの名前空間で、pod ネットワークと VLAN タグ付けされたセカンダリー ネットワークに接続できる VM を作成します。</p>
+</div>
+<div class="paragraph">
+<p>警告: この例の cloud-init パスワードは、デモのためのものです。実際の環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fedora-cudn-vlan-vm
+  namespace: vm-guests-vlan-prod
+  labels:
+    app: fedora-cudn-vlan-vm
+spec:
+  runStrategy: Always
+  dataVolumeTemplates:
+  - metadata:
+      name: fedora-cudn-vlan-volume
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 33Gi
+      sourceRef:
+        kind: DataSource
+        name: fedora
+        namespace: openshift-virtualization-os-images
+  template:
+    metadata:
+      labels:
+        app: fedora-cudn-vlan-vm
+    spec:
+      domain:
+        devices:
+          disks:
+          - name: datavolumedisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            bridge: {}
+          - name: cudn_vlan_network
+            bridge: {}
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: 1
+      networks:
+      - name: default
+        pod: {}
+      - name: cudn_vlan_network
+        multus:
+          networkName: cudn-localnet-vlan-100
+      volumes:
+      - name: datavolumedisk
+        dataVolume:
+          name: fedora-cudn-vlan-volume
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          networkData: |
+            version: 2
+            ethernets:
+              enp2s0:
+                addresses: ["192.168.100.10/24"]
+          userData: |
+            #cloud-config
+            user: fedora
+            password: fedora
+            chpasswd: { expire: False }
+            packages:
+            - python3
+            - tcpdump
+            - net-tools
+            write_files:
+            - path: /root/index.html
+              content: |
+                &lt;h1&gt;OpenShift ビジュアライゼーションの CUDN VLAN ネットワークへようこそ!&lt;/h1&gt;
+                &lt;p&gt;VLAN ID: 100&lt;/p&gt;
+                &lt;p&gt;静的 IP: 192.168.100.10/24&lt;/p&gt;
+                &lt;p&gt;ネットワーク: CUDN ローカルネットワーク&lt;/p&gt;
+                &lt;p&gt;名前空間: vm-guests-vlan-prod&lt;/p&gt;
+              permissions: '0644'
+            runcmd:
+            - nohup python3 -m http.server 8080 --directory /root &gt; /dev/null 2&gt;&amp;1 &amp;
+EOF</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_6_2_番目の名前空間で_vm_のデプロイ"><a class="anchor" href="#_ステップ_6_2_番目の名前空間で_vm_のデプロイ"></a>ステップ 6: 2 番目の名前空間で VM のデプロイ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>異なる名前空間間でネットワーク接続が可能であることを示すために、2 番目の名前空間で同じ CUDN を使用して異なる静的 IP を持つ VM を作成します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fedora-cudn-vlan-vm-dev
+  namespace: vm-guests-vlan-dev
+  labels:
+    app: fedora-cudn-vlan-vm-dev
+spec:
+  runStrategy: Always
+  dataVolumeTemplates:
+  - metadata:
+      name: fedora-cudn-vlan-volume-dev
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 33Gi
+      sourceRef:
+        kind: DataSource
+        name: fedora
+        namespace: openshift-virtualization-os-images
+  template:
+    metadata:
+      labels:
+        app: fedora-cudn-vlan-vm-dev
+    spec:
+      domain:
+        devices:
+          disks:
+          - name: datavolumedisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            bridge: {}
+          - name: cudn_vlan_network
+            bridge: {}
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: 1
+      networks:
+      - name: default
+        pod: {}
+      - name: cudn_vlan_network
+        multus:
+          networkName: cudn-localnet-vlan-100
+      volumes:
+      - name: datavolumedisk
+        dataVolume:
+          name: fedora-cudn-vlan-volume-dev
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          networkData: |
+            version: 2
+            ethernets:
+              enp2s0:
+                addresses: ["192.168.100.20/24"]
+          userData: |
+            #cloud-config
+            user: fedora
+            password: fedora
+            chpasswd: { expire: False }
+            packages:
+            - python3
+            - tcpdump
+            - net-tools
+            write_files:
+            - path: /root/index.html
+              content: |
+                &lt;h1&gt;OpenShift ビジュアライゼーションの CUDN VLAN ネットワークへようこそ!&lt;/h1&gt;
+                &lt;p&gt;VLAN ID: 100&lt;/p&gt;
+                &lt;p&gt;静的 IP: 192.168.100.20/24&lt;/p&gt;
+                &lt;p&gt;ネットワーク: CUDN ローカルネットワーク&lt;/p&gt;
+                &lt;p&gt;名前空間: vm-guests-vlan-dev&lt;/p&gt;
+              permissions: '0644'
+            runcmd:
+            - nohup python3 -m http.server 8080 --directory /root &gt; /dev/null 2&gt;&amp;1 &amp;
+EOF</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_7_vlan_ネットワーク接続の検証"><a class="anchor" href="#_ステップ_7_vlan_ネットワーク接続の検証"></a>ステップ 7: VLAN ネットワーク接続の検証</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>VM コンソールにアクセスして、VLAN 設定を持った双方向ネットワーク接続を検証します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 生産名前空間の VM の確認
+oc get vm -n vm-guests-vlan-prod
+oc get vmi -n vm-guests-vlan-prod
+
+# 開発名前空間の VM の確認
+oc get vm -n vm-guests-vlan-dev
+oc get vmi -n vm-guests-vlan-dev
+
+# 生産名前空間の VM コンソール (cloud-init 認証情報: fedora/fedora) にアクセス
+virtctl console -n vm-guests-vlan-prod fedora-cudn-vlan-vm
+
+# 開発名前空間の VM コンソール (cloud-init 認証情報: fedora/fedora) にアクセス
+virtctl console -n vm-guests-vlan-dev fedora-cudn-vlan-vm-dev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>各 VM コンソール内で、VLAN ネットワーク構成を検証します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 主ネットワーク (DHCP を使用した) とセカンダリー ネットワーク (VLAN ネットワーク) のネットワーク インターフェースを確認
+ip addr show
+
+# ルートを確認
+ip route show
+
+# 期待される出力例 (DHCP を使用した主ネットワーク):
+default via 10.128.0.1 dev enp1s0 proto dhcp src 10.128.0.174 metric 100
+
+# 外部接続をテスト
+ping 8.8.8.8
+
+# Web サービスが実行中であることを確認
+curl localhost:8080
+
+# VLAN インターフェースでの静的 IP 割り当ての確認
+ip addr show enp2s0
+# 期待される出力: inet 192.168.100.10/24 (生産) または 192.168.100.20/24 (開発)
+
+# VM 間の VLAN インターフェース接続をテスト
+# 生産 VM (192.168.100.10) から開発 VM に ping:
+ping 192.168.100.20
+
+# tcpdump が利用可能な場合は、VLAN-tagged トラフィックを確認 (セカンダリー インターフェース)
+sudo tcpdump -i enp2s0 -nn vlan 100</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_名前空間間の接続をテスト"><a class="anchor" href="#_名前空間間の接続をテスト"></a>名前空間間の接続をテスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>異なる名前空間間で VM が共有された CUDN VLAN ネットワークを介して通信できるかどうかを検証します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 生産 VM (192.168.100.10) から開発 VM に接続をテスト
+ping 192.168.100.20
+
+# 名前空間間で Web サービス接続をテスト
+curl 192.168.100.20:8080
+
+# 開発 VM (192.168.100.20) から生産 VM に接続をテスト
+ping 192.168.100.10
+curl 192.168.100.10:8080</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_トラブルシューティング"><a class="anchor" href="#_トラブルシューティング"></a>トラブルシューティング</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OVS ブリッジおよびブリッジマッピングのトラブルシューティング、および CUDN 固有の検証手順については、<a href="ovs-bridge-troubleshooting.html#_clusteruserdefinednetwork_cudn_verification" class="xref page">OVS ブリッジ検証トラブルシューティング ガイド</a> を参照してください。</p>
+</div>
+<div class="sect2">
+<h3 id="_一般的な問題"><a class="anchor" href="#_一般的な問題"></a>一般的な問題</h3>
+<div class="sect3">
+<h4 id="_vlan_トラフィックが_vm_に到達しない"><a class="anchor" href="#_vlan_トラフィックが_vm_に到達しない"></a>VLAN トラフィックが VM に到達しない</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>物理スイッチ構成が VLAN タグ付けをサポートしていることを確認してください</p>
+</li>
+<li>
+<p>ワーカーノード上のブリッジマッピング構成を確認してください</p>
+</li>
+<li>
+<p>VLAN ID がネットワークインフラストラクチャーと一致していることを確認してください</p>
+</li>
+<li>
+<p>カスタム OVS ブリッジ (<code>br-vlan</code>) が作成されていることを確認してください: <code>oc get nncp br-vlan-creation</code></p>
+</li>
+<li>
+<p>物理インターフェースがブリッジに接続されていることを確認してください</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ip_アドレス割り当ての問題"><a class="anchor" href="#_ip_アドレス割り当ての問題"></a>IP アドレス割り当ての問題</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>cloud-init networkData で静的 IP が正しく構成されていることを確認してください</p>
+</li>
+<li>
+<p>インターフェース名が一致していることを確認してください (2 番目のインターフェースの場合: enp2s0)</p>
+</li>
+<li>
+<p>VM 内の cloud-init ログを確認してください: <code>cat /var/log/cloud-init.log</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ネットワーク接続の問題"><a class="anchor" href="#_ネットワーク接続の問題"></a>ネットワーク接続の問題</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>物理ネットワークが構成された VLAN をサポートしていることを確認してください</p>
+</li>
+<li>
+<p>物理ネットワークから VLAN サブネットへの接続をテストしてください</p>
+</li>
+<li>
+<p>物理スイッチポートがトランク モードであることを確認してください</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_名前空間間の問題"><a class="anchor" href="#_名前空間間の問題"></a>名前空間間の問題</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>CUDN 設定の名前空間セレクターを確認してください</p>
+</li>
+<li>
+<p>両名前空間が値の配列にリストされていることを確認してください</p>
+</li>
+<li>
+<p>NAD がターゲット名前空間で自動作成されていることを確認してください</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_cudn_固有の問題"><a class="anchor" href="#_cudn_固有の問題"></a>CUDN 固有の問題</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>CUDN の <code>physicalNetworkName</code> がブリッジマッピングの logical name (<code>localnet-vlan</code>) と一致していることを確認してください</p>
+</li>
+<li>
+<p>選択された名前空間で CUDN が作成された NAD を確認してください: <code>oc get network-attachment-definitions -A | grep cudn-localnet-vlan-100</code></p>
+</li>
+<li>
+<p>IPAM モードが正しく (<code>Disabled</code> で静的 IP を cloud-init によって構成する) 設定されていることを確認してください</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_検証コマンド"><a class="anchor" href="#_検証コマンド"></a>検証コマンド</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># ClusterUserDefinedNetwork の状態を確認
+oc get clusteruserdefinednetwork
+
+# ワーカーノード上のブリッジマッピングを確認
+oc get nncp cudn-localnet-vlan-bridge-mapping -o yaml
+
+# 両名前空間で VM のネットワーク状態を確認
+oc get vmi -n vm-guests-vlan-prod -o yaml | grep -A 10 networks
+oc get vmi -n vm-guests-vlan-dev -o yaml | grep -A 10 networks
+
+# OVN-Kubernetes のログを確認してトラブルシューティングを行う
+oc logs -n openshift-ovn-kubernetes -l app=ovnkube-node
+
+# 名前空間間で CUDN ネットワーク 接続を確認
+oc get network-attachment-definitions -A | grep cudn-localnet-vlan-100</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cudn_と_networkattachmentdefinition_の比較"><a class="anchor" href="#_cudn_と_networkattachmentdefinition_の比較"></a>CUDN と NetworkAttachmentDefinition の比較</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">機能</th>
+<th class="tableblock halign-left valign-top">CUDN</th>
+<th class="tableblock halign-left valign-top">NetworkAttachmentDefinition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>範囲</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クラスター全体、複数の名前空間</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">名前空間固有</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>管理</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">中央集権的な構成</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">名前空間ごとの構成</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>VLAN サポート</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ネイティブ vlanID パラメーター</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ネイティブ vlanID パラメーター</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>IP 管理</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">静的/無効モード</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">静的/DHCP (IPAM を使用する)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>使用例</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エンタープライズ、一貫したネットワーク</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">アプリケーション固有のネットワーク</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_要約"><a class="anchor" href="#_要約"></a>要約</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルで学んだこと:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>追加の物理 NIC 上のカスタム OVS ブリッジを作成し、VLAN トラフィックのブリッジマッピングを設定する方法</p>
+</li>
+<li>
+<p>複数の名前空間をカバーする VLAN タグ付けを持つ CUDN の作成方法</p>
+</li>
+<li>
+<p>CUDN VLAN セカンダリー ネットワークに静的 IP を持つ VM を cloud-init でデプロイする方法</p>
+</li>
+<li>
+<p>同じ CUDN VLAN ネットワークを共有する VM 間の名前空間間のネットワーク接続を検証する方法</p>
+</li>
+<li>
+<p>VLAN ベースのネットワークの CUDN と NetworkAttachmentDefinition のアプローチの違い</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_参照"><a class="anchor" href="#_参照"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/4.19/html/multiple_networks/understanding-multiple-networks" target="_blank" rel="noopener">OpenShift - 複数のネットワークの理解</a></p>
+</li>
+<li>
+<p><a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/4.19/html/virtualization/networking#virt-creating-secondary-localnet-cudn_virt-connecting-vm-to-secondary-cudn" target="_blank" rel="noopener">ClusterUserDefinedNetwork の構成</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="localnet-vlan.html">VLAN を使用した NAD を使用したローカルネットワークのセカンダリーネットワークの構成</a></span>
+  <span class="next"><a href="layer2-secondary.html">2層セカンダリネットワーク</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

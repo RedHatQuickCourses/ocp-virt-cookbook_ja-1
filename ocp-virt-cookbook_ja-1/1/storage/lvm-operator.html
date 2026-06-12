@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>LVM Storage Operator のインストール :: OpenShift Virtualization cookbook</title>
+    <link rel="prev" href="index.html">
+    <link rel="next" href="lvm-troubleshooting.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">OpenShift Virtualization cookbook</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/ocp-virt-cookbook_ja/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja-1" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../getting-started/index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/static-ip-configuration.html">静的IP構成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/cloud-init-troubleshooting.html">クラウドインィット トラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/udn-primary-networks.html">UDN プライマリーネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/localnet-secondary.html">CUDN を使用したローカルネット 2 番目のネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/localnet-vlan.html">VLAN を使用した NAD を使用したローカルネットワークのセカンダリーネットワークの構成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/cudn-localnet-vlan.html">CUDN を使用したローカルネットワーク VLAN</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/layer2-secondary.html">2層セカンダリネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/linux-bridges.html">Linux ブリッジ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/sriov-secondary.html">SR-IOV 二次ネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM イングレスとルート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ローカルネットワークのトラブルシューティング</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-configuration/index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/internal-dns-for-vms.html">VM の内部 DNS</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-vms.html">リモートアクセスを通じたLinux VMへのアクセス</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-troubleshooting.html">リモートアクセスのLinux VMのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-windows-vms.html">RDP を介した Windows VM へのリモートアクセス</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/windows-vm-virtio-drivers.html">Windows VMs with VirtIO Drivers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/infrastructure-node-placement.html">インフラストラクチャーノード配置</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/node-placement-affinity.html">ノード配置とアフィニティ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/hotplug-volumes-interfaces.html">ボットプラグボリュームとインターフェース</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/vm-templates.html">仮想マシンテンプレート</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/resource-limits-qos.html">リソース制限とQoS</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/cpu-pinning.html">仮想マシン用専用CPU配置</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/numa-hugepages.html">NUMA とヒュージページ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/realtime-vms.html">リアルタイム VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">Glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="index.html">ストレージ構成</a></li>
+    <li><a href="lvm-operator.html">LVM Operator のインストール</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">LVM Storage Operator のインストール</h1>
+<div class="sect1">
+<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルでは、OpenShift ノードのスパアローカルディスクを使用して LVM Storage operator をインストールおよび構成する方法を示します。LVM operator は、Logical Volume Manager を使用した動的ストレージプロビジョニングを提供し、Single Node OpenShift (SNO) またはバレーメットライブクラスターに適したものです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><strong>OpenShift 4.18+</strong></p>
+</li>
+<li>
+<p><strong>スパアディスクが利用可能</strong>: クラスターノードに少なくとも 1 つのスパアディスク</p>
+</li>
+<li>
+<p><strong>クラスター管理者アクセス</strong>: オペレーターのインストールとストレージクラスの作成が必要</p>
+</li>
+<li>
+<p><strong>ディスクに既存のデータがある</strong>: <code>forceWipeDevicesAndDestroyAllData</code> パラメーターを使用してディスクを強制的に消去できます</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>テスト済みバージョン:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>OpenShift 4.19, 4.20</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_重要な警告"><a class="anchor" href="#_重要な警告"></a>重要な警告</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>注: <code>forceWipeDevicesAndDestroyAllData: true</code> パラメーターを使用すると、指定されたディスク上のすべてのデータが永久的に破棄されます。適切なディスクデバイスパスを使用し、バックアップがあることを確認してから、続行してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_1_利用可能なディスクの特定"><a class="anchor" href="#_ステップ_1_利用可能なディスクの特定"></a>ステップ 1: 利用可能なディスクの特定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>LVM operator を構成する前に、ストレージ用に使用するディスクを特定します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># ノード名を取得
+oc get nodes
+
+# ノード上のすべてのブロックデバイスをリスト表示
+oc debug node/&lt;node-name&gt; -- chroot /host lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_例出力"><a class="anchor" href="#_例出力"></a>例出力:</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>NAME    SIZE TYPE FSTYPE      MOUNTPOINT MODEL
+sda   558.4G disk LVM2_member            PERC H730 Adp
+sdc   558.4G disk                        PERC H730 Adp
+|-sdc1   1M part
+|-sdc2 127M part vfat
+|-sdc3 384M part ext4        /boot
+`-sdc4 557.9G part xfs        /sysroot</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>この例では:
+
+* `sda` - 既存の LVM データがあるスパアディスク (このディスクを使用します)
+* `sdc` - オペレーティングシステムパーティションを含むシステムディスク (使用しないでください)
+
+既存の LVM 使用状況を確認:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host pvs</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>例出力:</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>PV         VG  Fmt  Attr PSize   PFree
+/dev/sda   vg1 lvm2 a--  558.37g &lt;55.84g</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>この出力は、`/dev/sda` が既存の LVM 構成を持っており、`forceWipeDevicesAndDestroyAllData: true` を使用すると消去されることを示しています。
+
+永続的な識別子を得るためのディスクデバイスパスを取得:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host ls -la /dev/disk/by-path/ | grep -E "pci.*scsi"</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>例出力:</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>lrwxrwxrwx. 1 root root 9 Oct 6 13:30 pci-0000:03:00.0-scsi-0:2:1:0 &#8594; ../../sda</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>永続的なパス `/dev/disk/by-path/pci-0000:03:00.0-scsi-0:2:1:0` は `/dev/sda` を指します。
+
+== ステップ 2: LVM Storage Operator のインストール
+
+LVM operator の名前空間を作成し、インストールします。
+
+LVM operator の名前空間を作成:
+
+xref:attachment$lvm-operator/lvm-namespace.yaml[lvm-namespace.yaml をダウンロード]
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc apply -f - &lt;&lt;EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-lvm-storage
+EOF</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>OperatorGroup を作成:
+
+xref:attachment$lvm-operator/lvm-operatorgroup.yaml[lvm-operatorgroup.yaml をダウンロード]
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc apply -f - &lt;&lt;EOF
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-lvm-storage-operatorgroup
+  namespace: openshift-lvm-storage
+spec:
+  targetNamespaces:
+  - openshift-lvm-storage
+EOF</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>サブスクリプションを使用してオペレーターをインストール:
+
+xref:attachment$lvm-operator/lvm-subscription.yaml[lvm-subscription.yaml をダウンロード]
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc apply -f - &lt;&lt;EOF
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: lvms-operator
+  namespace: openshift-lvm-storage
+spec:
+  channel: stable-4.20
+  name: lvms-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Automatic
+EOF</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>オペレーターのインストールを確認:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+</div>
+</div>
+<h1 id="_オペレーターのインストールを待機します_2_3_分かかる場合があります" class="sect0"><a class="anchor" href="#_オペレーターのインストールを待機します_2_3_分かかる場合があります"></a>オペレーターのインストールを待機します (2-3 分かかる場合があります)</h1>
+<div class="paragraph">
+<p>oc get csv -n openshift-lvm-storage</p>
+</div>
+<h1 id="_オペレーターポッドが実行中であることを確認" class="sect0"><a class="anchor" href="#_オペレーターポッドが実行中であることを確認"></a>オペレーターポッドが実行中であることを確認</h1>
+<div class="paragraph">
+<p>oc get pods -n openshift-lvm-storage</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>インストール後の期待出力 (LVMCluster まだ作成していない場合):</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NAME                             READY   STATUS    RESTARTS   AGE
+lvms-operator-864b6975bb-kxt4t   1/1     Running   0          2m</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>注: この時点で、`lvms-operator` のみが表示されるはずです。`vg-manager` のポッドは、ステップ 3 で LVMCluster リソースを作成すると自動的に作成されます。
+
+インストール後の期待出力 (ステップ 3 で LVMCluster を作成した場合):</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NAME                                  READY   STATUS    RESTARTS   AGE
+lvms-operator-864b6975bb-kxt4t        1/1     Running   0          5m
+vg-manager-xxxxx                      1/1     Running   0          1m</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>== ステップ 3: LVMCluster 構成の作成
+
+LVM ストレージバックエンドを構成するための LVMCluster リソースを作成します。ここで、使用するディスクを指定し、`forceWipeDevicesAndDestroyAllData` パラメーターを使用して既存のデータを強制的に消去するかどうかを指定します。
+
+=== 既存データのあるディスクの構成
+
+ディスクに既存のデータまたはパーティション (例: `sda` の例) がある場合は、`forceWipeDevicesAndDestroyAllData: true` を使用します:
+
+注: `forceWipeDevicesAndDestroyAllData: true` を使用すると、指定されたディスク上のすべてのデータが永久的に破棄されます。適切なディスクデバイスパスを使用し、バックアップがあることを確認してから、続行してください。
+
+xref:attachment$lvm-operator/lvmcluster-with-wipe.yaml[lvmcluster-with-wipe.yaml をダウンロード]
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc apply -f - &lt;&lt;EOF
+apiVersion: lvm.topolvm.io/v1alpha1
+kind: LVMCluster
+metadata:
+  name: lvmcluster
+  namespace: openshift-lvm-storage
+spec:
+  storage:
+    deviceClasses:
+    - name: vg1
+      default: true
+      thinPoolConfig:
+        name: thin-pool-1
+        sizePercent: 90
+        overprovisionRatio: 10
+      nodeSelector:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+            - ""
+      deviceSelector:
+        paths:
+        - /dev/sda
+        forceWipeDevicesAndDestroyAllData: true
+EOF</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>=== クリーンなディスクの構成
+
+ディスクがクリーンで既存のデータまたはパーティションがない場合は:
+
+xref:attachment$lvm-operator/lvmcluster-clean-disk.yaml[lvmcluster-clean-disk.yaml をダウンロード]
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc apply -f - &lt;&lt;EOF
+apiVersion: lvm.topolvm.io/v1alpha1
+kind: LVMCluster
+metadata:
+  name: lvmcluster
+  namespace: openshift-lvm-storage
+spec:
+  storage:
+    deviceClasses:
+    - name: vg1
+      default: true
+      thinPoolConfig:
+        name: thin-pool-1
+        sizePercent: 90
+        overprovisionRatio: 10
+      nodeSelector:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+            - ""
+      deviceSelector:
+        paths:
+        - /dev/sda
+EOF</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>=== 構成パラメーターの説明
+
+* **`name: vg1`**: 作成されるボリュームグループの名前 (ディスクに作成されます)
+* **`default: true`**: クラスターのデフォルトのデバイスクラスにします
+  ** 目的: デフォルトのデバイスクラスがないときの警告を防ぐ
+  ** 効果: 生成される StorageClass を PVC で明示的に指定する必要がなくなります
+  ** 注: 複数のデバイスクラスがある場合は、1つだけをデフォルトとしてマークする必要があります
+* **`thinPoolConfig`**: 効率的なストレージ使用を可能にするためのスリンクプロビジョニングの構成
+  ** `sizePercent: 90`: スリンクプールにディスクの 90% を使用
+  ** `overprovisionRatio: 10`: 物理的に利用可能なより多くのストレージを提供できるように 10 倍のオーバープロビジョニングを許可
+* **`nodeSelector`**: 構成するノード (この例ではワーカーノード)
+* **`deviceSelector.paths`**: 使用する特定のディスクデバイスパス
+  ** `/dev/sda`、`/dev/disk/by-path/...`、または `/dev/disk/by-id/...` を使用できます
+* **`forceWipeDevicesAndDestroyAllData: true`**: 重要なパラメーター
+  ** 目的: ディスク上のすべての既存のパーティションとファイルシステムを削除します
+  ** 使用する場合: ディスクに既存のパーティション、ファイルシステム、または LVM 構成がある
+  ** 効果: 完全なデータ破棄 - 恢复は不可能
+  ** 省略する場合: ディスクが既にクリーンまたは空である
+
+== ステップ 4: LVMCluster の状態を確認
+
+LVMCluster が準備ができているかを確認するためのクイックヘルスチェックを実行します:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_lvmcluster_の状態を確認" class="sect0"><a class="anchor" href="#_lvmcluster_の状態を確認"></a>LVMCluster の状態を確認</h1>
+<div class="paragraph">
+<p>oc get lvmcluster -n openshift-lvm-storage</p>
+</div>
+<h1 id="_ボリュームグループが作成されたことを確認" class="sect0"><a class="anchor" href="#_ボリュームグループが作成されたことを確認"></a>ボリュームグループが作成されたことを確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host vgs</p>
+</div>
+<h1 id="_スリンクプールが作成されたことを確認" class="sect0"><a class="anchor" href="#_スリンクプールが作成されたことを確認"></a>スリンクプールが作成されたことを確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lvs</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>正常な健全な出力:
+
+* LVMCluster が `STATUS: Ready` で表示される
+* VG `vg1` が適切なサイズで表示される
+* アクティブな状態のアクティブなスリンクプール `thin-pool-1` が低いデータ/メタ使用率で表示される
+
+詳細な検証手順、期待出力、トラブルシューティングについては、xref:lvm-troubleshooting.adoc[LVM Storage Troubleshooting Guide] を参照してください。
+
+[[_step_5_set_default_storageclass]]
+== ステップ 5: デフォルトの StorageClass の設定
+
+LVM operator は自動的に `lvms-vg1` という名前の StorageClass を作成しますが、デフォルトでは設定されていません。OpenShift Virtualization で仮想マシンのディスクや DataVolume を自動的にプロビジョニングするために、デフォルトの StorageClass に設定する必要があります。
+
+=== デフォルトの StorageClass が存在するかどうかを確認
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc get storageclass</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>期待出力:</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NAME       PROVISIONER   RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+lvms-vg1   topolvm.io    Delete          WaitForFirstConsumer   true                   5m</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>注: `(default)` アノテーションが表示されていないことを確認してください - これはまだデフォルトではありません。
+
+=== デフォルトの StorageClass に設定
+
+クラスターのデフォルトの StorageClass に LVM StorageClass を設定:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc patch storageclass lvms-vg1 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>=== デフォルトのステータスを確認
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc describe sc | grep IsDefaultClass</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>デフォルト設定後の期待出力:</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NAME                 PROVISIONER   RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+lvms-vg1 (default)   topolvm.io    Delete          WaitForFirstConsumer   true                   6m</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>`(default)` アノテーションが表示されていることで、これが現在のデフォルト StorageClass であることが確認できます。
+
+=== OpenShift Virtualization での重要性
+
+デフォルトの StorageClass を設定することは、OpenShift Virtualization で重要です:
+
+==== データソース OS イメージがデフォルト StorageClass を必要とする
+
+OpenShift Virtualization のデータソース OS イメージ (Fedora、RHEL、CentOS Stream、Windows) は、デフォルトの StorageClass がないと、ブートソースボリュームを作成できません:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_利用可能な_os_イメージを確認" class="sect0"><a class="anchor" href="#_利用可能な_os_イメージを確認"></a>利用可能な OS イメージを確認</h1>
+<div class="paragraph">
+<p>oc get datasources -n openshift-virtualization-os-images</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>デフォルトの StorageClass がないと、これらのデータソースは待機状態に残り、VM の作成には使用できません。
+
+==== VM の作成時の自動 PVC の作成
+
+`dataVolumeTemplates` を使用して VM を作成する場合、`storageClassName` を指定しない場合、デフォルトの StorageClass が使用されます:
+
+[source,yaml]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>dataVolumeTemplates:
+- metadata:
+    name: fedora-volume
+  spec:
+    pvc:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 30Gi
+    sourceRef:
+      kind: DataSource
+      name: fedora
+      namespace: openshift-virtualization-os-images</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>これにより、デフォルト StorageClass (`lvms-vg1`) が自動的に使用されます。明示的に指定する必要はありません。
+
+==== 簡素な VM の作成
+
+デフォルトの StorageClass を設定すると:
+
+* テンプレートはボックスで動作します
+* DataSource のクローンが自動的に行われます
+* PVC で `storageClassName` を指定する必要はありません
+* クラスター全体で一貫したストレージプロビジョニング
+
+==== ブートソースの準備
+
+デフォルトの StorageClass が利用可能な場合、OpenShift Virtualization オペレーターは、一般的な OS イメージのブートソースを自動的に準備できます:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_ブートソースの準備状況を確認" class="sect0"><a class="anchor" href="#_ブートソースの準備状況を確認"></a>ブートソースの準備状況を確認</h1>
+<div class="paragraph">
+<p>oc get DataImportCron -n openshift-virtualization-os-images</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>=== 代替: VM 内の明示的な StorageClass
+
+デフォルトの StorageClass を設定しない場合は、すべての VM 定義で明示的に指定する必要があります:
+
+[source,yaml]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>dataVolumeTemplates:
+- metadata:
+    name: fedora-volume
+  spec:
+    pvc:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 30Gi
+      storageClassName: lvms-vg1  # 明示的に必要
+    sourceRef:
+      kind: DataSource
+      name: fedora
+      namespace: openshift-virtualization-os-images</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>注意: OpenShift Virtualization クラスターでは、常にデフォルト StorageClass を設定して、操作を簡素化し、自動ブートソースプロビジョニングを有効にしてください。
+
+== ステップ 6: ストレージプロビジョニングのテスト
+
+PVC を作成して、ストレージプロビジョニングが正常に機能するかを確認します:
+
+xref:attachment$lvm-operator/test-pvc.yaml[test-pvc.yaml をダウンロード]
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc apply -f - &lt;&lt;EOF
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lvms-test-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: lvms-vg1
+EOF</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>テスト用のポッドを作成:
+
+xref:attachment$lvm-operator/test-pod.yaml[test-pod.yaml をダウンロード]
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc apply -f - &lt;&lt;EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lvms-test-pod
+  namespace: default
+spec:
+  containers:
+  - name: test
+    image: registry.access.redhat.com/ubi9/ubi:latest
+    command: ["sleep", "3600"]
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: lvms-test-pvc
+EOF</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>PVC がバインドされているかを確認:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc get pvc lvms-test-pvc</p>
+</div>
+<h1 id="_bound_と表示される_status_が期待される" class="sect0"><a class="anchor" href="#_bound_と表示される_status_が期待される"></a>"Bound" と表示される STATUS が期待される</h1>
+<div class="listingblock">
+<div class="content">
+<pre>ポッドが実行中でストレージに書き込みできるかを確認:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_ポッドが開始されるまで待機" class="sect0"><a class="anchor" href="#_ポッドが開始されるまで待機"></a>ポッドが開始されるまで待機</h1>
+<div class="paragraph">
+<p>oc wait --for=condition=Ready pod/lvms-test-pod --timeout=120s</p>
+</div>
+<h1 id="_ボリュームに書き込みをテスト" class="sect0"><a class="anchor" href="#_ボリュームに書き込みをテスト"></a>ボリュームに書き込みをテスト</h1>
+<div class="paragraph">
+<p>oc exec lvms-test-pod&#8201;&#8212;&#8201;sh -c "echo 'LVM Storage Test' &gt; /data/test.txt &amp;&amp; cat /data/test.txt"</p>
+</div>
+<h1 id="_期待される出力_lvm_storage_test" class="sect0"><a class="anchor" href="#_期待される出力_lvm_storage_test"></a>期待される出力: LVM Storage Test</h1>
+<div class="listingblock">
+<div class="content">
+<pre>テストリソースをクリーンアップ:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc delete pod lvms-test-pod
+oc delete pvc lvms-test-pvc</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>== トラブルシューティング
+
+LVM ストレージのインストールおよび運用中に問題が発生した場合は、xref:lvm-troubleshooting.adoc[LVM Storage Troubleshooting Guide] を参照してください。
+
+トラブルシューティングガイドでは、
+
+* 完全な検証コマンドと期待出力
+* 一般的な問題とその解決策
+* デバイスの検出および消去の問題
+* PVC のプロビジョニングの問題
+* スリンクプールの管理
+* 診断手順
+
+== forceWipeDevicesAndDestroyAllData の理解
+
+=== 何をするのか
+
+`forceWipeDevicesAndDestroyAllData: true` パラメーターは次のことを行います:
+
+. **パーティションテーブルを削除**: GPT、MBR、およびパーティション情報を消去します
+. **ファイルシステムを破壊**: ext4、xfs、btrfs、およびその他のファイルシステムの署名を削除します
+. **LVM メタデータをクリア**: 既存の物理ボリューム、ボリュームグループ、および論理ボリュームを削除します
+. **ディスクの先頭にゼロを書き込み**: 最初の数メガバイトにゼロを書き込み、クリーンな状態を確保します
+. **再利用を強制**: LVM operator がディスクの所有権を取得できるようにします
+
+=== 使用する場合
+
+`forceWipeDevicesAndDestroyAllData: true` を次の場合に使用します:
+
+* ディスクに既存のパーティションまたはファイルシステムがある
+* ディスクが以前に LVM (PV/VG/LV を含む) で使用されていた
+* ディスクに破棄したいデータがある
+* ディスクを別の用途から再利用する
+
+使用しない場合は:
+
+* ディスクが新しく未形式化である
+* 使用するディスクが不明である (まず確認してください!)
+* ディスクに保持する必要があるデータがある
+
+=== 使用前の安全チェック
+
+常にディスクデバイスパスを確認する前に、`forceWipeDevicesAndDestroyAllData: true` パラメーターを有効にします:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_1_ディスクパスを確認" class="sect0"><a class="anchor" href="#_1_ディスクパスを確認"></a>1. ディスクパスを確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lsblk -o NAME,SIZE,TYPE,MOUNTPOINT</p>
+</div>
+<h1 id="_2_ディスクがマウントされていないことを確認" class="sect0"><a class="anchor" href="#_2_ディスクがマウントされていないことを確認"></a>2. ディスクがマウントされていないことを確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host mount | grep /dev/sda</p>
+</div>
+<h1 id="_3_システムディスクを使用していないことを確認" class="sect0"><a class="anchor" href="#_3_システムディスクを使用していないことを確認"></a>3. システムディスクを使用していないことを確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host df -h | grep sda</p>
+</div>
+<h1 id="_4_ディスクのシリアル番号を確認" class="sect0"><a class="anchor" href="#_4_ディスクのシリアル番号を確認"></a>4. ディスクのシリアル番号を確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lsblk -d -o NAME,SERIAL /dev/sda</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>== 要約
+
+このチュートリアルで学んだこと:
+
+* クラスターノード上のスパアディスクを特定して LVM ストレージに使用する方法
+* LVM Storage operator をインストールするために名前空間、OperatorGroup、およびサブスクリプションを作成する方法
+* `forceWipeDevicesAndDestroyAllData` パラメーターを使用して既存データを強制的に消去するディスクの LVMCluster リソースを作成および構成する方法
+* 自動生成される `lvms-vg1` StorageClass を OpenShift Virtualization のデフォルト StorageClass に設定する方法
+* PVC と Pod を使用してストレージプロビジョニングをテストし、LVMCluster の健全性を確認する方法
+
+== 参照
+
+* link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/persistent-storage-using-local-storage#persistent-storage-using-lvms[OpenShift Container Platform 4.20 でのローカルストレージを使用した永続ストレージ,window=_blank]
+* link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/understanding-persistent-storage#storage-classes_understanding-persistent-storage[OpenShift Container Platform 4.20 での永続ストレージの理解,window=_blank]</pre>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="index.html">ストレージ構成</a></span>
+  <span class="next"><a href="lvm-troubleshooting.html">LVMトラブルシューティング</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

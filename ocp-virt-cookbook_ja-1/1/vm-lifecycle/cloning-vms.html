@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>仮想マシンのクローン作成による迅速なデプロイ :: OpenShift Virtualization cookbook</title>
+    <link rel="prev" href="golden-images-troubleshooting.html">
+    <link rel="next" href="vm-snapshots.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">OpenShift Virtualization cookbook</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/ocp-virt-cookbook_ja/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja-1" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../getting-started/index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../storage/index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/static-ip-configuration.html">静的IP構成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/cloud-init-troubleshooting.html">クラウドインィット トラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/udn-primary-networks.html">UDN プライマリーネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/localnet-secondary.html">CUDN を使用したローカルネット 2 番目のネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/localnet-vlan.html">VLAN を使用した NAD を使用したローカルネットワークのセカンダリーネットワークの構成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/cudn-localnet-vlan.html">CUDN を使用したローカルネットワーク VLAN</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/layer2-secondary.html">2層セカンダリネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/linux-bridges.html">Linux ブリッジ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/sriov-secondary.html">SR-IOV 二次ネットワーク</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM イングレスとルート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ローカルネットワークのトラブルシューティング</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-configuration/index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/internal-dns-for-vms.html">VM の内部 DNS</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-vms.html">リモートアクセスを通じたLinux VMへのアクセス</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-troubleshooting.html">リモートアクセスのLinux VMのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/remote-access-windows-vms.html">RDP を介した Windows VM へのリモートアクセス</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/windows-vm-virtio-drivers.html">Windows VMs with VirtIO Drivers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/infrastructure-node-placement.html">インフラストラクチャーノード配置</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/node-placement-affinity.html">ノード配置とアフィニティ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/hotplug-volumes-interfaces.html">ボットプラグボリュームとインターフェース</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-configuration/vm-templates.html">仮想マシンテンプレート</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/resource-limits-qos.html">リソース制限とQoS</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/cpu-pinning.html">仮想マシン用専用CPU配置</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/numa-hugepages.html">NUMA とヒュージページ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../performance/realtime-vms.html">リアルタイム VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">Glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="index.html">VM ライフサイクル管理</a></li>
+    <li><a href="cloning-vms.html">仮想マシンのクローン作成</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">仮想マシンのクローン作成による迅速なデプロイ</h1>
+<div class="sect1">
+<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルでは、OpenShift Virtualization で既存の仮想マシンをクローン作成して、同じかカスタマイズされた仮想マシンインスタンスを迅速にデプロイする方法を示します。VM クローン作成は、既存の VM の完全なディスクコンテンツ、構成、およびインストールソフトウェアを含む新しい VM のコピーを作成します。これにより、環境の迅速なプロビジョニングが可能になります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_仮想マシンのクローン作成とは何か"><a class="anchor" href="#_仮想マシンのクローン作成とは何か"></a>仮想マシンのクローン作成とは何か</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>仮想マシンのクローン作成は、既存の VM を複製して新しい VM を作成します。OpenShift Virtualization は、以下の 2 つの主な方法で VM をクローン作成します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Web コンソールクローン作成</strong>: VM のクローン作成を簡単に行うポイント・アンド・クリックインターフェース</p>
+</li>
+<li>
+<p><strong>CLI ベースのクローン作成</strong>: PVC のクローン作成と新しい VM の作成を手動で行うプロセス</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>仮想マシンのクローン作成の主な利点:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>事前構成された環境の迅速なデプロイ</p>
+</li>
+<li>
+<p>インスタンス間でソフトウェアと構成の一貫性</p>
+</li>
+<li>
+<p>開発とテストワークフローの加速</p>
+</li>
+<li>
+<p>同じワークロードの迅速なスケールアウト</p>
+</li>
+<li>
+<p>デプロイからプロダクション準備状態への時間の短縮</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_クローン作成とゴールデンイメージの比較"><a class="anchor" href="#_クローン作成とゴールデンイメージの比較"></a>クローン作成とゴールデンイメージの比較</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>両方のアプローチは、VM の迅速なデプロイを可能にしますが、異なる目的を持ちます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 37.5%;">
+<col style="width: 37.5%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">アスペクト</th>
+<th class="tableblock halign-left valign-top">仮想マシンのクローン作成</th>
+<th class="tableblock halign-left valign-top">ゴールデンイメージ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">使用ケース</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">特定の VM とそのデータと状態を複製する</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">多数の VM に対する標準化された構成のテンプレート</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">カスタマイズ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クローンはソース VM のデータを保持し、cloud-init を使用してカスタマイズできます</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">各 VM はテンプレートから新規で始まります</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">データの保存</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ソース VM のすべてのデータを保持します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ベース構成のみを含みます</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ソース状態</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">実行中または停止中の VM からクローンを作成できます</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ソースは、一般化されたイメージです</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">典型的なシナリオ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">構成された開発環境のクローン作成（テスト用）</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">同じベース設定で複数の Web サーバーのデプロイ</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>OpenShift 4.18 以上に OpenShift Virtualization オペレーターがインストールされている</p>
+</li>
+<li>
+<p>OpenShift Web コンソールまたは CLI ツール (<code>oc</code>, <code>virtctl</code>) のアクセス権</p>
+</li>
+<li>
+<p>ボリュームクローン作成をサポートするストレージクラス</p>
+</li>
+<li>
+<p>クローンする VM が 1 つ以上あります（または作成します）</p>
+</li>
+<li>
+<p>PersistentVolumeClaims (PVC) についての基本的な理解</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_クローン作成方法の理解"><a class="anchor" href="#_クローン作成方法の理解"></a>クローン作成方法の理解</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShift Virtualization は、VM をクローン作成するための 2 つのアプローチを提供します。</p>
+</div>
+<div class="sect2">
+<h3 id="_web_コンソールクローン作成推奨"><a class="anchor" href="#_web_コンソールクローン作成推奨"></a>Web コンソールクローン作成（推奨）</h3>
+<div class="paragraph">
+<p>Web コンソールは、クローン作成のストリームライン化された経験を提供します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>PVC のクローン作成を自動的に処理します</p>
+</li>
+<li>
+<p>クローンされたディスクを持つ新しい VM を作成します</p>
+</li>
+<li>
+<p>実行中または停止中の VM からクローンを作成できます</p>
+</li>
+<li>
+<p>VM の構成（CPU、メモリ、ネットワーク）を保持します</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_手動_cli_クローン作成"><a class="anchor" href="#_手動_cli_クローン作成"></a>手動 CLI クローン作成</h3>
+<div class="paragraph">
+<p>自動化、カスタマイズ、または名前空間間クローン作成のために使用します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ソース VM の PVC をクローンします</p>
+</li>
+<li>
+<p>クローンされた PVC を参照する新しい VM を作成します</p>
+</li>
+<li>
+<p>クローンプロセス中にカスタマイズを可能にします</p>
+</li>
+<li>
+<p>名前空間間クローン作成のために役立ちます</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ボリュームクローン作成の動作"><a class="anchor" href="#_ボリュームクローン作成の動作"></a>ボリュームクローン作成の動作</h3>
+<div class="paragraph">
+<p>ボリュームクローン作成のパフォーマンスは、使用しているストレージシステムによって決まります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>スマートクローン作成</strong>: ストレージスナップショット（CSI を有効にしたスナップショットをサポートするストレージクラス）を使用します</p>
+</li>
+<li>
+<p><strong>ホストアシストクローン作成</strong>: ポッドを介してデータをコピーします（任意のストレージクラスを使用しますが、遅い）</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_web_コンソールを使用して仮想マシンをクローン作成する"><a class="anchor" href="#_web_コンソールを使用して仮想マシンをクローン作成する"></a>Web コンソールを使用して仮想マシンをクローン作成する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Web コンソールは、VM をクローン作成するための最も簡単な方法です。</p>
+</div>
+<div class="sect2">
+<h3 id="_セットアップソース_vm_の作成"><a class="anchor" href="#_セットアップソース_vm_の作成"></a>セットアップ：ソース VM の作成</h3>
+<div class="paragraph">
+<p>まず、名前空間とソース VM を作成します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc create namespace vm-cloning-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ソース VM に nginx を事前にインストールする VM をデプロイします。</p>
+</div>
+<div class="paragraph">
+<p>注意: この例の cloud-init パスワードは、デモのためのものです。実際のプロダクション環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。</p>
+</div>
+<div class="paragraph">
+<p><a href="_attachments/cloning-vms/source-webserver-vm.yaml" class="xref attachment">source-webserver-vm.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: source-webserver
+  namespace: vm-cloning-demo
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        name: source-webserver-disk
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: fedora
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: source-webserver
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              name: default
+          rng: {}
+        machine:
+          type: pc-q35-rhel9.4.0
+        memory:
+          guest: 4Gi
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - dataVolume:
+            name: source-webserver-disk
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: fedora
+              password: fedora123
+              chpasswd: { expire: false }
+              ssh_pwauth: true
+              runcmd:
+                - dnf install -y nginx
+                - systemctl enable --now nginx
+                - echo "&lt;h1&gt;Source Webserver VM&lt;/h1&gt;&lt;p&gt;Hostname: $(hostname)&lt;/p&gt;" &gt; /usr/share/nginx/html/index.html
+                - firewall-cmd --permanent --add-service=http
+                - firewall-cmd --reload
+          name: cloudinitdisk</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>VM をデプロイします。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f source-webserver-vm.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>VM が実行中になるまで待ちます。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vmi -n vm-cloning-demo</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_web_コンソールを使用して_vm_をクローン作成する"><a class="anchor" href="#_web_コンソールを使用して_vm_をクローン作成する"></a>Web コンソールを使用して VM をクローン作成する</h3>
+<div class="paragraph">
+<p>OpenShift Web コンソールを使用して VM をクローン作成するには、以下の手順に従います。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>仮想化</strong> → <strong>仮想マシン</strong> に移動します</p>
+<div class="imageblock">
+<div class="content">
+<img src="_images/clone-vm-list.png" alt="仮想マシンのリストが source-webserver VM を示しています">
+</div>
+</div>
+</li>
+<li>
+<p>クローンする VM (<code>source-webserver</code>) を見つけます</p>
+</li>
+<li>
+<p>VM の <strong>⋮</strong> (アクションメニュー) 側にある <strong>クローン</strong> をクリックします</p>
+<div class="imageblock">
+<div class="content">
+<img src="_images/clone-vm-actions-menu.png" alt="クローンオプションが強調表示されたアクションメニュー">
+</div>
+</div>
+</li>
+<li>
+<p><strong>クローン仮想マシン</strong> ダイアログで:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>新しい VM に対する名前を入力します（例: <code>webserver-clone-1</code>）</p>
+</li>
+<li>
+<p>新しい VM が作成されたら自動的に開始する場合は、<strong>仮想マシンの作成後に開始</strong> をチェックします</p>
+</li>
+<li>
+<p>構成の詳細（オペレーティングシステム、CPU、メモリ、NIC、ディスク）を確認します</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>クローン</strong> をクリックします</p>
+<div class="imageblock">
+<div class="content">
+<img src="_images/clone-vm-dialog.png" alt="名前と構成を示すクローン仮想マシンダイアログ">
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Web コンソールは、以下のことを行います。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ソース VM の PVC をクローンします</p>
+</li>
+<li>
+<p>クローンされたディスクを持つ新しい VM を作成します</p>
+</li>
+<li>
+<p>VM の構成（CPU、メモリ、ネットワーク）を保持します</p>
+</li>
+<li>
+<p>開始オプションを選択した場合は、VM を開始します</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>仮想マシンのリストでクローンの進捗を監視します。PVC クローンが完了するまで、クローンは "プロビジョニング" に表示されます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/clone-vm-dialog-full.png" alt="クローン仮想マシンダイアログでリクエストの進捗を示しています">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_web_コンソールクローンの確認"><a class="anchor" href="#_web_コンソールクローンの確認"></a>Web コンソールクローンの確認</h3>
+<div class="paragraph">
+<p>クローンされた VM の状態を確認します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vm -n vm-cloning-demo
+oc get vmi -n vm-cloning-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>クローンされた VM にアクセスします。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl console webserver-clone-1 -n vm-cloning-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>クローンされた VM は、nginx (ソースから) を事前にインストールし、最初のホスト名が同じです。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cli_を使用した仮想マシンのクローン作成"><a class="anchor" href="#_cli_を使用した仮想マシンのクローン作成"></a>CLI を使用した仮想マシンのクローン作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>自動化、カスタマイズ、または名前空間間クローン作成のために、CLI メソッドを使用します。</p>
+</div>
+<div class="sect2">
+<h3 id="_方法_1_pvc_をクローンし次に_vm_を作成推奨"><a class="anchor" href="#_方法_1_pvc_をクローンし次に_vm_を作成推奨"></a>方法 1: PVC をクローンし、次に VM を作成（推奨）</h3>
+<div class="paragraph">
+<p>推奨される CLI アプローチです。まず、ソース VM の PVC を識別します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pvc -n vm-cloning-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>出力は以下のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">NAME                    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+source-webserver-disk   Bound    pvc-1234abcd-5678-efgh-9012-ijklmnop3456   30Gi       RWO            lvms-vg1       10m</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ソース PVC をクローンするスタンドアロン DataVolumeを作成します。</p>
+</div>
+<div class="paragraph">
+<p><a href="_attachments/cloning-vms/clone-datavolume.yaml" class="xref attachment">clone-datavolume.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: webserver-clone-2-disk
+  namespace: vm-cloning-demo
+  annotations:
+    cdi.kubevirt.io/storage.bind.immediate.requested: "true"  <i class="conum" data-value="1"></i><b>(1)</b>
+spec:
+  source:
+    pvc:
+      name: source-webserver-disk
+      namespace: vm-cloning-demo
+  storage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 30Gi
+    storageClassName: gp3-csi  <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>WaitForFirstConsumer</code> バインディングモードを使用するストレージクラスの場合、このアノテーションは必須です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>ストレージクラスを指定することはオプションです。指定されていない場合、ソース PVC から継承されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>重要: <code>cdi.kubevirt.io/storage.bind.immediate.requested: "true"</code> アノテーションは、<code>WaitForFirstConsumer</code> バインディングモードを使用するストレージクラス (例: AWS EBS gp3-csi、Azure Disk、GCP PD など) の場合、DataVolume が <code>PendingPopulation</code> 状態に残るのを防ぐために重要です。これがないと、DataVolume は VM がそれを消費するまで <code>PendingPopulation</code> 状態に残ります。</p>
+</div>
+<div class="paragraph">
+<p>DataVolume を適用します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f clone-datavolume.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>クローンの進捗を監視します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get dv webserver-clone-2-disk -n vm-cloning-demo -w</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下のようなフェーズが表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">NAME                     PHASE                               PROGRESS   RESTARTS   AGE
+webserver-clone-2-disk   CloneFromSnapshotSourceInProgress   N/A                   4s
+webserver-clone-2-disk   PrepClaimInProgress                 N/A                   68s
+webserver-clone-2-disk   RebindInProgress                    N/A                   78s
+webserver-clone-2-disk   Succeeded                           100.0%                79s</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>DataVolume が <code>Succeeded</code> になったら、クローンされたディスクを使用する新しい VMを作成します。</p>
+</div>
+<div class="paragraph">
+<p><a href="_attachments/cloning-vms/vm-from-cloned-pvc.yaml" class="xref attachment">vm-from-cloned-pvc.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: webserver-clone-2
+  namespace: vm-cloning-demo
+spec:
+  runStrategy: Manual
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: webserver-clone-2
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+          interfaces:
+            - masquerade: {}
+              name: default
+          rng: {}
+        machine:
+          type: pc-q35-rhel9.4.0
+        memory:
+          guest: 4Gi
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rootdisk
+          persistentVolumeClaim:
+            claimName: webserver-clone-2-disk</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>VM を適用します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f vm-from-cloned-pvc.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>VM を開始します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl start webserver-clone-2 -n vm-cloning-demo</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_方法_2_仮想マシンのクローン作成代替方法"><a class="anchor" href="#_方法_2_仮想マシンのクローン作成代替方法"></a>方法 2: 仮想マシンのクローン作成（代替方法）</h3>
+<div class="paragraph">
+<p>注: このアプローチは手動の編集が必要で、推奨されていません。推奨される方法は上記の方法 1 を使用してください。より信頼性の高いもので、トラブルシューティングが容易です。</p>
+</div>
+<div class="paragraph">
+<p>ソース VM を停止してクリーンなクローンを作成します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl stop source-webserver -n vm-cloning-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>VM が停止するのを待ちます。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vm source-webserver -n vm-cloning-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ソース VM の構成をエクスポートします。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vm source-webserver -n vm-cloning-demo -o yaml &gt; clone-base.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>clone-base.yaml を編集してクローンを作成します。以下の変更を行う必要があります。</p>
+</div>
+<div class="paragraph">
+<p><strong>1. VM の名前を変更します:</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">metadata:
+  name: source-webserver  # 変更: webserver-manual-clone
+  namespace: vm-cloning-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>2. DataVolume の名前を更新し、PVC ソースを追加します:</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        name: source-webserver-disk  # 変更: webserver-manual-clone-disk
+      spec:
+        # オリジナルの sourceRef セクションを削除します
+        # 代わりに以下のように追加します:
+        source:
+          pvc:
+            name: source-webserver-disk
+            namespace: vm-cloning-demo
+        storage:
+          resources:
+            requests:
+              storage: 30Gi</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>3. ラベルとドメイン名を更新します:</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">spec:
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: source-webserver  # 変更: webserver-manual-clone
+    spec:
+      domain:
+        # ... その他の構成
+        volumes:
+          - dataVolume:
+              name: source-webserver-disk  # 変更: webserver-manual-clone-disk
+            name: rootdisk</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>4. 不要なフィールドを削除します:</strong></p>
+</div>
+<div class="paragraph">
+<p>自動生成されるメタデータフィールドを削除します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>metadata.uid</code></p>
+</li>
+<li>
+<p><code>metadata.resourceVersion</code></p>
+</li>
+<li>
+<p><code>metadata.creationTimestamp</code></p>
+</li>
+<li>
+<p><code>metadata.generation</code></p>
+</li>
+<li>
+<p><code>status</code> セクション（全体）</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>5. MAC アドレスを削除します（重要）:</strong></p>
+</div>
+<div class="paragraph">
+<p>ネットワークインターフェースの <code>macAddress</code> フィールドを削除して、自動割り当てを可能にします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">spec:
+  template:
+    spec:
+      domain:
+        devices:
+          interfaces:
+            - masquerade: {}
+              name: default
+              macAddress: "52:54:00:xx:xx:xx"  # 削除</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>MAC アドレスを削除しないと、以下のエラーが発生します。
+<code>Failed to allocate mac to the vm object: failed to allocate requested mac address</code></p>
+</div>
+<div class="paragraph">
+<p>変更を加えた後、YAML を適用します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f clone-base.yaml</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_クラウドイニシエイターの使用によるクローンされた仮想マシンのカスタマイズ"><a class="anchor" href="#_クラウドイニシエイターの使用によるクローンされた仮想マシンのカスタマイズ"></a>クラウドイニシエイターの使用によるクローンされた仮想マシンのカスタマイズ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クローンされた仮想マシンは、ソースからデータ（ホスト名と認証情報を含む）を継承します。クラウドイニシエイターを使用してクローンをカスタマイズします。</p>
+</div>
+<div class="sect2">
+<h3 id="_新しいホスト名とパスワードでクローン作成"><a class="anchor" href="#_新しいホスト名とパスワードでクローン作成"></a>新しいホスト名とパスワードでクローン作成</h3>
+<div class="paragraph">
+<p>方法 2 のように DataVolume をクローンします。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat &lt;&lt;EOF | oc apply -f -
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: webserver-custom-disk
+  namespace: vm-cloning-demo
+  annotations:
+    cdi.kubevirt.io/storage.bind.immediate.requested: "true"
+spec:
+  source:
+    pvc:
+      name: source-webserver-disk
+      namespace: vm-cloning-demo
+  storage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 30Gi
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>クローンが完了するまで待ちます。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get dv webserver-custom-disk -n vm-cloning-demo -w</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>クラウドイニシエイターのカスタマイズを使用して VM を作成します。</p>
+</div>
+<div class="paragraph">
+<p><a href="_attachments/cloning-vms/cloned-vm-with-cloudinit.yaml" class="xref attachment">cloned-vm-with-cloudinit.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: webserver-custom
+  namespace: vm-cloning-demo
+spec:
+  runStrategy: Manual
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: webserver-custom
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              name: default
+          rng: {}
+        machine:
+          type: pc-q35-rhel9.4.0
+        memory:
+          guest: 4Gi
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rootdisk
+          persistentVolumeClaim:
+            claimName: webserver-custom-disk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              hostname: webserver-custom
+              fqdn: webserver-custom.local
+              manage_etc_hosts: true
+              password: fedora123
+              chpasswd: { expire: false }
+              ssh_pwauth: true
+              runcmd:
+                - hostnamectl set-hostname webserver-custom
+                - echo "&lt;h1&gt;Customized Clone&lt;/h1&gt;&lt;p&gt;Hostname: $(hostname)&lt;/p&gt;" &gt; /usr/share/nginx/html/index.html
+                - systemctl restart nginx
+          name: cloudinitdisk</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このクラウドイニシエイターの構成:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ホスト名を <code>webserver-custom</code> に設定します</p>
+</li>
+<li>
+<p>fedora ユーザーのパスワードを設定します</p>
+</li>
+<li>
+<p>nginx のインストールを継承します</p>
+</li>
+<li>
+<p>nginx のようなウェルカムページを更新します</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>適用して開始します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f cloned-vm-with-cloudinit.yaml
+virtctl start webserver-custom -n vm-cloning-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>カスタマイズを確認します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl console webserver-custom -n vm-cloning-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>VM 内で:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">hostname
+# 出力: webserver-custom
+
+systemctl status nginx
+# nginx が実行中 (ソースから継承) を示します
+
+curl localhost
+# カスタム HTML を表示します</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_名前空間間でのクローン作成"><a class="anchor" href="#_名前空間間でのクローン作成"></a>名前空間間でのクローン作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>開発、テスト、プロダクションなどの環境を分離するために、異なる名前空間に VM をクローン作成します。</p>
+</div>
+<div class="sect2">
+<h3 id="_対象名前空間の作成"><a class="anchor" href="#_対象名前空間の作成"></a>対象名前空間の作成</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc create namespace vm-cloning-production</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_名前空間間クローン作成用の_rbac_の設定"><a class="anchor" href="#_名前空間間クローン作成用の_rbac_の設定"></a>名前空間間クローン作成用の RBAC の設定</h3>
+<div class="paragraph">
+<p>ターゲット名前空間のサービスアカウントがソース名前空間の PVC にアクセスできるようにするために、RBAC を設定します。</p>
+</div>
+<div class="paragraph">
+<p><a href="_attachments/cloning-vms/cross-namespace-clone-rbac.yaml" class="xref attachment">cross-namespace-clone-rbac.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: datavolume-cloner
+  namespace: vm-cloning-demo
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list"]
+  - apiGroups: ["cdi.kubevirt.io"]
+    resources: ["datavolumes"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: allow-clone-from-demo
+  namespace: vm-cloning-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: datavolume-cloner
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: vm-cloning-production</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RBAC を適用します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f cross-namespace-clone-rbac.yaml</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_名前空間間クローン作成"><a class="anchor" href="#_名前空間間クローン作成"></a>名前空間間クローン作成</h3>
+<div class="paragraph">
+<p>プロダクション名空間にある DataVolume を作成し、デモ名空間からクローンします。</p>
+</div>
+<div class="paragraph">
+<p><a href="_attachments/cloning-vms/cross-namespace-clone-datavolume.yaml" class="xref attachment">cross-namespace-clone-datavolume.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: webserver-production-disk
+  namespace: vm-cloning-production
+  annotations:
+    cdi.kubevirt.io/storage.bind.immediate.requested: "true"
+spec:
+  source:
+    pvc:
+      name: source-webserver-disk
+      namespace: vm-cloning-demo
+  storage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 30Gi</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>DataVolume を適用します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f cross-namespace-clone-datavolume.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>クローンの進捗を監視します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get dv -n vm-cloning-production -w</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロダクション VM を作成します。</p>
+</div>
+<div class="paragraph">
+<p><a href="_attachments/cloning-vms/cloned-webserver-production.yaml" class="xref attachment">cloned-webserver-production.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: webserver-production
+  namespace: vm-cloning-production
+  labels:
+    environment: production
+spec:
+  runStrategy: Manual
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: webserver-production
+    spec:
+      domain:
+        cpu:
+          cores: 4
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              name: default
+          rng: {}
+        machine:
+          type: pc-q35-rhel9.4.0
+        memory:
+          guest: 8Gi
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rootdisk
+          persistentVolumeClaim:
+            claimName: webserver-production-disk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              hostname: webserver-prod
+              fqdn: webserver-prod.production.local
+              manage_etc_hosts: true
+              password: fedora123
+              chpasswd: { expire: false }
+              ssh_pwauth: true
+              runcmd:
+                - hostnamectl set-hostname webserver-prod
+                - echo "&lt;h1&gt;Production Webserver&lt;/h1&gt;&lt;p&gt;Environment: Production&lt;/p&gt;" &gt; /usr/share/nginx/html/index.html
+                - systemctl restart nginx
+          name: cloudinitdisk</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロダクション用の主な違い:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>異なる名前空間</p>
+</li>
+<li>
+<p>リソースが増えます（4 コア、8Gi RAM）</p>
+</li>
+<li>
+<p>プロダクション固有のラベル</p>
+</li>
+<li>
+<p>アクセスのためのパスワードを設定します</p>
+</li>
+<li>
+<p>プロダクション固有のカスタマイズ</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>適用して開始します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f cloned-webserver-production.yaml
+virtctl start webserver-production -n vm-cloning-production</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ストレージに関する考慮事項"><a class="anchor" href="#_ストレージに関する考慮事項"></a>ストレージに関する考慮事項</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="_クローン作成のパフォーマンス"><a class="anchor" href="#_クローン作成のパフォーマンス"></a>クローン作成のパフォーマンス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クローン作成の速度は、使用しているストレージによって異なります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>スマートクローン作成</strong>（CSI スナップショット）: 非常に速く、ストレージスナップショットを使用します</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Ceph RBD、AWS EBS、Azure Disk、GCP PD</p>
+</li>
+<li>
+<p>フェーズ: <code>SnapshotForSmartCloneInProgress</code> → <code>SmartClonePVCInProgress</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>ホストアシストクローン作成</strong>: より遅く、ポッドを介してデータをコピーします</p>
+<div class="ulist">
+<ul>
+<li>
+<p>スナップショットサポートがないストレージクラスの任意のもの</p>
+</li>
+<li>
+<p>フェーズ: <code>CloneInProgress</code> に進捗パーセンテージ</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>クローン作成の方法を確認します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get dv &lt;datavolume-name&gt; -n &lt;namespace&gt; -o yaml | grep cloneType</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">cdi.kubevirt.io/cloneType: snapshot  # スマートクローン作成
+# または
+cdi.kubevirt.io/cloneType: copy      # ホストアシストクローン作成</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ストレージ領域の要件"><a class="anchor" href="#_ストレージ領域の要件"></a>ストレージ領域の要件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>各クローンには、ソースボリュームサイズの完全なストレージ割り当てが必要です。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>クローンは、ソースボリュームの独立したコピーではなく、スナップショットです</p>
+</li>
+<li>
+<p>各クローンには、ソースボリュームサイズの同じストレージが必要です</p>
+</li>
+<li>
+<p>計画する際の容量: (クローン数 × ソースボリュームサイズ)</p>
+</li>
+<li>
+<p>名前空間のクォータとストレージクラスの容量を確認してください</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>利用可能なストレージを確認します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get sc
+oc describe sc &lt;storage-class-name&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ストレージのベストプラクティス"><a class="anchor" href="#_ストレージのベストプラクティス"></a>ストレージのベストプラクティス</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>スナップショットサポートを持つストレージクラスを使用すると、クローン作成が速くなります</p>
+</li>
+<li>
+<p>クローン作成前に十分なストレージ容量があることを確認してください</p>
+</li>
+<li>
+<p>名前空間のストレージ使用量を監視してください</p>
+</li>
+<li>
+<p>定期的に不要なクローンを削除してください</p>
+</li>
+<li>
+<p>名前空間のストレージクォータを考慮してください</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_確認とトラブルシューティング"><a class="anchor" href="#_確認とトラブルシューティング"></a>確認とトラブルシューティング</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="_クローン作成の確認"><a class="anchor" href="#_クローン作成の確認"></a>クローン作成の確認</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>DataVolume の状態を確認します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get dv -n vm-cloning-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>成功したクローンには、<code>Succeeded</code> が表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">NAME                          PHASE       PROGRESS   AGE
+webserver-custom-disk         Succeeded   N/A        5m</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_クローン作成のイベントの確認"><a class="anchor" href="#_クローン作成のイベントの確認"></a>クローン作成のイベントの確認</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クローン作成のイベントを表示します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc describe dv &lt;datavolume-name&gt; -n &lt;namespace&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>クローン作成の進捗を示すイベントを探します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  CloneInProgress    5m    datavolume-controller  Cloning from vm-cloning-demo/source-webserver-disk in progress
+  Normal  CloneSucceeded     2m    datavolume-controller  Successfully cloned from vm-cloning-demo/source-webserver-disk</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_vm_が実行中であることの確認"><a class="anchor" href="#_vm_が実行中であることの確認"></a>VM が実行中であることの確認</h2>
+<div class="sectionbody">
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vmi -n vm-cloning-demo</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_カスタマイズの確認"><a class="anchor" href="#_カスタマイズの確認"></a>カスタマイズの確認</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>VM コンソールにアクセスします。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl console &lt;vm-name&gt; -n &lt;namespace&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>VM 内で:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># ホスト名を確認
+hostname
+
+# ソース VM からのソフトウェアを確認
+systemctl status nginx
+
+# cloud-init の状態を確認
+cloud-init status
+
+# cloud-init ログを表示
+sudo cat /var/log/cloud-init-output.log
+
+# カスタマイズされた場合は、マシン ID を確認
+cat /etc/machine-id</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_一般的な問題と解決策"><a class="anchor" href="#_一般的な問題と解決策"></a>一般的な問題と解決策</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="_問題_クローンが_provisioning_または_cloneinprogress_に停止している"><a class="anchor" href="#_問題_クローンが_provisioning_または_cloneinprogress_に停止している"></a>問題: クローンが "Provisioning" または "CloneInProgress" に停止している</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>問題</strong>: DataVolume が <code>CloneInProgress</code> に長時間残っています。</p>
+</div>
+<div class="paragraph">
+<p><strong>可能な原因</strong>:
+* 大きなソースボリューム
+* 遅いストレージまたはネットワーク
+* 大きなボリュームのホストアシストクローン作成</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># クローンイベントを確認
+oc describe dv &lt;datavolume-name&gt; -n &lt;namespace&gt;
+
+# CDI ポッドを確認
+oc get pods -n &lt;namespace&gt; | grep cdi
+
+# CDI ログを表示
+oc logs &lt;cdi-pod&gt; -n &lt;namespace&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>大きなボリュームの場合、ホストアシストクローン作成は時間がかかります。これは予想される振る舞いです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_問題_クローン作成に_permission_denied_エラーが発生"><a class="anchor" href="#_問題_クローン作成に_permission_denied_エラーが発生"></a>問題: クローン作成に "permission denied" エラーが発生</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>問題</strong>: 名前空間間クローン作成に RBAC エラーが発生します。</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>: RBAC 許可を確認します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># ロールの存在を確認
+oc get role datavolume-cloner -n &lt;source-namespace&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a></span>
+  <span class="next"><a href="vm-snapshots.html">VM スナップショット</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>
