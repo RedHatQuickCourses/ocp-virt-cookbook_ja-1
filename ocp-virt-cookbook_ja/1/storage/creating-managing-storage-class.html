@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>ストレージクラスの作成と管理 :: FIXME Course Title</title>
+    <link rel="prev" href="hostpath-provisioner.html">
+    <link rel="next" href="multi-disk-configuration.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">FIXME Course Title</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../getting-started/index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#静的IP構成.adoc">静的IP構成.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#クラウドイニシャルトラブルシューティング.adoc">クラウドイニシャルトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#UDN主ネットワーク.adoc">UDN主ネットワーク.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットセカンダリ.adoc">ローカルネットセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットVLAN.adoc">ローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CUDNローカルネットVLAN.adoc">CUDNローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#レイヤ2セカンダリ.adoc">レイヤ2セカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Linuxブリッジ.adoc">Linuxブリッジ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#SIRIUSセカンダリ.adoc">SIRIUSセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#VM入口ルート.adoc">VM入口ルート.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#OVSブリッジトラブルシューティング.adoc">OVSブリッジトラブルシューティング.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-configuration/index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#内部DNSの仮想マシン.adoc">内部DNSの仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシン.adoc">リモートアクセスを用いたLinux仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc">リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたWindows仮想マシン.adoc">リモートアクセスを用いたWindows仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Windows仮想マシンのVirtioドライバー.adoc">Windows仮想マシンのVirtioドライバー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#インフラストラクチャーノードの配置.adoc">インフラストラクチャーノードの配置.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ノードのアフィニティー.adoc">ノードのアフィニティー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ホットプラグ可能なボリュームとインターフェース.adoc">ホットプラグ可能なボリュームとインターフェース.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#仮想マシンテンプレート.adoc">仮想マシンテンプレート.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リソース制限とQoS.adoc">リソース制限とQoS.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CPUピニング.adoc">CPUピニング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#NUMA大ページ.adoc">NUMA大ページ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リアルタイム仮想マシン.adoc">リアルタイム仮想マシン.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="index.html">ストレージ構成</a></li>
+    <li><a href="creating-managing-storage-class.html">ストレージクラスの作成と管理</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">ストレージクラスの作成と管理</h1>
+<div class="sect1">
+<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルでは、OpenShift Container Platform (OCP) でのストレージクラスについて説明します。このガイドは、OCP 4.x (しばしば OCPv4 と略される) を中心に、Container Storage Interface (CSI) が標準的なストレージプロビジョニング方法であることに焦点を当てています。これらの概念は、OpenShift Virtualization (CNV) でも直接適用されます。ここでは、仮想マシンディスクのプロビジョニング方法を決定するストレージクラスが重要です。ストレージクラスについて詳しくは、以下の OpenShift ドキュメントを参照してください。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>[ストレージクラス API](<a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage_apis/storageclass-storage-k8s-io-v1" class="bare">https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage_apis/storageclass-storage-k8s-io-v1</a>)</p>
+</li>
+<li>
+<p>[Container Storage Interface](<a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/using-container-storage-interface-csi" class="bare">https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/using-container-storage-interface-csi</a>)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ストレージクラスの基本"><a class="anchor" href="#_ストレージクラスの基本"></a>ストレージクラスの基本</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShift で、ストレージクラス (SC) は、クラスターに使用可能なストレージの「クラス」を記述します。これにより、管理者は、ユーザーが底上げインフラストラクチャーの詳細を知らないで異なるストレージ層 (例: "fast-ssd", "cheap-hdd") を定義できます。</p>
+</div>
+<div class="paragraph">
+<p>ユーザーが PersistentVolumeClaim (PVC) を作成するときに、ストレージクラスを指定します。その後、動的プロビジョナーが自動的にバックインの PersistentVolume (PV) を作成します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ストレージクラスオブジェクトの主要パラメーター"><a class="anchor" href="#_ストレージクラスオブジェクトの主要パラメーター"></a>ストレージクラスオブジェクトの主要パラメーター</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><strong>プロビジョナー:</strong> ボリュームを作成するプラグイン (例: AWS の場合 <code>ebs.csi.aws.com</code>, NFS の場合 <code>nfs.csi.k8s.io</code>).</p>
+</li>
+<li>
+<p><strong>パラメーター:</strong> 特定のプロビジョナーに渡されるキー値ペア (例: <code>type: gp3, encrypted: "true"</code>).</p>
+</li>
+<li>
+<p><strong>リクレームポリシー:</strong> PVC が削除されたときに、底上げストレージがどのようになるか。</p>
+</li>
+<li>
+<p><strong>ボリュームバインディングモード:</strong> PVC が使用されるタイミングを制御します。</p>
+</li>
+<li>
+<p><strong>ボリューム拡張を許可する:</strong> PVC を編集して拡張できるようになります。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ボリュームバインディングモード"><a class="anchor" href="#_ボリュームバインディングモード"></a>ボリュームバインディングモード</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>この設定は、特に多ゾーンクラスターまたはローカルストレージ (LVM/HostPath) を使用する場合に、パフォーマンスとスケジューリングにとって重要です。</p>
+</div>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>即時</p>
+<div class="ulist">
+<ul>
+<li>
+<p>動作: PVC が作成されたときに、ボリュームが作成されます。Pod が使用しているかどうかに関係なくです。</p>
+</li>
+<li>
+<p>リスク: 多ゾーンクラスター (例: <code>AWS us-east-1a, 1b, 1c</code>) の場合、ボリュームがゾーン A に作成される可能性があります。その後、Pod がゾーン B のノードにスケジュールされると、ボリュームに接続できません。</p>
+</li>
+<li>
+<p>最適な使用方法: 単一ゾーンクラスターでの標準的なクラウドストレージ; トポロジーが関係ないシナリオ。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>WaitForFirstConsumer (推奨)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>動作: PVC を使用する Pod がスケジュールされるまで、ボリュームの作成が遅らせられます。</p>
+</li>
+<li>
+<p>利点: スケジューラーは、Pod が PVC を必要としていることを認識します。まず、Pod のノードを選択します (例: ゾーン B)。次に、ストレージプロビジョナーをトリガーして、ゾーン B にボリュームを作成します。</p>
+</li>
+<li>
+<p>必要な場合: ローカルストレージ (LVM)、HostPath、またはマルチゾーンクラウド環境。</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_リクレームポリシー"><a class="anchor" href="#_リクレームポリシー"></a>リクレームポリシー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>PVC が削除されたときに、データの運び方を決定します。</p>
+</div>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>Delete (デフォルト)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>動作: PVC が削除されたときに、PV オブジェクトと実際のストレージインフラストラクチャー (例: AWS EBS ボリューム) が削除されます。</p>
+</li>
+<li>
+<p>使用例: エピメラルデータ、CI/CD ワークスペース、テスト。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Retain</p>
+<div class="ulist">
+<ul>
+<li>
+<p>動作: PVC が削除されたときに、PV オブジェクトはリリース状態に残ります。ストレージアレイ上の実際のデータは整理されています。</p>
+</li>
+<li>
+<p>回復: 管理者は、データを手動でクリーンアップするか、PV を削除してスペースを再利用する必要があります。</p>
+</li>
+<li>
+<p>使用例: データベース、重要な生産データで、意図的な削除を防ぐ必要がある場合。</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_デフォルトのストレージクラスの設定"><a class="anchor" href="#_デフォルトのストレージクラスの設定"></a>デフォルトのストレージクラスの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>特定のストレージクラスをデフォルトにマークできます。ユーザーが storageClassName を指定せずに PVC を作成するときに、このクラスが使用されます。</p>
+</div>
+<div class="paragraph">
+<p>コマンド:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc patch storageclass &lt;your-class-name&gt; -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デフォルトの状態を削除する:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc patch storageclass &lt;old-default-name&gt; -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ヒント: デフォルトの SC を 1 つだけマークすることを確認して、混乱を避けてください。
+詳細については、[デフォルトのストレージクラス](<a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/getting-started/default-storage-class.html" class="bare">https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/getting-started/default-storage-class.html</a>) を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ストレージクラスの例"><a class="anchor" href="#_ストレージクラスの例"></a>ストレージクラスの例</h2>
+<div class="sectionbody">
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>AWS EBS (高性能)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>この例では、CSI ドライバーを使用して gp3 ボリュームをプロビジョニングします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3-fast
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+parameters:
+  type: gp3
+  iops: "3000"
+  throughput: "125"
+  encrypted: "true"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OpenShift ドキュメント: <a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/using-container-storage-interface-csi#persistent-storage-csi-ebs" class="bare">https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/using-container-storage-interface-csi#persistent-storage-csi-ebs</a></p>
+</div>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>ローカルストレージ / LVM (パフォーマンス/データベース)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Local Storage Operator または LVM Storage Operator がインストールされている必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-lvm-storage
+provisioner: topolvm.io  # 使用するオペレーターの具体的なものに依存します
+volumeBindingMode: WaitForFirstConsumer # ローカルストレージの場合に重要です
+reclaimPolicy: Retain
+parameters:
+  "csi.storage.k8s.io/fstype": "xfs"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>注: このストレージクラスは参照用の例です。LVMS オペレーターは自動で生成します。</p>
+</div>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>NFS (共有ストレージ / RWX)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>NFS CSI Driver Operator または外部 NFS プロビジョナーが必要です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-shared
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: nfs-server.example.com
+  share: /exports/data
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+mountOptions:
+  - nfsvers=4.1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OpenShift ドキュメント: <a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/persistent-storage-using-local-storage" class="bare">https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/persistent-storage-using-local-storage</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_確認とトラブルシューティングの検証コマンド"><a class="anchor" href="#_確認とトラブルシューティングの検証コマンド"></a>確認とトラブルシューティングの検証コマンド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ストレージクラスをリスト表示:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get sc
+# 名前の (デフォルト) マーカーを探してください</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>クラスを説明:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc describe sc &lt;name&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>テストプロビジョニング: テスト PVCを作成:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: test-pvc
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources: { requests: { storage: 1Gi } }
+  storageClassName: gp3-fast</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OpenShift ドキュメント: <a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/configuring-persistent-storage" class="bare">https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/configuring-persistent-storage</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_一般的なトラブルシューティングシナリオ"><a class="anchor" href="#_一般的なトラブルシューティングシナリオ"></a>一般的なトラブルシューティングシナリオ</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><strong>問題 1:</strong> PVC が保留状態に残る</p>
+<div class="ulist">
+<ul>
+<li>
+<p>原因 A: volumeBindingMode が WaitForFirstConsumer であるが、まだ Pod が PVC を使用していません。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>解決策: この PVC を使用する Pod を作成します。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>原因 B: Pod をスケジュールするノードが十分なリソースがないため、ストレージが待機します。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>解決策: <code>oc get pods</code> を確認して、Pod が保留状態であるかどうかを確認します。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>問題 2:</strong> Pod がボリュームに接続できない (トポロジー不一致)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>エラー: ボリュームノードアフィニティー衝突</p>
+</li>
+<li>
+<p>原因: 多ゾーンクラスター (例: <code>AWS us-east-1a, 1b, 1c</code>) で、volumeBindingMode: Immediate を使用し、ボリュームがゾーン A に作成され、Pod がゾーン B にスケジュールされた場合です。</p>
+</li>
+<li>
+<p>解決策: PVC を削除して、WaitForFirstConsumer を使用するストレージクラスで再度作成します。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>問題 3:</strong> "プロビジョナーが見つかりません"</p>
+<div class="ulist">
+<ul>
+<li>
+<p>原因: provisioner に指定された CSI ドライバーがインストールされていないか、崩れています。</p>
+</li>
+<li>
+<p>解決策: 関連する名前空間 (例: openshift-cluster-csi-drivers) でストレージオペレーターのポッドを確認します。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>問題 4:</strong> ボリューム拡張が失敗する</p>
+<div class="ulist">
+<ul>
+<li>
+<p>原因: StorageClass で allowVolumeExpansion が false に設定されています。</p>
+</li>
+<li>
+<p>解決策: StorageClass を true に編集します。
+NOTE: すべてのプロビジョナーがオンライン拡張をサポートしていないことに注意してください。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_要約"><a class="anchor" href="#_要約"></a>要約</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルで学んだこと:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>OpenShift でのストレージクラスの役割と、動的プロビジョニングのための異なるストレージ層の定義</p>
+</li>
+<li>
+<p>ストレージクラスの主要パラメーター、プロビジョナー、リクレームポリシー、ボリュームバインディングモード、ボリューム拡張</p>
+</li>
+<li>
+<p><code>Immediate</code> と <code>WaitForFirstConsumer</code> ボリュームバインディングモードの違いと、それぞれの使用方法</p>
+</li>
+<li>
+<p>AWS EBS、ローカル LVM、NFS ストレージバックエンド用のストレージクラス定義の作成方法</p>
+</li>
+<li>
+<p>PVC が保留状態になる、トポロジー不一致、ボリューム拡張失敗などの一般的なトラブルシューティングシナリオ</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_参照"><a class="anchor" href="#_参照"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>[OpenShift - 永続ストレージの設定](<a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/configuring-persistent-storage" class="bare">https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/configuring-persistent-storage</a>)</p>
+</li>
+<li>
+<p>[OpenShift - Container Storage Interface](<a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/using-container-storage-interface-csi" class="bare">https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/using-container-storage-interface-csi</a>)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="hostpath-provisioner.html">HostPath Provisioner</a></span>
+  <span class="next"><a href="multi-disk-configuration.html">複数ディスク VM</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

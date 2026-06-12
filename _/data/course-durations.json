@@ -1,81 +1,151 @@
 {
-  "totalSeconds": 428,
-  "pageCount": 15,
+  "totalSeconds": 2597,
+  "pageCount": 29,
   "pages": [
     {
       "module": "ROOT",
       "page": "index.adoc",
-      "seconds": 15
+      "seconds": 40
     },
     {
-      "module": "LABENV",
+      "module": "getting-started",
       "page": "index.adoc",
-      "seconds": 4
+      "seconds": 22
     },
     {
-      "module": "chapter1",
+      "module": "getting-started",
+      "page": "prerequisites.adoc",
+      "seconds": 14
+    },
+    {
+      "module": "getting-started",
+      "page": "install-openshift-virtualization.adoc",
+      "seconds": 65
+    },
+    {
+      "module": "getting-started",
+      "page": "default-storage-class.adoc",
+      "seconds": 77
+    },
+    {
+      "module": "getting-started",
+      "page": "create-vm-web-console.adoc",
+      "seconds": 35
+    },
+    {
+      "module": "getting-started",
+      "page": "vm-lifecycle-states.adoc",
+      "seconds": 118
+    },
+    {
+      "module": "getting-started",
+      "page": "virtctl-basics.adoc",
+      "seconds": 101
+    },
+    {
+      "module": "getting-started",
+      "page": "cloud-init-fundamentals.adoc",
+      "seconds": 105
+    },
+    {
+      "module": "storage",
       "page": "index.adoc",
-      "seconds": 9
+      "seconds": 38
     },
     {
-      "module": "chapter1",
-      "page": "section1.adoc",
-      "seconds": 9
+      "module": "storage",
+      "page": "lvm-operator.adoc",
+      "seconds": 165
     },
     {
-      "module": "chapter1",
-      "page": "section2.adoc",
-      "seconds": 9
+      "module": "storage",
+      "page": "lvm-troubleshooting.adoc",
+      "seconds": 201
     },
     {
-      "module": "chapter1",
-      "page": "section3.adoc",
-      "seconds": 9
+      "module": "storage",
+      "page": "hostpath-provisioner.adoc",
+      "seconds": 183
     },
     {
-      "module": "chapter1",
-      "page": "tabs-demo.adoc",
-      "seconds": 20
+      "module": "storage",
+      "page": "creating-managing-storage-class.adoc",
+      "seconds": 106
     },
     {
-      "module": "chapter1",
-      "page": "collapsible-demo.adoc",
-      "seconds": 36
+      "module": "storage",
+      "page": "multi-disk-configuration.adoc",
+      "seconds": 90
     },
     {
-      "module": "chapter1",
-      "page": "images.adoc",
-      "seconds": 271
-    },
-    {
-      "module": "chapter2",
+      "module": "networking",
       "page": "index.adoc",
-      "seconds": 9
+      "seconds": 59
     },
     {
-      "module": "chapter2",
-      "page": "section1.adoc",
-      "seconds": 9
-    },
-    {
-      "module": "chapter3",
+      "module": "vm-configuration",
       "page": "index.adoc",
-      "seconds": 9
+      "seconds": 40
     },
     {
-      "module": "chapter3",
-      "page": "section1.adoc",
-      "seconds": 9
+      "module": "performance",
+      "page": "index.adoc",
+      "seconds": 26
     },
     {
-      "module": "chapter3",
-      "page": "section2.adoc",
-      "seconds": 9
+      "module": "vm-lifecycle",
+      "page": "index.adoc",
+      "seconds": 29
+    },
+    {
+      "module": "vm-lifecycle",
+      "page": "import-qcow2-boot-volume.adoc",
+      "seconds": 134
+    },
+    {
+      "module": "vm-lifecycle",
+      "page": "custom-golden-images.adoc",
+      "seconds": 102
+    },
+    {
+      "module": "vm-lifecycle",
+      "page": "golden-images-troubleshooting.adoc",
+      "seconds": 101
+    },
+    {
+      "module": "vm-lifecycle",
+      "page": "cloning-vms.adoc",
+      "seconds": 188
+    },
+    {
+      "module": "vm-lifecycle",
+      "page": "vm-snapshots.adoc",
+      "seconds": 92
+    },
+    {
+      "module": "vm-lifecycle",
+      "page": "boot-order-boot-sources.adoc",
+      "seconds": 40
+    },
+    {
+      "module": "manifests",
+      "page": "index.adoc",
+      "seconds": 81
+    },
+    {
+      "module": "api",
+      "page": "index.adoc",
+      "seconds": 23
+    },
+    {
+      "module": "api",
+      "page": "api-component-overview.adoc",
+      "seconds": 305
     },
     {
       "module": "appendix",
-      "page": "appendix.adoc",
-      "seconds": 1
+      "page": "glossary.adoc",
+      "seconds": 17
     }
   ]
 }

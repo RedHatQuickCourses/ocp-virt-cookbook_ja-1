@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>リモートアクセスを通じたLinux VMへのアクセス :: FIXME Course Title</title>
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">FIXME Course Title</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../getting-started/index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../storage/index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#静的IP構成.adoc">静的IP構成.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#クラウドイニシャルトラブルシューティング.adoc">クラウドイニシャルトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#UDN主ネットワーク.adoc">UDN主ネットワーク.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットセカンダリ.adoc">ローカルネットセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットVLAN.adoc">ローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CUDNローカルネットVLAN.adoc">CUDNローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#レイヤ2セカンダリ.adoc">レイヤ2セカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Linuxブリッジ.adoc">Linuxブリッジ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#SIRIUSセカンダリ.adoc">SIRIUSセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#VM入口ルート.adoc">VM入口ルート.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#OVSブリッジトラブルシューティング.adoc">OVSブリッジトラブルシューティング.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#内部DNSの仮想マシン.adoc">内部DNSの仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシン.adoc">リモートアクセスを用いたLinux仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc">リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたWindows仮想マシン.adoc">リモートアクセスを用いたWindows仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Windows仮想マシンのVirtioドライバー.adoc">Windows仮想マシンのVirtioドライバー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#インフラストラクチャーノードの配置.adoc">インフラストラクチャーノードの配置.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ノードのアフィニティー.adoc">ノードのアフィニティー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ホットプラグ可能なボリュームとインターフェース.adoc">ホットプラグ可能なボリュームとインターフェース.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#仮想マシンテンプレート.adoc">仮想マシンテンプレート.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リソース制限とQoS.adoc">リソース制限とQoS.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CPUピニング.adoc">CPUピニング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#NUMA大ページ.adoc">NUMA大ページ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リアルタイム仮想マシン.adoc">リアルタイム仮想マシン.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="remote-access-linux-vms.html">リモートアクセスを通じたLinux VMへのアクセス</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">リモートアクセスを通じたLinux VMへのアクセス</h1>
+<div class="sect1">
+<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルでは、OpenShift Virtualization で実行されているLinux仮想マシンにアクセスするためのさまざまな方法を紹介します。各方法は異なる使用ケースに適しており、トラブルシューティングから生産レベルのアクセスパターンまであります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_アクセス方法と使用ケース"><a class="anchor" href="#_アクセス方法と使用ケース"></a>アクセス方法と使用ケース</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">方法</th>
+<th class="tableblock halign-left valign-top">使用ケース</th>
+<th class="tableblock halign-left valign-top">SSHキーが必要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">コンソール</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">初期設定、トラブルシューティング</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">いいえ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VNC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GUIアクセス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">いいえ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">virtctl SSH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クイックな管理アクセス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">はい</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NodePortサービス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">外部アクセス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">はい</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ポートフォワード</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">開発、テスト</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">はい</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">セカンダリーネットワーク</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">伝統的なインフラストラクチャ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">はい</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>OpenShift 4.18+ で OpenShift Virtualization オペレーターがインストールされている</p>
+</li>
+<li>
+<p>CLI ツール: <code>oc</code>, <code>virtctl</code>, <code>kubectl</code></p>
+</li>
+<li>
+<p>少なくとも 1 つの実行中の Linux VM (このチュートリアルでは作成します)</p>
+</li>
+<li>
+<p>SSH とネットワーキングの基本的な理解</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_セットアップ_テスト_vm_のデプロイ"><a class="anchor" href="#_セットアップ_テスト_vm_のデプロイ"></a>セットアップ: テスト VM のデプロイ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>名前空間を作成し、Fedora VM をデプロイします:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc create namespace vm-access-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>SSH を有効にした VM を作成します:</p>
+</div>
+<div class="paragraph">
+<p>[注意] この例の cloud-init パスワードはデモ目的でのみ使用されます。実際の生産環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。</p>
+</div>
+<div class="paragraph">
+<p><a href="#attachment$remote-access-linux-vms/fedora-access-vm.yaml" class="xref unresolved">fedora-access-vm.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fedora-access-vm
+  namespace: vm-access-demo
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        name: fedora-access-vm-disk
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: fedora
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: fedora-access-vm
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              name: default
+          rng: {}
+        machine:
+          type: pc-q35-rhel9.4.0
+        memory:
+          guest: 4Gi
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - dataVolume:
+            name: fedora-access-vm-disk
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: fedora
+              password: fedora123
+              chpasswd: { expire: false }
+              ssh_pwauth: true
+              ssh_authorized_keys:
+                - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... your-public-key-here
+          name: cloudinitdisk</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>your-public-key-here</code> を、実際の SSH 公開鍵に置き換えます。または、パスワード認証を使用する場合は、テストのために使用できます。</p>
+</div>
+<div class="paragraph">
+<p>VM をデプロイします:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f fedora-access-vm.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>VM が準備ができたことを待ちます:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vmi -n vm-access-demo</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_手法_1_virtctl_を使用したコンソールアクセス"><a class="anchor" href="#_手法_1_virtctl_を使用したコンソールアクセス"></a>手法 1: virtctl を使用したコンソールアクセス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>VM に直接コンソールアクセスを行う最も基本的な方法です。</p>
+</div>
+<div class="sect2">
+<h3 id="_コンソールにアクセスする"><a class="anchor" href="#_コンソールにアクセスする"></a>コンソールにアクセスする</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl console fedora-access-vm -n vm-access-demo</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_コンソールから退出する"><a class="anchor" href="#_コンソールから退出する"></a>コンソールから退出する</h3>
+<div class="paragraph">
+<p><code>Ctrl+]</code> を押して退出します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_使用する際"><a class="anchor" href="#_使用する際"></a>使用する際</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>VM の初期設定と構成</p>
+</li>
+<li>
+<p>ネットワーク接続がない場合のトラブルシューティング</p>
+</li>
+<li>
+<p>SSH に応答しない VM</p>
+</li>
+<li>
+<p>ネットワークが壊れた場合の緊急アクセス</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_制限事項"><a class="anchor" href="#_制限事項"></a>制限事項</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>コピー・ペーストのサポートが限定されている (制限)</p>
+</li>
+<li>
+<p>スクロールバックがない</p>
+</li>
+<li>
+<p>テキストのみのインターフェース</p>
+</li>
+<li>
+<p>1 つのセッションのみ</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_手法_2_vnc_アクセス"><a class="anchor" href="#_手法_2_vnc_アクセス"></a>手法 2: VNC アクセス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>グラフィカルデスクトップ環境を持つ VM に対して使用します。</p>
+</div>
+<div class="sect2">
+<h3 id="_vnc_セッションを開始する"><a class="anchor" href="#_vnc_セッションを開始する"></a>VNC セッションを開始する</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl vnc fedora-access-vm -n vm-access-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、VM のディスプレイに接続する VNC ビューアーを起動します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_使用する際_2"><a class="anchor" href="#_使用する際_2"></a>使用する際</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>デスクトップ Linux VM にアクセスする</p>
+</li>
+<li>
+<p>GUI アプリケーションを実行する</p>
+</li>
+<li>
+<p>GUI を必要とするソフトウェアのインストール</p>
+</li>
+<li>
+<p>ディスプレイの問題をトラブルシューティングする</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_要件"><a class="anchor" href="#_要件"></a>要件</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>ローカルに VNC ビューアーがインストールされている</p>
+</li>
+<li>
+<p>デスクトップ環境 (GNOME、KDE など) を持つ VM</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_手法_3_virtctl_を使用した_ssh"><a class="anchor" href="#_手法_3_virtctl_を使用した_ssh"></a>手法 3: virtctl を使用した SSH</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>virtctl コマンドを使用して、クイックな SSH アクセスを得ます。この方法は、ポートフォワーディングを使用して VM の SSH ポートに接続します。</p>
+</div>
+<div class="sect2">
+<h3 id="_前提条件_2"><a class="anchor" href="#_前提条件_2"></a>前提条件</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>VM 内で SSH キーが構成されている (cloud-init を介す)</p>
+</li>
+<li>
+<p>VM 内で SSH サービスが実行中</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ssh_への接続"><a class="anchor" href="#_ssh_への接続"></a>SSH への接続</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl ssh fedora@fedora-access-vm -n vm-access-demo</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ホストキー確認をスキップする_テストのため"><a class="anchor" href="#_ホストキー確認をスキップする_テストのため"></a>ホストキー確認をスキップする (テストのため)</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl ssh fedora@fedora-access-vm -n vm-access-demo --local-ssh-opts="-o StrictHostKeyChecking=no"</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_使用する際_3"><a class="anchor" href="#_使用する際_3"></a>使用する際</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>クイックな管理アクセス</p>
+</li>
+<li>
+<p>開発とテスト</p>
+</li>
+<li>
+<p>一時的なアクセスの必要性</p>
+</li>
+<li>
+<p>oc/kubectl を介したクラスターへのアクセスがある場合</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_制限事項_2"><a class="anchor" href="#_制限事項_2"></a>制限事項</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>クラスターへのアクセスが必要</p>
+</li>
+<li>
+<p>ポートフォワーディングを使用し、少しの遅延が生じる可能性がある</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_手法_4_ノードポートサービスを使用した直接の_ssh"><a class="anchor" href="#_手法_4_ノードポートサービスを使用した直接の_ssh"></a>手法 4: ノードポートサービスを使用した直接の SSH</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ノードポートサービスを使用して SSH ポートを外部に公開します。</p>
+</div>
+<div class="sect2">
+<h3 id="_ノードポートサービスの作成"><a class="anchor" href="#_ノードポートサービスの作成"></a>ノードポートサービスの作成</h3>
+<div class="paragraph">
+<p><a href="#attachment$remote-access-linux-vms/ssh-nodeport-service.yaml" class="xref unresolved">ssh-nodeport-service.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: fedora-ssh-nodeport
+  namespace: vm-access-demo
+spec:
+  type: NodePort
+  selector:
+    kubevirt.io/domain: fedora-access-vm
+  ports:
+    - protocol: TCP
+      port: 22
+      targetPort: 22
+      nodePort: 30022</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>サービスを適用します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f fedora-ssh-nodeport.yaml</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_サービスの確認"><a class="anchor" href="#_サービスの確認"></a>サービスの確認</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get svc fedora-ssh-nodeport -n vm-access-demo</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ssh_への接続_2"><a class="anchor" href="#_ssh_への接続_2"></a>SSH への接続</h3>
+<div class="paragraph">
+<p>クラスターノードの IP を取得します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get nodes -o wide</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ノードポートを使用して接続します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ssh fedora@&lt;node-ip&gt; -p 30022</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_使用する際_4"><a class="anchor" href="#_使用する際_4"></a>使用する際</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>外部アクセスが必要</p>
+</li>
+<li>
+<p>簡単なデプロイメント (ロードバランサーなし)</p>
+</li>
+<li>
+<p>開発/テストクラスター</p>
+</li>
+<li>
+<p>クイックな外部アクセス設定</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_セキュリティーに関する考慮事項"><a class="anchor" href="#_セキュリティーに関する考慮事項"></a>セキュリティーに関する考慮事項</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>クラスターノード上で SSH ポートをすべてのノードに公開</p>
+</li>
+<li>
+<p>強力な認証 (SSH キーのみ) を実装</p>
+</li>
+<li>
+<p>ファイアウォールのルールを考慮</p>
+</li>
+<li>
+<p>生産では推奨しない</p>
+</li>
+<li>
+<p>未許可のアクセス試行を監視</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_手法_5_kubectloc_のポートフォワードを使用した_ssh"><a class="anchor" href="#_手法_5_kubectloc_のポートフォワードを使用した_ssh"></a>手法 5: kubectl/oc のポートフォワードを使用した SSH</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>kubectl/oc のポートフォワードを使用して、一時的な SSH アクセスを得ます。</p>
+</div>
+<div class="sect2">
+<h3 id="_vm_pod_を見つける"><a class="anchor" href="#_vm_pod_を見つける"></a>VM Pod を見つける</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pods -n vm-access-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">NAME                                   READY   STATUS    RESTARTS   AGE
+virt-launcher-fedora-access-vm-xxxxx   2/2     Running   0          10m</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ssh_ポートをフォワードする"><a class="anchor" href="#_ssh_ポートをフォワードする"></a>SSH ポートをフォワードする</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc port-forward -n vm-access-demo virt-launcher-fedora-access-vm-xxxxx 2222:22</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ssh_への接続_別のターミナルで"><a class="anchor" href="#_ssh_への接続_別のターミナルで"></a>SSH への接続 (別のターミナルで)</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ssh fedora@localhost -p 2222</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_使用する際_5"><a class="anchor" href="#_使用する際_5"></a>使用する際</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>一時的なアクセスが必要</p>
+</li>
+<li>
+<p>開発とテスト</p>
+</li>
+<li>
+<p>特定の VM のトラブルシューティング</p>
+</li>
+<li>
+<p>NodePort/LoadBalancer が使用できない場合</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_制限事項_3"><a class="anchor" href="#_制限事項_3"></a>制限事項</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>ポートフォワードがアクティブになる必要がある</p>
+</li>
+<li>
+<p>1 つの接続のみ</p>
+</li>
+<li>
+<p>生産では使用できない</p>
+</li>
+<li>
+<p>アクティブなターミナルセッションが必要</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_手法_6_セカンダリーネットワークを通じた直接のネットワークアクセス"><a class="anchor" href="#_手法_6_セカンダリーネットワークを通じた直接のネットワークアクセス"></a>手法 6: セカンダリーネットワークを通じた直接のネットワークアクセス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ブリッジまたは localnet ネットワークにある VM に対して、直接 IP でアクセスします。</p>
+</div>
+<div class="sect2">
+<h3 id="_前提条件_3"><a class="anchor" href="#_前提条件_3"></a>前提条件</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>VM がブリッジ、localnet、VLAN などのセカンダリーネットワークに接続されている</p>
+</li>
+<li>
+<p>あなたの場所からアクセス可能なネットワーク</p>
+</li>
+<li>
+<p>静的 IP (DHCP に予約されたアドレス) が設定されている</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_セカンダリーネットワークを持つ_vm"><a class="anchor" href="#_セカンダリーネットワークを持つ_vm"></a>セカンダリーネットワークを持つ VM</h3>
+<div class="paragraph">
+<p><a href="#attachment$remote-access-linux-vms/fedora-vlan-access-vm.yaml" class="xref unresolved">fedora-vlan-access-vm.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fedora-vlan-vm
+  namespace: vm-access-demo
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        name: fedora-vlan-vm-disk
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: fedora
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: fedora-vlan-vm
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              name: default
+            - bridge: {}
+              name: vlan-network
+          rng: {}
+        machine:
+          type: pc-q35-rhel9.4.0
+        memory:
+          guest: 4Gi
+      networks:
+        - name: default
+          pod: {}
+        - name: vlan-network
+          multus:
+            networkName: localnet-vlan-100
+      volumes:
+        - dataVolume:
+            name: fedora-vlan-vm-disk
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: fedora
+              password: fedora123
+              chpasswd: { expire: false }
+              ssh_pwauth: true
+              ssh_authorized_keys:
+                - ssh-rsa AAAAB3NzaC... your-public-key-here
+            networkData: |-
+              version: 2
+              ethernets:
+                enp1s0:
+                  dhcp4: true
+                enp2s0:
+                  dhcp4: false
+                  dhcp6: false
+                  addresses:
+                    - 192.168.100.100/24
+          name: cloudinitdisk</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ssh_への接続_3"><a class="anchor" href="#_ssh_への接続_3"></a>SSH への接続</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ssh fedora@192.168.100.100</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_使用する際_6"><a class="anchor" href="#_使用する際_6"></a>使用する際</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>生産環境</p>
+</li>
+<li>
+<p>伝統的なインフラストラクチャー パターン</p>
+</li>
+<li>
+<p>持続的な、予測可能なアクセスが必要な VM</p>
+</li>
+<li>
+<p>既存のネットワークとの統合</p>
+</li>
+<li>
+<p>同じネットワークセグメントに複数の VM</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_利点"><a class="anchor" href="#_利点"></a>利点</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>ネットワークアクセスのネイティブ</p>
+</li>
+<li>
+<p>ポートフォワーディングのオーバーヘッドがない</p>
+</li>
+<li>
+<p>複数の同時接続</p>
+</li>
+<li>
+<p>標準的なネットワークツールが機能する</p>
+</li>
+<li>
+<p>伝統的なアーキテクチャーに合わせる</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ssh_キーの構成"><a class="anchor" href="#_ssh_キーの構成"></a>SSH キーの構成</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_必要に応じて_ssh_キーを生成する"><a class="anchor" href="#_必要に応じて_ssh_キーを生成する"></a>必要に応じて SSH キーを生成する</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ssh-keygen -t rsa -b 4096 -f ~/.ssh/ocp-virt-key</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_cloud_init_にキーを追加する"><a class="anchor" href="#_cloud_init_にキーを追加する"></a>cloud-init にキーを追加する</h3>
+<div class="paragraph">
+<p>VM の <code>userData</code> セクションに含めます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC... your-key-here</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_パスワード認証を無効にする"><a class="anchor" href="#_パスワード認証を無効にする"></a>パスワード認証を無効にする</h3>
+<div class="paragraph">
+<p>生産環境では、パスワード認証を無効にし、root ログインを防止します。<code>userData</code> セクションの cloud-init 設定に次の設定を追加します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">volumes:
+  - cloudInitNoCloud:
+      userData: |-
+        #cloud-config
+        user: fedora
+        ssh_pwauth: false
+        disable_root: true
+        ssh_authorized_keys:
+          - ssh-rsa AAAAB3NzaC... your-key-here
+    name: cloudinitdisk</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この構成:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ssh_pwauth: false</code> - SSH でのパスワード認証を無効に</p>
+</li>
+<li>
+<p><code>disable_root: true</code> - SSH での root ログインを防止</p>
+</li>
+<li>
+<p>SSH キー認証のみが必要</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_確認コマンド"><a class="anchor" href="#_確認コマンド"></a>確認コマンド</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_vm_の状態を確認する"><a class="anchor" href="#_vm_の状態を確認する"></a>VM の状態を確認する</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># VirtualMachine
+oc get vm -n vm-access-demo
+
+# VirtualMachineInstance
+oc get vmi -n vm-access-demo
+
+# VM の詳細情報
+oc describe vmi fedora-access-vm -n vm-access-demo</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_vm_内で_ssh_サービスを確認する"><a class="anchor" href="#_vm_内で_ssh_サービスを確認する"></a>VM 内で SSH サービスを確認する</h3>
+<div class="paragraph">
+<p>コンソールから:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl console fedora-access-vm -n vm-access-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>VM 内で:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># SSH サービスの状態を確認する
+sudo systemctl status sshd
+
+# SSH が 22 ポートでリッスンしているかを確認する
+sudo ss -tlnp | grep :22
+
+# ファイアウォールを確認する
+sudo firewall-cmd --list-all</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ネットワーク接続をテストする"><a class="anchor" href="#_ネットワーク接続をテストする"></a>ネットワーク接続をテストする</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># VM 内で
+ping -c 3 8.8.8.8
+
+# 同じネットワークにある場合 (外部から)
+ping -c 3 192.168.100.100</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_一般的な問題と解決策"><a class="anchor" href="#_一般的な問題と解決策"></a>一般的な問題と解決策</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>すべてのアクセス方法のトラブルシューティングについては、<a href="remote-access-linux-troubleshooting.html" class="xref page">リモートアクセスのLinux VMのトラブルシューティング</a>を参照してください。</p>
+</div>
+<div class="sect2">
+<h3 id="_問題_virtctl_console_がログインプロンプトを表示しない"><a class="anchor" href="#_問題_virtctl_console_がログインプロンプトを表示しない"></a>問題: virtctl console がログインプロンプトを表示しない</h3>
+<div class="paragraph">
+<p><strong>問題</strong>: VM が完全にブートされていないか、ディスプレイの問題がある</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>: 長く待ち、VM の状態を確認し、VM が実行中であることを確認する</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_問題_ssh_接続が拒否される"><a class="anchor" href="#_問題_ssh_接続が拒否される"></a>問題: SSH 接続が拒否される</h3>
+<div class="paragraph">
+<p><strong>問題</strong>: SSH サービスが実行されていないか、ファイアウォールがブロックしている</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>sshd の状態を確認: <code>sudo systemctl status sshd</code></p>
+</li>
+<li>
+<p>必要に応じて開始: <code>sudo systemctl start sshd</code></p>
+</li>
+<li>
+<p>ファイアウォールを確認: <code>sudo firewall-cmd --list-services</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_問題_virtctl_ssh_接続が失敗する"><a class="anchor" href="#_問題_virtctl_ssh_接続が失敗する"></a>問題: virtctl ssh 接続が失敗する</h3>
+<div class="paragraph">
+<p><strong>問題</strong>: SSH サービスが実行されていないか、認証障害がある</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>VM 内で SSH サービスが実行中であることを確認する</p>
+</li>
+<li>
+<p>SSH キーの構成が正しく行われていることを確認する</p>
+</li>
+<li>
+<p>VM がネットワーク接続があることを確認する</p>
+</li>
+<li>
+<p>クラスター内でポートフォワード方法を使用して SSH をテストする</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_問題_nodeport_がアクセスできない"><a class="anchor" href="#_問題_nodeport_がアクセスできない"></a>問題: NodePort がアクセスできない</h3>
+<div class="paragraph">
+<p><strong>問題</strong>: クラスターノードのファイアウォールがポートをブロックしている</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>: ノードファイアウォールのルールを確認し、NodePort の範囲が開いていることを確認する</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_問題_セカンダリーネットワークの_ip_に接続できない"><a class="anchor" href="#_問題_セカンダリーネットワークの_ip_に接続できない"></a>問題: セカンダリーネットワークの IP に接続できない</h3>
+<div class="paragraph">
+<p><strong>問題</strong>: ネットワークが到達できないか、ルーティングの問題がある</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>: ネットワーク構成を確認し、ルートを確認し、ブリッジまたは VLAN が適切に構成されていることを確認する</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_セキュリティーのベストプラクティス"><a class="anchor" href="#_セキュリティーのベストプラクティス"></a>セキュリティーのベストプラクティス</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_認証"><a class="anchor" href="#_認証"></a>認証</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>SSH キーのみを使用し、パスワード認証を無効にする</p>
+</li>
+<li>
+<p>定期的に SSH キーを回転する</p>
+</li>
+<li>
+<p>異なる環境用に異なるキーを使用する</p>
+</li>
+<li>
+<p>キー管理ポリシーを実装する</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ネットワークセキュリティー"><a class="anchor" href="#_ネットワークセキュリティー"></a>ネットワークセキュリティー</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>可能な限り、特定の IP に NodePort の公開を制限する</p>
+</li>
+<li>
+<p>ネットワークポリシーを使用して VM へのアクセスを制限する</p>
+</li>
+<li>
+<p>VM のファイアウォールを適切に構成する</p>
+</li>
+<li>
+<p>定期的にアクセスログを監視する</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_アクセス制御"><a class="anchor" href="#_アクセス制御"></a>アクセス制御</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>virtctl へのアクセス制御を RBAC で実装する</p>
+</li>
+<li>
+<p>異なる環境用に異なる名前空間を使用する</p>
+</li>
+<li>
+<p>誰がどの VM にアクセスできるかを記録する</p>
+</li>
+<li>
+<p>定期的なアクセス監査を行う</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_クリーンアップ"><a class="anchor" href="#_クリーンアップ"></a>クリーンアップ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルで作成したすべてのリソースを削除します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># VM を削除
+oc delete vm fedora-access-vm fedora-vlan-vm -n vm-access-demo
+
+# サービスを削除
+oc delete svc fedora-ssh-nodeport -n vm-access-demo
+
+# 名前空間を削除
+oc delete namespace vm-access-demo</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_要約"><a class="anchor" href="#_要約"></a>要約</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルで、以下のことを学びました:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>OpenShift Virtualization で Linux VM にアクセスするためのさまざまな方法</p>
+</li>
+<li>
+<p>各アクセス方法の使用ケース</p>
+</li>
+<li>
+<p>cloud-init を介した SSH キーの構成</p>
+</li>
+<li>
+<p>サービスを使用して VM を外部に公開する</p>
+</li>
+<li>
+<p>ポートフォワードを使用して一時的なアクセスを得る</p>
+</li>
+<li>
+<p>セカンダリーネットワークを通じた VM へのアクセス</p>
+</li>
+<li>
+<p>VM へのアクセスのセキュリティー最適化</p>
+</li>
+<li>
+<p>一般的な問題とトラブルシューティング手順</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_参照"><a class="anchor" href="#_参照"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/4.19/html/virtualization/managing-vms" target="_blank" rel="noopener">仮想マシンの管理</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

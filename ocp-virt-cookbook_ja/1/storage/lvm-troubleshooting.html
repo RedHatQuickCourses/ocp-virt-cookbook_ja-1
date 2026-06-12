@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>LVMストレージオペレーターのトラブルシューティング :: FIXME Course Title</title>
+    <link rel="prev" href="lvm-operator.html">
+    <link rel="next" href="hostpath-provisioner.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">FIXME Course Title</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../getting-started/index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#静的IP構成.adoc">静的IP構成.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#クラウドイニシャルトラブルシューティング.adoc">クラウドイニシャルトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#UDN主ネットワーク.adoc">UDN主ネットワーク.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットセカンダリ.adoc">ローカルネットセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットVLAN.adoc">ローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CUDNローカルネットVLAN.adoc">CUDNローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#レイヤ2セカンダリ.adoc">レイヤ2セカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Linuxブリッジ.adoc">Linuxブリッジ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#SIRIUSセカンダリ.adoc">SIRIUSセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#VM入口ルート.adoc">VM入口ルート.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#OVSブリッジトラブルシューティング.adoc">OVSブリッジトラブルシューティング.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-configuration/index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#内部DNSの仮想マシン.adoc">内部DNSの仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシン.adoc">リモートアクセスを用いたLinux仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc">リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたWindows仮想マシン.adoc">リモートアクセスを用いたWindows仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Windows仮想マシンのVirtioドライバー.adoc">Windows仮想マシンのVirtioドライバー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#インフラストラクチャーノードの配置.adoc">インフラストラクチャーノードの配置.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ノードのアフィニティー.adoc">ノードのアフィニティー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ホットプラグ可能なボリュームとインターフェース.adoc">ホットプラグ可能なボリュームとインターフェース.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#仮想マシンテンプレート.adoc">仮想マシンテンプレート.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リソース制限とQoS.adoc">リソース制限とQoS.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CPUピニング.adoc">CPUピニング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#NUMA大ページ.adoc">NUMA大ページ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リアルタイム仮想マシン.adoc">リアルタイム仮想マシン.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="index.html">ストレージ構成</a></li>
+    <li><a href="lvm-troubleshooting.html">LVMトラブルシューティング</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">LVMストレージオペレーターのトラブルシューティング</h1>
+<div class="sect1">
+<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、OpenShiftのLVMストレージオペレーターのトラブルシューティング手順を提供します。これらのコマンドを使用して、LVMストレージのプロビジョニング、ボリュームグループ、および永続ボリューム要求の一般的な問題を診断および解決します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_クイックヘルスチェック"><a class="anchor" href="#_クイックヘルスチェック"></a>クイックヘルスチェック</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>以下のヘルスチェックを実行して、LVMストレージが正しく動作していることを確認します。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 1. LVMClusterのステータスを確認
+oc get lvmcluster -n openshift-lvm-storage
+
+# 2. すべてのポッドが実行中であることを確認
+oc get pods -n openshift-lvm-storage
+
+# 3. StorageClassが存在することを確認
+oc get storageclass | grep lvms
+
+# 4. ノード上のボリュームグループを確認
+oc debug node/&lt;node-name&gt; -- chroot /host vgs
+
+# 5. スリムプールを確認
+oc debug node/&lt;node-name&gt; -- chroot /host lvs</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>正常な出力:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>LVMCluster: <code>STATUS: Ready</code></p>
+</li>
+<li>
+<p>ポッド: すべて`Running`で再起動がない</p>
+</li>
+<li>
+<p>StorageClass: `lvms-vg1`が存在</p>
+</li>
+<li>
+<p>VG: 使用可能なスペースを示すボリュームグループが表示される</p>
+</li>
+<li>
+<p>LV: データ/メタデータの使用率が低いスリムプールが表示される</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_コンポーネントごとの検証コマンド"><a class="anchor" href="#_コンポーネントごとの検証コマンド"></a>コンポーネントごとの検証コマンド</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_lvmclusterのステータス"><a class="anchor" href="#_lvmclusterのステータス"></a>LVMClusterのステータス</h3>
+<div class="sect3">
+<h4 id="_基本的なステータスの確認"><a class="anchor" href="#_基本的なステータスの確認"></a>基本的なステータスの確認</h4>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get lvmcluster -n openshift-lvm-storage</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>正常な出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>NAME         STATUS
+lvmcluster   Ready</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>不健康な指標:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ステータスが`NotReady`、<code>Degraded</code>、または`Error`に表示される</p>
+</li>
+<li>
+<p>リソースが見つからない</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_詳細なステータスの確認"><a class="anchor" href="#_詳細なステータスの確認"></a>詳細なステータスの確認</h4>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get lvmcluster lvmcluster -n openshift-lvm-storage -o yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>探している内容:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">status:
+  conditions:
+  - status: "True"
+    type: ResourcesAvailable
+    message: Reconciliation is complete and all the resources are available
+  - status: "True"
+    type: VolumeGroupsReady
+    message: All the VGs are ready
+  deviceClassStatuses:
+  - name: vg1
+    nodeStatus:
+    - devices:
+      - /dev/sda
+      status: Ready
+  ready: true
+  state: Ready</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>重要なフィールド:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>status.conditions</code>: `ResourcesAvailable: True`と`VolumeGroupsReady: True`が表示される必要がある</p>
+</li>
+<li>
+<p><code>deviceClassStatuses[].nodeStatus[].status</code>: `Ready`にする必要がある</p>
+</li>
+<li>
+<p><code>deviceClassStatuses[].nodeStatus[].devices</code>: 構成されたディスクをリストに含める必要がある</p>
+</li>
+<li>
+<p><code>ready: true`と`state: Ready</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_デバイスディスカバリーと除外の表示"><a class="anchor" href="#_デバイスディスカバリーと除外の表示"></a>デバイスディスカバリーと除外の表示</h4>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get lvmcluster lvmcluster -n openshift-lvm-storage -o yaml | grep -A 50 "deviceClassStatuses"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>例出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">deviceClassStatuses:
+- name: vg1
+  nodeStatus:
+  - devices:
+    - /dev/sda
+    excluded:
+    - name: /dev/sdc
+      reasons:
+      - /dev/sdcには子ブロックデバイスがあり、考慮できなかった
+      - /dev/sdcはデバイスセレクターに含まれていない
+    status: Ready</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、選択されたデバイスと除外された理由を示しています。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ポッドのステータス"><a class="anchor" href="#_ポッドのステータス"></a>ポッドのステータス</h3>
+<div class="sect3">
+<h4 id="_すべてのポッドの確認"><a class="anchor" href="#_すべてのポッドの確認"></a>すべてのポッドの確認</h4>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pods -n openshift-lvm-storage</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>正常な出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>NAME                             READY   STATUS    RESTARTS   AGE
+lvms-operator-864b6975bb-kxt4t   1/1     Running   0          10m
+vg-manager-xxxxx                 1/1     Running   0          5m</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待されるポッド:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>lvms-operator</strong>: 常に存在し、LVMストレージのライフサイクルを管理します</p>
+</li>
+<li>
+<p><strong>vg-manager</strong>: ノードごとに1つ、そのノード上のボリュームグループを管理します</p>
+</li>
+<li>
+<p><strong>topolvm-controller</strong>: 単一ノードOpenShift (SNO)ではない場合には存在しない可能性があります</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ポッドの詳細の確認"><a class="anchor" href="#_ポッドの詳細の確認"></a>ポッドの詳細の確認</h4>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># ポッドの詳細を取得
+oc describe pod -n openshift-lvm-storage &lt;pod-name&gt;
+
+# 特定のポッドのログを確認
+oc logs -n openshift-lvm-storage &lt;pod-name&gt;
+
+# vg-managerのログ (デバイスの問題を解決するために最も役立つ)
+oc logs -n openshift-lvm-storage daemonset/vg-manager</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>一般的なログエラー:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>"device is in use"</code> - ディスクがシステムによってマウントまたは使用されている</p>
+</li>
+<li>
+<p><code>"cannot wipe device"</code> - `forceWipeDevicesAndDestroyAllData: true`が必要</p>
+</li>
+<li>
+<p><code>"device not found"</code> - 誤ったデバイスパスが指定されている</p>
+</li>
+<li>
+<p><code>"no devices found"</code> - デバイスセレクターが利用可能なデバイスと一致しない</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_オペレーターのインストールの確認"><a class="anchor" href="#_オペレーターのインストールの確認"></a>オペレーターのインストールの確認</h4>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># ClusterServiceVersionの確認
+oc get csv -n openshift-lvm-storage
+
+# サブスクリプションの確認
+oc get subscription -n openshift-lvm-storage
+
+# インストールプランの確認
+oc get installplan -n openshift-lvm-storage</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ストレージリソース"><a class="anchor" href="#_ストレージリソース"></a>ストレージリソース</h3>
+<div class="sect3">
+<h4 id="_storageclassの確認"><a class="anchor" href="#_storageclassの確認"></a>StorageClassの確認</h4>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># すべてのStorageClassのリスト表示
+oc get storageclass
+
+# 特定のLVMストレージStorageClassの取得
+oc get storageclass lvms-vg1 -o yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>正常な出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>NAME       PROVISIONER   RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+lvms-vg1   topolvm.io    Delete          WaitForFirstConsumer   true                   10m</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>重要なパラメーター:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>PROVISIONER: topolvm.io</code> - 正しいプロビジョナー</p>
+</li>
+<li>
+<p><code>VOLUMEBINDINGMODE: WaitForFirstConsumer</code> - 効率的なバインディング</p>
+</li>
+<li>
+<p><code>ALLOWVOLUMEEXPANSION: true</code> - ボリューム拡張が有効</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_storageclassがデフォルトであるかどうかの確認"><a class="anchor" href="#_storageclassがデフォルトであるかどうかの確認"></a>StorageClassがデフォルトであるかどうかの確認</h4>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get storageclass lvms-vg1 -o jsonpath='{.metadata.annotations.storageclass\.kubernetes\.io/is-default-class}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>出力:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>true</code> - このはデフォルトのStorageClass</p>
+</li>
+<li>
+<p>出力なしまたは`false` - デフォルトではない</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_persistentvolumesの確認"><a class="anchor" href="#_persistentvolumesの確認"></a>PersistentVolumesの確認</h4>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># すべてのPVのリスト表示
+oc get pv
+
+# LVMストレージを使用するPVの確認
+oc get pv | grep topolvm</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ボリュームグループの検証"><a class="anchor" href="#_ボリュームグループの検証"></a>ボリュームグループの検証</h3>
+<div class="sect3">
+<h4 id="_ボリュームグループのステータスの確認"><a class="anchor" href="#_ボリュームグループのステータスの確認"></a>ボリュームグループのステータスの確認</h4>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc debug node/&lt;node-name&gt; -- chroot /host vgs</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>正常な出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>VG   #PV #LV #SN Attr   VSize   VFree
+vg1    1   1   0 wz--n- 558.37g &lt;55.84g</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>確認すべき点:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>VG名がLVMClusterの構成と一致する (例: <code>vg1</code>)</p>
+</li>
+<li>
+<p>`VSize`は総ディスクサイズを示す</p>
+</li>
+<li>
+<p>`VFree`は利用可能なスペースを示す</p>
+</li>
+<li>
+<p><code>Attr`は`wz&#8212;&#8203;n-</code> (書き込み可能、拡張可能、通常)を含む必要がある</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ボリュームグループの詳細の確認"><a class="anchor" href="#_ボリュームグループの詳細の確認"></a>ボリュームグループの詳細の確認</h4>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc debug node/&lt;node-name&gt; -- chroot /host vgdisplay vg1</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_例出力"><a class="anchor" href="#_例出力"></a>例出力:</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>--- ボリュームグループ ---
+VG Name               vg1
+System ID
+Format                lvm2
+Metadata Areas        1
+Metadata Sequence No  2
+VG Access             read/write
+VG Status             resizable
+MAX LV                0
+Cur LV                1
+Open LV               0
+Max PV                0
+Cur PV                1
+Act PV                1
+VG Size               558.37 GiB
+PE Size               4.00 MiB
+Total PE              142942
+Alloc PE / Size       128517 / 502.04 GiB
+Free  PE / Size       14425 / 56.35 GiB
+VG UUID               abc123&#8230;&#8203;</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>健康の側面:
+
+* `VG Status: resizable`
+* `VG Access: read/write`
+* `Free PE / Size`は利用可能なスペースを示す
+
+=== スリムプールの検証
+
+==== スリムプールのステータスの確認
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lvs</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>正常な出力:</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>LV          VG  Attr       LSize    Pool Origin Data%  Meta%
+thin-pool-1 vg1 twi-a-tz-- &lt;502.04g             0.00   6.76</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>属性の分解 (twi-a-tz--):
+
+* `t` - スリムプール
+* `w` - 書き込み可能
+* `i` - 継承
+* `a` - アクティブ
+* `t` - スリム
+* `z` - 零
+
+データ%とメタデータ%のしきい値:
+
+* **データ%**: スリムプールのデータが使用されている量を示す
+  ** `&lt; 80%` - 正常
+  ** `80-90%` - 注意深く監視する
+  ** `&gt; 90%` - 拡張またはクリーニングを検討する
+* **Meta%**: メタデータの使用量を示す
+  ** `&lt; 80%` - 正常
+  ** `&gt; 80%` - メタデータの拡張が必要かもしれない
+
+==== スリムプールの詳細の確認
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lvdisplay vg1/thin-pool-1</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>=== 物理ボリュームの検証
+
+==== 物理ボリュームの確認
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host pvs</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>正常な出力:</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>PV         VG  Fmt  Attr PSize   PFree
+/dev/sda   vg1 lvm2 a--  558.37g &lt;55.84g</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>属性の分解 (a--):
+
+* `a` - 可用
+* `-` - 非エクスポート
+* `-` - 見つからない
+
+==== 物理ボリュームの詳細の確認
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host pvdisplay /dev/sda</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>==== デバイスパスの検証
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+</div>
+</div>
+<h1 id="_デバイスの存在を確認" class="sect0"><a class="anchor" href="#_デバイスの存在を確認"></a>デバイスの存在を確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host ls -la /dev/sda</p>
+</div>
+<h1 id="_デバイスがブロックデバイスであることを確認" class="sect0"><a class="anchor" href="#_デバイスがブロックデバイスであることを確認"></a>デバイスがブロックデバイスであることを確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lsblk /dev/sda</p>
+</div>
+<h1 id="_デバイスがマウントされていないことを確認" class="sect0"><a class="anchor" href="#_デバイスがマウントされていないことを確認"></a>デバイスがマウントされていないことを確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host mount | grep /dev/sda</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>注: デバイスがマウントされている場合、それを使用することはできません。デバイスをアンマウントするか、異なるデバイスを使用してください。
+
+=== ディスクとデバイス情報
+
+==== すべてのブロックデバイスのリスト表示
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>例出力:</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NAME    SIZE TYPE FSTYPE      MOUNTPOINT MODEL
+sda   558.4G disk LVM2_member            PERC H730 Adp
+sdc   558.4G disk                        PERC H730 Adp
+|-sdc1   1M part
+|-sdc2 127M part vfat
+|-sdc3 384M part ext4        /boot
+`-sdc4 557.9G part xfs        /sysroot</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>使用可能なディスクを特定する方法:
+
+* `MOUNTPOINT`がない - ディスクがシステムによって使用されていない
+* `FSTYPE`がないか、`LVM2_member` (ワイプが予定されている場合)を示す - ディスクが使用されていない
+* `MOUNTPOINT`がある - ディスクがシステムによって使用されている
+* 子分割がある - ワイプが必要かもしれない
+
+==== ディスクのシリアル番号の確認
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lsblk -d -o NAME,SIZE,SERIAL</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>これを使用して、正しいディスクをターゲットにしていることを確認します。
+
+==== デバイスの永続パスの確認
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_パスによるもの" class="sect0"><a class="anchor" href="#_パスによるもの"></a>パスによるもの</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host ls -la /dev/disk/by-path/ | grep sda</p>
+</div>
+<h1 id="_idによるもの" class="sect0"><a class="anchor" href="#_idによるもの"></a>IDによるもの</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host ls -la /dev/disk/by-id/ | grep sda</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>== 一般的な問題と解決策
+
+=== 問題1: LVMClusterが"NotReady"に表示される
+
+症状:</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NAME         STATUS
+lvmcluster   NotReady</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>診断:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_詳細なステータスの確認_2" class="sect0"><a class="anchor" href="#_詳細なステータスの確認_2"></a>詳細なステータスの確認</h1>
+<div class="paragraph">
+<p>oc get lvmcluster lvmcluster -n openshift-lvm-storage -o yaml | grep -A 20 "conditions"</p>
+</div>
+<h1 id="_vg_managerのログの確認" class="sect0"><a class="anchor" href="#_vg_managerのログの確認"></a>vg-managerのログの確認</h1>
+<div class="paragraph">
+<p>oc logs -n openshift-lvm-storage daemonset/vg-manager</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>一般的な原因と解決策:
+
+==== デバイスが見つからないか、正しいパスではない
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_デバイスの存在を確認_2" class="sect0"><a class="anchor" href="#_デバイスの存在を確認_2"></a>デバイスの存在を確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host ls -la /dev/sda</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>解決策: LVMClusterに正しいデバイスパスを更新
+
+==== デバイスに既存のデータ/ファイルシステムがある
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_既存のファイルシステムの確認" class="sect0"><a class="anchor" href="#_既存のファイルシステムの確認"></a>既存のファイルシステムの確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lsblk -f /dev/sda</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>解決策: `forceWipeDevicesAndDestroyAllData: true`を`deviceSelector`に追加
+
+==== デバイスが使用中
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_マウントされているかどうかを確認" class="sect0"><a class="anchor" href="#_マウントされているかどうかを確認"></a>マウントされているかどうかを確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host mount | grep /dev/sda</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>解決策: デバイスをアンマウントするか、異なるデバイスを使用する
+
+=== 問題2: ボリュームグループが作成されていない
+
+症状:
+
+* LVMClusterが存在するが、`vgs`がボリュームグループがない
+* デバイスが`deviceClassStatuses`で表示されていない
+
+診断:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_デバイスがワイプされたかどうかの確認" class="sect0"><a class="anchor" href="#_デバイスがワイプされたかどうかの確認"></a>デバイスがワイプされたかどうかの確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host pvs</p>
+</div>
+<h1 id="_vg_managerのログでエラーがないかどうかの確認" class="sect0"><a class="anchor" href="#_vg_managerのログでエラーがないかどうかの確認"></a>vg-managerのログでエラーがないかどうかの確認</h1>
+<div class="paragraph">
+<p>oc logs -n openshift-lvm-storage daemonset/vg-manager --tail=100</p>
+</div>
+<h1 id="_デバイスの可視性の確認" class="sect0"><a class="anchor" href="#_デバイスの可視性の確認"></a>デバイスの可視性の確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lsblk -o NAME,SIZE,TYPE,FSTYPE</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>解決策:
+
+==== デバイスが選択されていない
+
+* `deviceSelector`のパスが実際のデバイスと一致していることを確認
+* デバイスが除外されていないこと (see `deviceClassStatuses.excluded`)を確認
+
+==== パーミッションの問題
+
+* vg-managerがデバイスにアクセスするための必要な権限がない場合
+* ノードログでSELinuxの拒否を確認
+
+==== デバイスのワイプが失敗した
+
+* `forceWipeDevicesAndDestroyAllData: true`を設定
+* 手動でデバイスをワイプし、オペレーターを再起動
+
+=== 問題3: PVCが"Pending"にある
+
+症状:</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NAME            STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+test-pvc        Pending                                      lvms-vg1       5m</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>診断:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_pvcのイベントの確認" class="sect0"><a class="anchor" href="#_pvcのイベントの確認"></a>PVCのイベントの確認</h1>
+<div class="paragraph">
+<p>oc describe pvc &lt;pvc-name&gt;</p>
+</div>
+<h1 id="_pvcを使用しているポッドが存在するかどうかの確認" class="sect0"><a class="anchor" href="#_pvcを使用しているポッドが存在するかどうかの確認"></a>PVCを使用しているポッドが存在するかどうかの確認</h1>
+<div class="paragraph">
+<p>oc get pods --all-namespaces -o wide | grep &lt;pvc-name&gt;</p>
+</div>
+<h1 id="_vgの利用可能なスペースの確認" class="sect0"><a class="anchor" href="#_vgの利用可能なスペースの確認"></a>VGの利用可能なスペースの確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host vgs</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>一般的な原因:
+
+==== WaitForFirstConsumer - まだスケジュールされたポッドがない
+
+* **通常の動作**: PVCがスケジュールされたポッドが存在しないまま"Pending"になる
+* **解決策**: 使用するPVCを持つポッドを作成
+
+==== 利用可能なスペースが不足している
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_vgの利用可能なスペースの確認_2" class="sect0"><a class="anchor" href="#_vgの利用可能なスペースの確認_2"></a>VGの利用可能なスペースの確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host vgdisplay vg1 | grep "Free"</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>解決策: 未使用のPVを削除するか、ボリュームグループを拡張
+
+==== スリムプールが満杯
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_スリムプールの使用状況の確認" class="sect0"><a class="anchor" href="#_スリムプールの使用状況の確認"></a>スリムプールの使用状況の確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lvs | grep thin-pool</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>解決策: 古いボリュームを削除するか、スリムプールのサイズを増やす
+
+==== ノードセレクターのマッチング不一致
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_ポッドのノードセレクターとlvmclusterのノードセレクターを比較" class="sect0"><a class="anchor" href="#_ポッドのノードセレクターとlvmclusterのノードセレクターを比較"></a>ポッドのノードセレクターとLVMClusterのノードセレクターを比較</h1>
+<div class="paragraph">
+<p>oc get pod &lt;pod-name&gt; -o yaml | grep nodeSelector
+oc get lvmcluster lvmcluster -n openshift-lvm-storage -o yaml | grep -A 5 nodeSelector</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>=== 問題4: スリムプールのデータ%またはメタデータ%が高い
+
+症状:</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>LV          VG  Attr       LSize    Data%  Meta%
+thin-pool-1 vg1 twi-a-tz-- 502.04g  92.00  85.00</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>診断:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_スリムプールの詳細の確認" class="sect0"><a class="anchor" href="#_スリムプールの詳細の確認"></a>スリムプールの詳細の確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lvs -a | grep thin-pool</p>
+</div>
+<h1 id="_すべてのスリムボリュームのリスト表示" class="sect0"><a class="anchor" href="#_すべてのスリムボリュームのリスト表示"></a>すべてのスリムボリュームのリスト表示</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lvs -a -o lv_name,lv_size,data_percent,pool_lv | grep thin-pool</p>
+</div>
+<h1 id="_pvcがスペースを消費しているpvの確認" class="sect0"><a class="anchor" href="#_pvcがスペースを消費しているpvの確認"></a>PVCがスペースを消費しているPVの確認</h1>
+<div class="paragraph">
+<p>oc get pv -o custom-columns=NAME:.metadata.name,SIZE:.spec.capacity.storage,STORAGECLASS:.spec.storageClassName | grep lvms</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>解決策:
+
+==== 未使用のPVCの削除
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_使用されていないpvcの確認" class="sect0"><a class="anchor" href="#_使用されていないpvcの確認"></a>使用されていないPVCの確認</h1>
+<div class="paragraph">
+<p>oc get pvc --all-namespaces</p>
+</div>
+<h1 id="_pvcの削除" class="sect0"><a class="anchor" href="#_pvcの削除"></a>PVCの削除</h1>
+<div class="paragraph">
+<p>oc delete pvc &lt;pvc-name&gt; -n &lt;namespace&gt;</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>==== スリムプールの拡張 (VGが利用可能なスペースがある場合)
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_vgの利用可能なスペースの確認_3" class="sect0"><a class="anchor" href="#_vgの利用可能なスペースの確認_3"></a>VGの利用可能なスペースの確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host vgs</p>
+</div>
+<h1 id="_必要に応じて手動でスリムプールを拡張_通常はlvmオペレーターによって自動的に処理される" class="sect0"><a class="anchor" href="#_必要に応じて手動でスリムプールを拡張_通常はlvmオペレーターによって自動的に処理される"></a>必要に応じて手動でスリムプールを拡張 (通常はLVMオペレーターによって自動的に処理される)</h1>
+<div class="listingblock">
+<div class="content">
+<pre>==== 過剰割り当て比の調整
+
+LVMClusterを編集して、`overprovisionRatio`を減らす
+
+=== 問題5: デバイスのワイプが失敗した
+
+症状:
+
+* LVMClusterが作成されたが、デバイスが使用されていない
+* ログに`"cannot wipe device"`または`"device busy"`が表示されている
+
+診断:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_現在のファイルシステムパーティションの確認" class="sect0"><a class="anchor" href="#_現在のファイルシステムパーティションの確認"></a>現在のファイルシステム/パーティションの確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lsblk -f /dev/sda</p>
+</div>
+<h1 id="_デバイスにlvm署名があるかどうかの確認" class="sect0"><a class="anchor" href="#_デバイスにlvm署名があるかどうかの確認"></a>デバイスにLVM署名があるかどうかの確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host pvs | grep /dev/sda</p>
+</div>
+<h1 id="_デバイスが開いているかどうかの確認" class="sect0"><a class="anchor" href="#_デバイスが開いているかどうかの確認"></a>デバイスが開いているかどうかの確認</h1>
+<div class="paragraph">
+<p>oc debug node/&lt;node-name&gt;&#8201;&#8212;&#8201;chroot /host lsof | grep /dev/sda</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>解決策:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_forcewipedevicesanddestroyalldataが有効であることを確認" class="sect0"><a class="anchor" href="#_forcewipedevicesanddestroyalldataが有効であることを確認"></a>`forceWipeDevicesAndDestroyAllData`が有効であることを確認</h1>
+<div class="paragraph">
+<p>oc edit lvmcluster lvmcluster -n openshift-lvm-storage</p>
+</div>
+<h1 id="_deviceselectorの下に次のように追加" class="sect0"><a class="anchor" href="#_deviceselectorの下に次のように追加"></a>deviceSelectorの下に次のように追加</h1>
+<div class="paragraph">
+<p>forceWipeDevicesAndDestroyAllData: true</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>=== 問題6: vg-manager PodがCrashLoopBackOffにある
+
+症状:</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NAME             READY   STATUS             RESTARTS   AGE
+vg-manager-xxx   0/1     CrashLoopBackOff   5          3m</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>診断:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_ポッドのログの確認" class="sect0"><a class="anchor" href="#_ポッドのログの確認"></a>ポッドのログの確認</h1>
+<div class="paragraph">
+<p>oc logs -n openshift-lvm-storage &lt;vg-manager-pod&gt; --previous</p>
+</div>
+<h1 id="_ポッドのイベントの確認" class="sect0"><a class="anchor" href="#_ポッドのイベントの確認"></a>ポッドのイベントの確認</h1>
+<div class="paragraph">
+<p>oc describe pod -n openshift-lvm-storage &lt;vg-manager-pod&gt;</p>
+</div>
+<h1 id="_ノードのリソースの確認" class="sect0"><a class="anchor" href="#_ノードのリソースの確認"></a>ノードのリソースの確認</h1>
+<div class="paragraph">
+<p>oc describe node &lt;node-name&gt;</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>一般的な原因:
+
+==== デバイスのパーミッション
+
+* vg-managerがデバイスにアクセスするための必要な権限がない場合
+* ノードログでSELinuxの拒否を確認
+
+==== 見つからないデバイス
+
+* 設定に指定されたデバイスパスが存在しない
+* デバイスが削除されたか名前が変更された
+
+==== リソース制約
+
+* ノードがメモリーまたはCPUが不足している
+* ノードの容量を確認
+
+=== 問題7: StorageClassがデフォルトではない
+
+症状:
+
+* ストレージクラスを指定していないPVCがバインドできない
+* 警告: "no default deviceClass was specified"
+
+診断:
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<h1 id="_デフォルトのstorageclassが存在するかどうかの確認" class="sect0"><a class="anchor" href="#_デフォルトのstorageclassが存在するかどうかの確認"></a>デフォルトのStorageClassが存在するかどうかの確認</h1>
+<div class="paragraph">
+<p>oc get storageclass | grep default</p>
+</div>
+<h1 id="_lvms_storageclassのアノテーションの確認" class="sect0"><a class="anchor" href="#_lvms_storageclassのアノテーションの確認"></a>lvms StorageClassのアノテーションの確認</h1>
+<div class="paragraph">
+<p>oc get storageclass lvms-vg1 -o yaml | grep is-default-class</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>解決策:
+
+==== lvms StorageClassをデフォルトに設定
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc patch storageclass lvms-vg1 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>==== またはLVMClusterでデフォルトを設定
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc edit lvmcluster lvmcluster -n openshift-lvm-storage</p>
+</div>
+<h1 id="_deviceclassesの下に次のように追加" class="sect0"><a class="anchor" href="#_deviceclassesの下に次のように追加"></a>deviceClassesの下に次のように追加</h1>
+<div class="ulist">
+<ul>
+<li>
+<p>name: vg1
+default: true</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>== 診断スクリプト
+
+以下のように保存して、LVMストレージの問題を迅速に診断するためのシェルスクリプトにします。
+
+[source,bash,role=execute]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>#!/bin/bash</p>
+</div>
+<div class="paragraph">
+<p>NAMESPACE="openshift-lvm-storage"
+NODE_NAME="&lt;your-node-name&gt;"</p>
+</div>
+<div class="paragraph">
+<p>echo "=== LVMストレージ診断レポート ==="
+echo ""</p>
+</div>
+<div class="paragraph">
+<p>echo "1. LVMClusterのステータス:"
+oc get lvmcluster -n $NAMESPACE
+echo ""</p>
+</div>
+<div class="paragraph">
+<p>echo "2. ポッドのステータス:"
+oc get pods -n $NAMESPACE
+echo ""</p>
+</div>
+<div class="paragraph">
+<p>echo "3. StorageClass:"
+oc get storageclass | grep lvms
+echo ""</p>
+</div>
+<div class="paragraph">
+<p>echo "4. PV:"
+oc get pv | grep topolvm
+echo ""</p>
+</div>
+<div class="paragraph">
+<p>echo "5. ボリュームグループ:"
+oc debug node/$NODE_NAME&#8201;&#8212;&#8201;chroot /host vgs
+echo ""</p>
+</div>
+<div class="paragraph">
+<p>echo "6. 論理ボリューム:"
+oc debug node/$NODE_NAME&#8201;&#8212;&#8201;chroot /host lvs
+echo ""</p>
+</div>
+<div class="paragraph">
+<p>echo "7. 物理ボリューム:"
+oc debug node/$NODE_NAME&#8201;&#8212;&#8201;chroot /host pvs
+echo ""</p>
+</div>
+<div class="paragraph">
+<p>echo "8. ブロックデバイス:"
+oc debug node/$NODE_NAME&#8201;&#8212;&#8201;chroot /host lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT
+echo ""</p>
+</div>
+<div class="paragraph">
+<p>echo "9. vg-managerの最近のログ:"
+oc logs -n $NAMESPACE daemonset/vg-manager --tail=20
+echo ""</p>
+</div>
+<div class="paragraph">
+<p>echo "=== 診断レポートの終了 ==="</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>== 要約
+
+このガイドでは、以下のことを学びました。
+
+* `vgs`, `lvs`, `pvs`コマンドを使用してLVMCluster、ポッド、StorageClass、ボリュームグループ、スリムプールのステータスを確認するクイックヘルスチェックを実行する方法
+* 一般的な問題の診断方法、例えばLVMClusterが"NotReady"に表示される問題、欠落するボリュームグループ、PVCが"Pending"にある問題
+* `vgs`, `lvs`, `pvs`コマンドを使用してボリュームグループ、スリムプール、物理ボリュームのステータスを確認する方法
+* デバイスのワイプが失敗した問題、vg-managerのCrashLoopBackOff、ストレージクラスのデフォルト構成のトラブルシューティング方法
+* 迅速にLVMストレージの健康情報を収集するための診断スクリプトの使用方法
+
+== 参照
+
+* xref:lvm-operator.adoc[LVMオペレーターのローカルディスクインストールガイド] - 詳細な構成が含まれたインストールガイド</pre>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="lvm-operator.html">LVM Operator のインストール</a></span>
+  <span class="next"><a href="hostpath-provisioner.html">HostPath Provisioner</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

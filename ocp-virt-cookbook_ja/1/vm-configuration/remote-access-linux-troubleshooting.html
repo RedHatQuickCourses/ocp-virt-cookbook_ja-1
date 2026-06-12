@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>リモートアクセスのLinux VMのトラブルシューティング :: FIXME Course Title</title>
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">FIXME Course Title</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../getting-started/index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../storage/index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#静的IP構成.adoc">静的IP構成.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#クラウドイニシャルトラブルシューティング.adoc">クラウドイニシャルトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#UDN主ネットワーク.adoc">UDN主ネットワーク.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットセカンダリ.adoc">ローカルネットセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットVLAN.adoc">ローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CUDNローカルネットVLAN.adoc">CUDNローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#レイヤ2セカンダリ.adoc">レイヤ2セカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Linuxブリッジ.adoc">Linuxブリッジ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#SIRIUSセカンダリ.adoc">SIRIUSセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#VM入口ルート.adoc">VM入口ルート.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#OVSブリッジトラブルシューティング.adoc">OVSブリッジトラブルシューティング.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#内部DNSの仮想マシン.adoc">内部DNSの仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシン.adoc">リモートアクセスを用いたLinux仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc">リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたWindows仮想マシン.adoc">リモートアクセスを用いたWindows仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Windows仮想マシンのVirtioドライバー.adoc">Windows仮想マシンのVirtioドライバー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#インフラストラクチャーノードの配置.adoc">インフラストラクチャーノードの配置.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ノードのアフィニティー.adoc">ノードのアフィニティー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ホットプラグ可能なボリュームとインターフェース.adoc">ホットプラグ可能なボリュームとインターフェース.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#仮想マシンテンプレート.adoc">仮想マシンテンプレート.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リソース制限とQoS.adoc">リソース制限とQoS.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CPUピニング.adoc">CPUピニング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#NUMA大ページ.adoc">NUMA大ページ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リアルタイム仮想マシン.adoc">リアルタイム仮想マシン.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="remote-access-linux-troubleshooting.html">リモートアクセスのLinux VMのトラブルシューティング</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">リモートアクセスのLinux VMのトラブルシューティング</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、OpenShift VirtualizationでリモートアクセスのLinux VMに関連する問題のトラブルシューティング手順、検証コマンド、および解決策を提供します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_目次"><a class="anchor" href="#_目次"></a>目次</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#クイックヘルスチェック">[クイックヘルスチェック]</a></p>
+</li>
+<li>
+<p><a href="#_方法1_コンソールアクセス">方法1: コンソールアクセス</a></p>
+</li>
+<li>
+<p><a href="#_方法2_vncアクセス">方法2: VNCアクセス</a></p>
+</li>
+<li>
+<p><a href="#方法3: virtctlによるSSH">[方法3: virtctlによるSSH]</a></p>
+</li>
+<li>
+<p><a href="#方法4: NodePortサービスによるSSH">[方法4: NodePortサービスによるSSH]</a></p>
+</li>
+<li>
+<p><a href="#方法5: LoadBalancerサービスによるSSH">[方法5: LoadBalancerサービスによるSSH]</a></p>
+</li>
+<li>
+<p><a href="#方法6: ポートフォワードによるSSH">[方法6: ポートフォワードによるSSH]</a></p>
+</li>
+<li>
+<p><a href="#方法7: 第二のネットワークによる直接アクセス">[方法7: 第二のネットワークによる直接アクセス]</a></p>
+</li>
+<li>
+<p><a href="#診断コマンド">[診断コマンド]</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_クイックヘルスチェック"><a class="anchor" href="#_クイックヘルスチェック"></a>クイックヘルスチェック</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_vmの状態を確認する"><a class="anchor" href="#_vmの状態を確認する"></a>VMの状態を確認する</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vm &lt;vm-name&gt; -n &lt;namespace&gt;
+oc get vmi &lt;vm-name&gt; -n &lt;namespace&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>実行中のVMの期待出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">NAME        AGE   STATUS    READY
+my-vm       5m    Running   True</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_vmにipアドレスがあるか確認する"><a class="anchor" href="#_vmにipアドレスがあるか確認する"></a>VMにIPアドレスがあるか確認する</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vmi &lt;vm-name&gt; -n &lt;namespace&gt; -o jsonpath='{.status.interfaces[*].ipAddress}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>少なくとも1つのIPアドレスが返されるはずです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_vmのpodが実行中か確認する"><a class="anchor" href="#_vmのpodが実行中か確認する"></a>VMのPodが実行中か確認する</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pods -n &lt;namespace&gt; -l kubevirt.io/domain=&lt;vm-name&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">NAME                       READY   STATUS    RESTARTS   AGE
+virt-launcher-&lt;vm&gt;-xxxxx   3/3     Running   0          5m</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ゲストエージェントの状態を確認する"><a class="anchor" href="#_ゲストエージェントの状態を確認する"></a>ゲストエージェントの状態を確認する</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vmi &lt;vm-name&gt; -n &lt;namespace&gt; -o jsonpath='{.status.guestOSInfo.id}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>空の場合、ゲストエージェントは実行されていません。注: 基本的なアクセス方法（コンソール、VNC、SSH、ポートフォワード、NodePort、LoadBalancer、第二のネットワーク）では、ゲストエージェントは必要ありません。ゲストOSの詳細情報を提供し、動的SSH鍵のインジェクションなどの機能を有効にするために、追加情報を提供します。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_方法1_コンソールアクセス"><a class="anchor" href="#_方法1_コンソールアクセス"></a>方法1: コンソールアクセス</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_問題_コンソールへの接続ができない"><a class="anchor" href="#_問題_コンソールへの接続ができない"></a>問題: コンソールへの接続ができない</h3>
+<div class="paragraph">
+<p><strong>症状</strong>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ virtctl console my-vm -n my-namespace
+Error: unable to connect to console</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>診断</strong>:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># VMが実行中か確認する
+oc get vm my-vm -n my-namespace
+
+# VMIが存在するか確認する
+oc get vmi my-vm -n my-namespace
+
+# virt-launcher Podを確認する
+oc get pods -n my-namespace -l kubevirt.io/domain=my-vm</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>一般的な原因</strong>:
+- VMが停止中
+- VMIが作成されていない
+- virt-launcher Podが実行されていない
+- クライアントとAPIサーバー間のネットワーク問題</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>停止中のVMを開始する:</p>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl start my-vm -n my-namespace</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>VMIが準備ができているまで待つ:</p>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc wait --for=condition=Ready vmi/my-vm -n my-namespace --timeout=60s</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>virt-launcher Podのログを確認する:</p>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc logs -n my-namespace -l kubevirt.io/domain=my-vm</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>virtctlバージョンがクラスターと一致するか確認する:</p>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl version
+oc get kubevirt -n openshift-cnv -o jsonpath='{.items[0].status.observedKubeVirtVersion}'</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_問題_コンソールに接続されていますがログインプロンプトが表示されていない"><a class="anchor" href="#_問題_コンソールに接続されていますがログインプロンプトが表示されていない"></a>問題: コンソールに接続されていますが、ログインプロンプトが表示されていない</h3>
+<div class="paragraph">
+<p><strong>症状</strong>:
+コンソールに接続できますが、ログインプロンプトが表示されず、または空の画面が表示されます。</p>
+</div>
+<div class="paragraph">
+<p><strong>診断</strong>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 複数回Enterキーを押す</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>一般的な原因</strong>:
+- VMがまだブート中
+- VMにシリアルコンソールが構成されていない
+- ttyS0でsystemd-gettyが実行されていない</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>VMが完全にブートされるまで待つ (VMのフェーズを確認):</p>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vmi my-vm -n my-namespace -o jsonpath='{.status.phase}'</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>ゲストOSがシリアルコンソールを有効にしているか確認する:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>RHEL/Fedora: <code>systemctl status serial-getty@ttyS0.service</code></p>
+</li>
+<li>
+<p>クラウドイメージでは通常、デフォルトで有効になっています</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>断線して再接続してみる:</p>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Ctrl+]を押して断線
+virtctl console my-vm -n my-namespace</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_問題_コンソールでログインできない"><a class="anchor" href="#_問題_コンソールでログインできない"></a>問題: コンソールでログインできない</h3>
+<div class="paragraph">
+<p><strong>症状</strong>:
+ログインプロンプトが表示されますが、ユーザー名とパスワードが機能しません。</p>
+</div>
+<div class="paragraph">
+<p><strong>一般的な原因</strong>:
+- ユーザー名またはパスワードが間違っている
+- cloud-initのSSH-onlyアクセスが構成されている
+- ルートログインが無効になっている</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>:</p>
+</div>
+<div class="paragraph">
+<p>警告: この例では、cloud-initのパスワードはデモ目的で使用されています。実際の環境では、強力で一意のパスワードまたはSSH鍵認証を使用してください。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>cloud-initを使用してパスワードを設定する (クラウドイメージ):</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">cloudInitNoCloud:
+  userData: |
+    #cloud-config
+    user: fedora
+    password: mypassword
+    chpasswd:
+      expire: false</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>または、SSH鍵認証を使用し、コンソールで鍵を使用してアクセスする</p>
+</li>
+<li>
+<p>VM内のcloud-initログを確認してユーザー作成エラーがないか確認する</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_方法2_vncアクセス"><a class="anchor" href="#_方法2_vncアクセス"></a>方法2: VNCアクセス</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_問題_virtctl_vncコマンドが機能しない"><a class="anchor" href="#_問題_virtctl_vncコマンドが機能しない"></a>問題: virtctl vncコマンドが機能しない</h3>
+<div class="paragraph">
+<p><strong>症状</strong>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ virtctl vnc my-vm -n my-namespace
+Error: VNC is not configured for this VM</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>診断</strong>:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># グラフィックスが有効か確認する
+oc get vm my-vm -n my-namespace -o jsonpath='{.spec.template.spec.domain.devices.autoattachGraphicsDevice}'
+
+# VMデバイス構成を確認する
+oc get vm my-vm -n my-namespace -o yaml | grep -A 10 "devices:"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>一般的な原因</strong>:
+- `autoattachGraphicsDevice: false`によってグラフィックスデバイスが無効になっている
+- VM仕様でグラフィックスデバイスを明示的に除外している</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>:
+グラフィックスデバイスが有効になっていることを確認します (OpenShift Virtualizationではデフォルトで有効になっています)。明示的に無効になっている場合は、`autoattachGraphicsDevice: false`設定を削除するか、`true`に設定します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_問題_vncビューアーが接続できない"><a class="anchor" href="#_問題_vncビューアーが接続できない"></a>問題: VNCビューアーが接続できない</h3>
+<div class="paragraph">
+<p><strong>症状</strong>:
+virtctl vncコマンドが実行されますが、VNCビューアーが接続できません。</p>
+</div>
+<div class="paragraph">
+<p><strong>診断</strong>:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># virtctl出力からポート番号を確認する
+virtctl vnc my-vm -n my-namespace
+# 出力: "VNC connection on port 5900"
+
+# ポートがリスニングしているか確認する
+netstat -tuln | grep 5900</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>一般的な原因</strong>:
+- ファイアウォールがVNCポートをブロックしている
+- VNCビューアーがインストールされていないか、正しいビューアーではない
+- ポート競合</p>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>VNCビューアーをインストールする:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Linux
+sudo dnf install tigervnc
+
+# macOS
+brew install tiger-vnc</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>localhost:5900または127.0.0.1:5900に接続する</p>
+</li>
+<li>
+<p>ポート競合がある場合は、virtctlが次の利用可能なポートを使用します (5901、5902など)</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_問題_vncに接続しましたがブランク画面が表示される"><a class="anchor" href="#_問題_vncに接続しましたがブランク画面が表示される"></a>問題: VNCに接続しましたが、ブランク画面が表示される</h3>
+<div class="paragraph">
+<p><strong>症状</strong>:
+VNCに接続できますが、ブランクまたは黒い画面が表示されます。</p>
+</div>
+<div class="paragraph">
+<p><strong>一般的な原因</strong>:
+- VMがまだブート中
+- なし</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

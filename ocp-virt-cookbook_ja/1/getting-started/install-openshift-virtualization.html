@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>OpenShift仮想化オペレーターのインストールと構成 :: FIXME Course Title</title>
+    <link rel="prev" href="prerequisites.html">
+    <link rel="next" href="default-storage-class.html">
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">FIXME Course Title</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../storage/index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#静的IP構成.adoc">静的IP構成.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#クラウドイニシャルトラブルシューティング.adoc">クラウドイニシャルトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#UDN主ネットワーク.adoc">UDN主ネットワーク.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットセカンダリ.adoc">ローカルネットセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットVLAN.adoc">ローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CUDNローカルネットVLAN.adoc">CUDNローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#レイヤ2セカンダリ.adoc">レイヤ2セカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Linuxブリッジ.adoc">Linuxブリッジ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#SIRIUSセカンダリ.adoc">SIRIUSセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#VM入口ルート.adoc">VM入口ルート.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#OVSブリッジトラブルシューティング.adoc">OVSブリッジトラブルシューティング.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-configuration/index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#内部DNSの仮想マシン.adoc">内部DNSの仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシン.adoc">リモートアクセスを用いたLinux仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc">リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたWindows仮想マシン.adoc">リモートアクセスを用いたWindows仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Windows仮想マシンのVirtioドライバー.adoc">Windows仮想マシンのVirtioドライバー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#インフラストラクチャーノードの配置.adoc">インフラストラクチャーノードの配置.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ノードのアフィニティー.adoc">ノードのアフィニティー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ホットプラグ可能なボリュームとインターフェース.adoc">ホットプラグ可能なボリュームとインターフェース.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#仮想マシンテンプレート.adoc">仮想マシンテンプレート.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リソース制限とQoS.adoc">リソース制限とQoS.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CPUピニング.adoc">CPUピニング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#NUMA大ページ.adoc">NUMA大ページ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リアルタイム仮想マシン.adoc">リアルタイム仮想マシン.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="index.html">開始</a></li>
+    <li><a href="install-openshift-virtualization.html">OpenShift仮想化のインストール</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">OpenShift仮想化オペレーターのインストールと構成</h1>
+<div class="sect1">
+<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルでは、OpenShift仮想化オペレーターのインストールと構成方法を紹介します。このオペレーターを使用すると、OpenShiftクラスター上で仮想マシンとコンテナワークロードを同時に実行できます。OpenShift仮想化は、upstreamのKubeVirtプロジェクトに基づいており、エンタープライズレベルの仮想化機能を提供します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#_webコンソールを使用したインストール">Webコンソールを使用したインストール</a></p>
+</li>
+<li>
+<p><a href="#コマンドラインを使用したインストール">[コマンドラインを使用したインストール]</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><strong>OpenShift 4.18+</strong> がインストールされ、サポートされているプラットフォームで実行中</p>
+</li>
+<li>
+<p><strong>クラスター管理者アクセス権限</strong>: オペレーターのインストールとクラスターリソースの構成に必要</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>テスト済みバージョン:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>OpenShift 4.18, 4.19, 4.20, 4.21</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ハードウェアおよびソフトウェア要件"><a class="anchor" href="#_ハードウェアおよびソフトウェア要件"></a>ハードウェアおよびソフトウェア要件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShift仮想化をインストールする前に、クラスターがハードウェア、オペレーティングシステム、ストレージ、ネットワーク要件を満たしていることを確認してください。</p>
+</div>
+<div class="paragraph">
+<p>詳細な要件、CPU仕様、サポートされるプラットフォーム、ストレージに関する考慮事項、リソースオーバーヘッドについては、<a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/latest/html/virtualization/installing#virt-preparing-cluster-for-virt_preparing-cluster-for-virt" target="_blank" rel="noopener">クラスターをOpenShift仮想化に準備する</a>を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>ヒント: ストレージ構成については、オペレーターインストール後に<a href="default-storage-class.html" class="xref page">デフォルトストレージクラスの構成</a>を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_webコンソールを使用したインストール"><a class="anchor" href="#_webコンソールを使用したインストール"></a>Webコンソールを使用したインストール</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Webコンソールは、OpenShift仮想化のガイド付きインストールを提供します。</p>
+</div>
+<div class="sect2">
+<h3 id="_ステップ1_operatorhubにアクセス"><a class="anchor" href="#_ステップ1_operatorhubにアクセス"></a>ステップ1: OperatorHubにアクセス</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>クラスター管理者権限</strong>を持つユーザーとしてOpenShiftWebコンソールにログインします</p>
+</li>
+<li>
+<p><strong>Operators</strong> &#8594; <strong>OperatorHub</strong>に移動します</p>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="install-1-software-catalog.png" alt="OpenShiftWebコンソールのOperatorHub">
+</div>
+</div>
+</li>
+<li>
+<p><strong>キーワードフィルター</strong>フィールドに、`Virtualization`を入力します</p>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="install-2-find-openshift-virtualization.png" alt="OperatorHubでOpenShift仮想化を検索">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ステップ2_オペレーターのインストール"><a class="anchor" href="#_ステップ2_オペレーターのインストール"></a>ステップ2: オペレーターのインストール</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Red Hat</strong>ソースラベルを持つ<strong>OpenShift Virtualization</strong>タイルを選択します</p>
+</li>
+<li>
+<p>オペレーターの情報を確認し、`インストール`をクリックします</p>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="install-3-click-install.png" alt="OpenShift Virtualizationオペレーターの詳細とインストールボタン">
+</div>
+</div>
+</li>
+<li>
+<p><strong>オペレーターのインストール</strong>ページで、デフォルト設定を維持し、`インストール`をクリックします</p>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="install-4-let-default-click-install.png" alt="デフォルト構成のオペレーターのインストールページ">
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>重要: 手動承認が利用可能ですが、不適切なバージョンの組み合わせを実行するリスクがあるため、推奨されません。手動を選択する場合は、その意味を完全に理解していることを確認してください。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>オペレーターのインストールが完了するまで待ちます</p>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="install-5-wait-for-install-ready.png" alt="オペレーターのインストール中">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ステップ3_hyperconvergedリソースの作成"><a class="anchor" href="#_ステップ3_hyperconvergedリソースの作成"></a>ステップ3: HyperConvergedリソースの作成</h3>
+<div class="paragraph">
+<p>オペレーターのインストールが完了したら、`HyperConverged`を作成します</p>
+</div>
+<div class="paragraph">
+<p>+
+image::install-6-create-hyperconverged.png[オペレーターインストール後の`HyperConverged`の作成ボタン]</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>デフォルト設定を維持し、ページの下部にスクロールします</p>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="install-7-let-default-roll-to-the-bottom.png" alt="デフォルト設定のHyperConverged構成">
+</div>
+</div>
+</li>
+<li>
+<p>`作成`をクリックしてOpenShift仮想化をデプロイします</p>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="install-8-click-create.png" alt="HyperConvergedリソースの作成ボタン">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ステップ4_インストールの確認"><a class="anchor" href="#_ステップ4_インストールの確認"></a>ステップ4: インストールの確認</h3>
+<div class="paragraph">
+<p>すべての条件が成功を示すまで待ちます。HyperConvergedリソースのステータスは、デプロイメントの進捗を示します。</p>
+</div>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="install-9-wait-for-conditions.png" alt="成功したデプロイメントを示すHyperConverged条件">
+</div>
+</div>
+<div class="paragraph">
+<p>インストールが完了すると、オペレーターは`Operators`リストで`インストール済み`として表示されます。</p>
+</div>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="install-10-installed-operator.png" alt="OpenShift仮想化オペレーターの成功したインストール">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_コマンドラインを使用したインストール"><a class="anchor" href="#_コマンドラインを使用したインストール"></a>コマンドラインを使用したインストール</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Webコンソールにアクセスできない自動化デプロイメントの環境や、自動化されたデプロイメントの環境では、CLIインストール方法を使用します。</p>
+</div>
+<div class="sect2">
+<h3 id="_ステップ1_namespaceoperatorgroupおよびsubscriptionの作成"><a class="anchor" href="#_ステップ1_namespaceoperatorgroupおよびsubscriptionの作成"></a>ステップ1: Namespace、OperatorGroup、およびSubscriptionの作成</h3>
+<div class="paragraph">
+<p>すべての必要なリソースを含む1つのマニフェストファイルを作成します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-cnv
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: kubevirt-hyperconverged-group
+  namespace: openshift-cnv
+spec:
+  targetNamespaces:
+  - openshift-cnv
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: hco-operatorhub
+  namespace: openshift-cnv
+spec:
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  name: kubevirt-hyperconverged
+  channel: stable
+  installPlanApproval: Automatic
+EOF</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ステップ2_オペレーターのインストールを確認"><a class="anchor" href="#_ステップ2_オペレーターのインストールを確認"></a>ステップ2: オペレーターのインストールを確認</h3>
+<div class="paragraph">
+<p>オペレーターのインストールを完了させ、そのステータスを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># CSVのステータスを`Succeeded`になるまで監視します
+oc get csv -n openshift-cnv -w</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>インストールが完了した場合の期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>NAME                                       DISPLAY                    VERSION   REPLACES                                   PHASE
+kubevirt-hyperconverged-operator.v4.20.3   OpenShift Virtualization   4.20.3    kubevirt-hyperconverged-operator.v4.20.1   Succeeded</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>`Succeeded`を見たら、`Ctrl+C`を使用して監視を停止します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ステップ3_hyperconvergedリソースの作成_2"><a class="anchor" href="#_ステップ3_hyperconvergedリソースの作成_2"></a>ステップ3: HyperConvergedリソースの作成</h3>
+<div class="paragraph">
+<p>HyperConvergedカスタムリソースをデプロイしてインストールを完了させます:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>注: ここで示されている最小限のHyperConverged仕様は、すべてのデフォルト設定を使用します。高度な構成オプションについては、<a href="https://docs.openshift.com/container-platform/latest/virt/install/installing-virt.html#virt-customizing-storage-profile_installing-virt" target="_blank" rel="noopener">公式ドキュメント</a>を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ステップ4_インストールの完了を待機"><a class="anchor" href="#_ステップ4_インストールの完了を待機"></a>ステップ4: インストールの完了を待機</h3>
+<div class="paragraph">
+<p>HyperConvergedリソースが利用可能になるまで待ちます:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc wait hyperconverged kubevirt-hyperconverged -n openshift-cnv --for=condition=Available --timeout=15m</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>インストールは通常5-10分かかります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ステップ5_インストールの確認"><a class="anchor" href="#_ステップ5_インストールの確認"></a>ステップ5: インストールの確認</h3>
+<div class="paragraph">
+<p>すべての条件が正常になるかどうかを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get hyperconverged kubevirt-hyperconverged -n openshift-cnv -o jsonpath='{range .status.conditions[*]}{.type}: {.status}{"\n"}{end}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>インストールが完了した場合の期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ReconcileComplete: True
+Available: True
+Progressing: False
+Degraded: False
+Upgradeable: True</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_openshift仮想化のアンインストール"><a class="anchor" href="#_openshift仮想化のアンインストール"></a>OpenShift仮想化のアンインストール</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クラスターからOpenShift仮想化を削除する必要がある場合は、以下の順序で手順に従ってください。アンインストールプロセスは、すべての仮想化コンポーネントをグレースフルに終了するため、数分かかります。</p>
+</div>
+<div class="paragraph">
+<p>重要: オペレーターのサブスクリプションのみを削除すると、デプロイされたリソースは削除されません。HyperConvergedリソースを最初に削除することで、すべてのコンポーネントを適切にクリーンアップする必要があります。</p>
+</div>
+<div class="sect2">
+<h3 id="_ステップ1_すべての仮想マシンの削除"><a class="anchor" href="#_ステップ1_すべての仮想マシンの削除"></a>ステップ1: すべての仮想マシンの削除</h3>
+<div class="paragraph">
+<p>アンインストール前に、すべてのVMが停止され、削除されていることを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># すべての名前空間でのVMのリスト表示
+oc get vm -A
+
+# 名前空間ごとにVMを削除します (各名前空間で)
+oc delete vm --all -n &lt;namespace&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>警告: アンインストール中に実行中のVMは強制的に終了されます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ステップ2_hyperconvergedリソースの削除"><a class="anchor" href="#_ステップ2_hyperconvergedリソースの削除"></a>ステップ2: HyperConvergedリソースの削除</h3>
+<div class="paragraph">
+<p>このステップは、すべてのOpenShift仮想化コンポーネントを削除します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc delete hyperconverged kubevirt-hyperconverged -n openshift-cnv</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>クリーンアップの進捗を監視します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># ポッドが終了するのを5-10分待ちます (これは必要に応じて長くなる可能性があります)
+oc get pods -n openshift-cnv -w</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>すべてのポッドが終了するまで待ちます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ステップ3_オペレーターのサブスクリプションとcsvの削除"><a class="anchor" href="#_ステップ3_オペレーターのサブスクリプションとcsvの削除"></a>ステップ3: オペレーターのサブスクリプションとCSVの削除</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># サブスクリプションを削除
+oc delete subscription hco-operatorhub -n openshift-cnv
+
+# ClusterServiceVersionを削除
+oc delete csv -n openshift-cnv -l operators.coreos.com/kubevirt-hyperconverged.openshift-cnv</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ステップ4_名前空間の削除_オプション"><a class="anchor" href="#_ステップ4_名前空間の削除_オプション"></a>ステップ4: 名前空間の削除 (オプション)</h3>
+<div class="paragraph">
+<p>完全なクリーンアップのために名前空間を削除します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc delete namespace openshift-cnv</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ステップ5_クリーンアップの確認"><a class="anchor" href="#_ステップ5_クリーンアップの確認"></a>ステップ5: クリーンアップの確認</h3>
+<div class="paragraph">
+<p>すべてのリソースが削除されていることを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 空または"No resources found"を返すはずです
+oc get pods -n openshift-cnv
+oc get csv -n openshift-cnv</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_要約"><a class="anchor" href="#_要約"></a>要約</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShift仮想化をインストールして構成しました。クラスターは、コンテナワークロードと仮想マシンを同時に実行できるようになりました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_次のステップ"><a class="anchor" href="#_次のステップ"></a>次のステップ</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="virtctl-basics.html" class="xref page">virtctlの基本を学ぶ</a> - VM管理のためのコマンドラインツール</p>
+</li>
+<li>
+<p><a href="default-storage-class.html" class="xref page">デフォルトストレージの設定</a> - VM用のストレージの設定</p>
+</li>
+<li>
+<p><a href="../networking/static-ip-configuration.html" class="xref page">VM用の静的IPの構成</a> - cloud-init、DHCP予約、ゲストエージェント、Sysprepを使用して静的IPの構成</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_参照"><a class="anchor" href="#_参照"></a>参照</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>トラブルシューティング、高度な構成オプション、Single Node OpenShiftに関する考慮事項については、以下の公式ドキュメントを参照してください:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/latest/html/virtualization/installing" target="_blank" rel="noopener">OpenShift仮想化のインストールドキュメント</a></p>
+</li>
+<li>
+<p><a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/latest/html/virtualization/getting-started" target="_blank" rel="noopener">OpenShift仮想化のスタートガイド</a></p>
+</li>
+<li>
+<p><a href="https://kubevirt.io/" target="_blank" rel="noopener">KubeVirtプロジェクト</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="prerequisites.html">前提条件</a></span>
+  <span class="next"><a href="default-storage-class.html">ストレージ設定</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

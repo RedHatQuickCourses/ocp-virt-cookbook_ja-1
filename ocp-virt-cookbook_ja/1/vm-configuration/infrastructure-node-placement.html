@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>OpenShift仮想化インフラストラクチャーノード配置 :: FIXME Course Title</title>
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">FIXME Course Title</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../getting-started/index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../storage/index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#静的IP構成.adoc">静的IP構成.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#クラウドイニシャルトラブルシューティング.adoc">クラウドイニシャルトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#UDN主ネットワーク.adoc">UDN主ネットワーク.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットセカンダリ.adoc">ローカルネットセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットVLAN.adoc">ローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CUDNローカルネットVLAN.adoc">CUDNローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#レイヤ2セカンダリ.adoc">レイヤ2セカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Linuxブリッジ.adoc">Linuxブリッジ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#SIRIUSセカンダリ.adoc">SIRIUSセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#VM入口ルート.adoc">VM入口ルート.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#OVSブリッジトラブルシューティング.adoc">OVSブリッジトラブルシューティング.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#内部DNSの仮想マシン.adoc">内部DNSの仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシン.adoc">リモートアクセスを用いたLinux仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc">リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたWindows仮想マシン.adoc">リモートアクセスを用いたWindows仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Windows仮想マシンのVirtioドライバー.adoc">Windows仮想マシンのVirtioドライバー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#インフラストラクチャーノードの配置.adoc">インフラストラクチャーノードの配置.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ノードのアフィニティー.adoc">ノードのアフィニティー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ホットプラグ可能なボリュームとインターフェース.adoc">ホットプラグ可能なボリュームとインターフェース.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#仮想マシンテンプレート.adoc">仮想マシンテンプレート.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リソース制限とQoS.adoc">リソース制限とQoS.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CPUピニング.adoc">CPUピニング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#NUMA大ページ.adoc">NUMA大ページ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リアルタイム仮想マシン.adoc">リアルタイム仮想マシン.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="infrastructure-node-placement.html">インフラストラクチャーノード配置</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">OpenShift仮想化インフラストラクチャーノード配置</h1>
+<div class="sect1">
+<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShift仮想化インフラストラクチャーコンポーネント（virt-controller、virt-api、virt-handler、CDI）は、`openshift-cnv`名前空間内のポッドで実行されます。生産環境では、仮想化インフラストラクチャーを特定のノードに専用にするか、仮想マシンワークロードと分離するか、またはゾーン間で高可用性を最適化する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>このチュートリアルでは、HyperConvergedカスタムリソースを使用してOpenShift仮想化インフラストラクチャーコンポーネントのノード配置を構成する方法を説明します。</p>
+</div>
+<div class="sect2">
+<h3 id="_学習目標"><a class="anchor" href="#_学習目標"></a>学習目標</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>OpenShift仮想化インフラストラクチャーコンポーネントの動作方法</p>
+</li>
+<li>
+<p>HyperConverged CRを使用してインフラストラクチャープレースメントを構成する方法</p>
+</li>
+<li>
+<p>インフラストラクチャーポッドのノードセレクターとアフィニティーの構成</p>
+</li>
+<li>
+<p>異なるクラスターサイズの一般的な配置パターン</p>
+</li>
+<li>
+<p>専用インフラストラクチャーノードのためのタインとトレーリーションの使用方法</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>OpenShift 4.18+ で OpenShift仮想化がインストールされている</p>
+</li>
+<li>
+<p>HyperConverged CRを変更するためのクラスター管理者アクセス権</p>
+</li>
+<li>
+<p><code>oc</code> CLIツールがインストールされている</p>
+</li>
+<li>
+<p>複数のワーカーノード（有意義な配置のために推奨）</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_インフラストラクチャーコンポーネントの理解"><a class="anchor" href="#_インフラストラクチャーコンポーネントの理解"></a>インフラストラクチャーコンポーネントの理解</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShift仮想化のインフラストラクチャーには、いくつかの主要なコンポーネントがあります：</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">コンポーネント</th>
+<th class="tableblock halign-left valign-top">目的</th>
+<th class="tableblock halign-left valign-top">デプロイタイプ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">virt-controller</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">仮想マシンのライフサイクルとオーケストレーションを管理します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デプロイメント（2レプリカ）</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">virt-api</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">仮想化リソース用のAPIサーバーを提供します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デプロイメント（2レプリカ）</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">virt-handler</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">各ノード上の仮想マシンインスタンスを管理します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デーモンセット</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cdi-controller</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ディスクインポート用のContainerized Data Importerを管理します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デプロイメント（1レプリカ）</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cdi-uploadproxy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Webコンソールを介したVMディスクのアップロードを処理します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デプロイメント（1レプリカ）</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cdi-apiserver</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CDI APIエンドポイントを提供します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デプロイメント（1レプリカ）</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hco-webhook</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HyperConverged CRの変更を検証します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デプロイメント（1レプリカ）</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_現在のインフラストラクチャープレースメントの表示"><a class="anchor" href="#_現在のインフラストラクチャープレースメントの表示"></a>現在のインフラストラクチャープレースメントの表示</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>インフラストラクチャーポッドが現在どのノードで実行されているかを確認します：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># openshift-cnv名前空間内のすべての仮想化インフラストラクチャーポッドとノードを表示します
+oc get pods -n openshift-cnv -o wide</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>例出力：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">NAME                                   READY   STATUS    NODE
+virt-api-6d9f8c7b9d-4xk2l              1/1     Running   ip-10-0-24-89.ec2.internal
+virt-api-6d9f8c7b9d-8tz5p              1/1     Running   ip-10-0-43-58.ec2.internal
+virt-controller-7c8d9f5b6d-5nvlm       1/1     Running   ip-10-0-24-89.ec2.internal
+virt-controller-7c8d9f5b6d-9kqwz       1/1     Running   ip-10-0-43-58.ec2.internal
+virt-handler-8zkgp                     1/1     Running   ip-10-0-24-89.ec2.internal
+virt-handler-f2nlb                     1/1     Running   ip-10-0-43-58.ec2.internal
+virt-handler-q7xmc                     1/1     Running   ip-10-0-82-27.ec2.internal
+cdi-apiserver-5f8c9d7b6c-7nlqx         1/1     Running   ip-10-0-24-89.ec2.internal
+cdi-deployment-7c8f9b5d6e-2kxmp        1/1     Running   ip-10-0-43-58.ec2.internal
+cdi-uploadproxy-6d9f8c7b9d-5pqrs       1/1     Running   ip-10-0-24-89.ec2.internal</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>特定のコンポーネントを確認します：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># virt-controllerポッドを表示します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-controller -o wide
+
+# virt-apiポッドを表示します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-api -o wide
+
+# virt-handlerデーモンセットを表示します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-handler -o wide
+
+# CDIコンポーネントを表示します
+oc get pods -n openshift-cnv -l app.kubernetes.io/component=storage -o wide</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_hyperconvergedカスタムリソース"><a class="anchor" href="#_hyperconvergedカスタムリソース"></a>HyperConvergedカスタムリソース</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>インフラストラクチャープレースメントはHyperConverged CRを通じて構成されます：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 現在のHyperConverged構成を表示します
+oc get hyperconverged kubevirt-hyperconverged -n openshift-cnv -o yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>HyperConverged CRは、2つの主要な配置構成を提供します：</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">フィールド</th>
+<th class="tableblock halign-left valign-top">制御</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>spec.infra.nodePlacement</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">virt-api、virt-controller、CDIコントローラー、CDIアップロードプロキシー</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>spec.workloads.nodePlacement</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">virt-handlerデーモンセット（1つのノードあたり）</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>重要：HyperConverged CRはOpenShift仮想化オペレーターによって管理されます。変更はクラスター全体に適用され、すべてのインフラストラクチャーコンポーネントに自動的に伝播されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_配置オプション"><a class="anchor" href="#_配置オプション"></a>配置オプション</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_ノードセレクターの使用"><a class="anchor" href="#_ノードセレクターの使用"></a>ノードセレクターの使用</h3>
+<div class="paragraph">
+<p>ノードセレクターは、ラベルベースの単純な配置を提供します：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 仮想化インフラストラクチャー用のノードをラベル付けします
+oc label node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra=
+oc label node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra=</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>HyperConverged CRを編集します：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc edit hyperconverged kubevirt-hyperconverged -n openshift-cnv</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ノードセレクター構成を追加します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この構成：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>制御プレーンコンポーネント</strong>（virt-api、virt-controller、CDI）は、`node-role.kubernetes.io/infra`ラベルを持つノードでのみ実行されます</p>
+</li>
+<li>
+<p><strong>virt-handlerデーモンセット</strong>は、`node-role.kubernetes.io/worker`ラベルを持つすべてのノードで実行されます</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ノードアフィニティーの使用"><a class="anchor" href="#_ノードアフィニティーの使用"></a>ノードアフィニティーの使用</h3>
+<div class="paragraph">
+<p>より複雑な配置ルールのために、ノードアフィニティーを使用します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/infra
+                operator: Exists
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - us-east-1a
+                - us-east-1b</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この構成：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>インフラストラクチャーノード</strong>（強制的な制約）</p>
+</li>
+<li>
+<p><strong>特定の可用性ゾーン</strong>（柔軟な制約）</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_タインとトレーリーションを使用した専用インフラストラクチャーノード"><a class="anchor" href="#_タインとトレーリーションを使用した専用インフラストラクチャーノード"></a>タインとトレーリーションを使用した専用インフラストラクチャーノード</h3>
+<div class="paragraph">
+<p>インフラストラクチャーノードをタインして、通常のワークロードが実行されないようにします：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># インフラストラクチャーノードをタインします
+oc adm taint node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra=:NoSchedule
+oc adm taint node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra=:NoSchedule</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>HyperConverged CRに対応するトレーリーションを追加します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、マッチングのタインを持つポッドのみがタインされたインフラストラクチャーノードで実行できます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ポッド反アフィニティーを使用した高可用性"><a class="anchor" href="#_ポッド反アフィニティーを使用した高可用性"></a>ポッド反アフィニティーを使用した高可用性</h3>
+<div class="paragraph">
+<p>可用性を向上させるために、ゾーン内でインフラストラクチャーコンポーネントを分散させます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  kubevirt.io: virt-api
+              topologyKey: topology.kubernetes.io/zone
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  kubevirt.io: virt-controller
+              topologyKey: topology.kubernetes.io/zone
+      tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        kubevirt.io/schedulable: "true"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、virt-apiとvirt-controllerの複数のレプリカが異なるゾーンに分散されます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_一般的なデプロイメントパターン"><a class="anchor" href="#_一般的なデプロイメントパターン"></a>一般的なデプロイメントパターン</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_パターン1小規模クラスター3_6ノード"><a class="anchor" href="#_パターン1小規模クラスター3_6ノード"></a>パターン1：小規模クラスター（3-6ノード）</h3>
+<div class="paragraph">
+<p>仮想化インフラストラクチャーとVMワークロードを同じワーカーノードで実行します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>使用例</strong>：開発、テスト、または小規模の生産クラスターで、専用ノードを割り当てることがコスト効率的ではない場合。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_パターン2中規模クラスターに専用インフラストラクチャー"><a class="anchor" href="#_パターン2中規模クラスターに専用インフラストラクチャー"></a>パターン2：中規模クラスターに専用インフラストラクチャー</h3>
+<div class="paragraph">
+<p>仮想化インフラストラクチャーをVMワークロードと分離します：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># インフラストラクチャーノードをラベル付けします
+oc label node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra=
+oc label node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra=
+
+# インフラストラクチャーノードをタインします
+oc adm taint node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra=:NoSchedule
+oc adm taint node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra=:NoSchedule
+
+# VMワークロード用のワーカーノードをラベル付けします
+oc label node ip-10-0-82-27.ec2.internal kubevirt.io/schedulable=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>HyperConverged構成：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        kubevirt.io/schedulable: "true"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>使用例</strong>：予想可能なインフラストラクチャー性能を保証し、VMワークロードのリソース競合から分離した予想可能なインフラストラクチャー性能を保証したい生産クラスター。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_パターン3大規模多ゾーンの高可用性"><a class="anchor" href="#_パターン3大規模多ゾーンの高可用性"></a>パターン3：大規模多ゾーンの高可用性</h3>
+<div class="paragraph">
+<p>可用性を向上させるために、ゾーン内でインフラストラクチャーを分散させます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - us-east-1a
+                - us-east-1b
+                - us-east-1c
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  kubevirt.io: virt-api
+              topologyKey: topology.kubernetes.io/zone
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  kubevirt.io: virt-controller
+              topologyKey: topology.kubernetes.io/zone
+      tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        kubevirt.io/schedulable: "true"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>使用例</strong>：厳格な可用性SLAを要求するエンタープライズ生産環境で、ゾーンレベルの障害耐性が必要です。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_変更の適用"><a class="anchor" href="#_変更の適用"></a>変更の適用</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_hyperconverged_crを直接編集"><a class="anchor" href="#_hyperconverged_crを直接編集"></a>HyperConverged CRを直接編集</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc edit hyperconverged kubevirt-hyperconverged -n openshift-cnv</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_hyperconverged_crをパッチ"><a class="anchor" href="#_hyperconverged_crをパッチ"></a>HyperConverged CRをパッチ</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc patch hyperconverged kubevirt-hyperconverged -n openshift-cnv --type=merge -p '
+{
+  "spec": {
+    "infra": {
+      "nodePlacement": {
+        "nodeSelector": {
+          "node-role.kubernetes.io/infra": ""
+        }
+      }
+    }
+  }
+}'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_変更が適用されたことの確認"><a class="anchor" href="#_変更が適用されたことの確認"></a>変更が適用されたことの確認</h3>
+<div class="paragraph">
+<p>インフラストラクチャーポッドがマッチングノードで終了され、再起動されるのを観察します：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># リアルタイムでポッドの変更を監視します
+oc get pods -n openshift-cnv -w
+
+# 変更が適用された後の新しい配置を確認します
+oc get pods -n openshift-cnv -o wide
+
+# 特定のコンポーネントの配置を確認します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-api -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.nodeName}{"\n"}{end}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される動作：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>インフラストラクチャーポッドはノードセレクターやアフィニティールールにマッチしない場合に終了され、再起動されます</p>
+</li>
+<li>
+<p>virt-handlerデーモンセットはノードセレクターの変更に基づいてポッドを追加または削除します</p>
+</li>
+<li>
+<p>変更は通常2-5分で完了します</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_モニタリングと検証"><a class="anchor" href="#_モニタリングと検証"></a>モニタリングと検証</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_ノード間のポッド分布の確認"><a class="anchor" href="#_ノード間のポッド分布の確認"></a>ノード間のポッド分布の確認</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># ノードごとにポッドをグループ化します
+oc get pods -n openshift-cnv -o jsonpath='{range .items[*]}{.spec.nodeName}{"\t"}{.metadata.name}{"\n"}{end}' | sort | column -t
+
+# ノードごとのポッドの数をカウントします
+oc get pods -n openshift-cnv -o jsonpath='{range .items[*]}{.spec.nodeName}{"\n"}{end}' | sort | uniq -c</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_タインが適用されていることの確認"><a class="anchor" href="#_タインが適用されていることの確認"></a>タインが適用されていることの確認</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># virt-apiポッドが正しいタインを持っているかを確認します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-api -o jsonpath='{.items[0].spec.tolerations}' | jq</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_適用されたノードアフィニティーの確認"><a class="anchor" href="#_適用されたノードアフィニティーの確認"></a>適用されたノードアフィニティーの確認</h3>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># virt-controllerのノードアフィニティーを表示します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-controller -o jsonpath='{.items[0].spec.affinity}' | jq</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_トラブルシューティング"><a class="anchor" href="#_トラブルシューティング"></a>トラブルシューティング</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_インフラストラクチャーポッドが保留中"><a class="anchor" href="#_インフラストラクチャーポッドが保留中"></a>インフラストラクチャーポッドが保留中</h3>
+<div class="paragraph">
+<p><strong>問題</strong>：配置構成を変更した後、インフラストラクチャーポッドが保留中の状態になっています。</p>
+</div>
+<div class="paragraph">
+<p><strong>診断</strong>：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># ポッドのイベントを確認します
+oc describe pod &lt;pod-name&gt; -n openshift-cnv
+
+# スケジューリングエラーを探します
+oc get events -n openshift-cnv --sort-by='.lastTimestamp' | grep -i failedscheduling</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>一般的な原因</strong>：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ノードセレクターやアフィニティールールにマッチするノードがない</p>
+</li>
+<li>
+<p>ノードがタインされているがタインを持たない</p>
+</li>
+<li>
+<p>マッチングノードのリソースが不足しています</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># ノードが必要なラベルを持っていることを確認します
+oc get nodes -L node-role.kubernetes.io/infra
+
+# ノードのタインを確認します
+oc get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.taints}{"\n"}{end}'
+
+# マッチングノードの容量を確認します
+oc describe nodes | grep -A 5 "Allocated resources"</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_virt_handlerがすべてのノードで実行されていない"><a class="anchor" href="#_virt_handlerがすべてのノードで実行されていない"></a>virt-handlerがすべてのノードで実行されていない</h3>
+<div class="paragraph">
+<p><strong>問題</strong>：virt-handlerデーモンセットが、一部のノードでポッドが欠落していることがわかりました。</p>
+</div>
+<div class="paragraph">
+<p><strong>診断</strong>：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># virt-handlerデーモンセットの状況を確認します
+oc get daemonset virt-handler -n openshift-cnv
+
+# 期待されるポッドと現在のポッドを比較します
+oc describe daemonset virt-handler -n openshift-cnv | grep -E "Desired|Current|Ready"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>解決策</strong>：`spec.workloads.nodePlacement`セレクターがノードに一致しているかどうかを確認します：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># ワークロードのノードセレクターを表示します
+oc get hyperconverged kubevirt-hyperconverged -n openshift-cnv -o jsonpath='{.spec.workloads.nodePlacement}' | jq
+
+# セレクターに一致するノードを確認します
+oc get nodes --selector=&lt;label-from-workloads-nodeSelector&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_変更が適用されなかった"><a class="anchor" href="#_変更が適用されなかった"></a>変更が適用されなかった</h3>
+<div class="paragraph">
+<p><strong>問題</strong>：HyperConverged CRを編集したが、インフラストラクチャーポッドが変更されませんでした。</p>
+</div>
+<div class="paragraph">
+<p><strong>HyperConverged CRの状況を確認</strong>：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># HyperConvergedの状況を表示します
+oc get hyperconverged kubevirt-hyperconverged -n openshift-cnv -o yaml | grep -A 10 status:
+
+# 検証エラーを確認します
+oc get events -n openshift-cnv --sort-by='.lastTimestamp' | grep HyperConverged</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>再同期を強制する</strong>：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 再同期をトリガーするためのアノテーションを追加します
+oc annotate hyperconverged kubevirt-hyperconverged -n openshift-cnv reconcile-trigger="$(date +%s)" --overwrite</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ベストプラクティス"><a class="anchor" href="#_ベストプラクティス"></a>ベストプラクティス</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>インフラストラクチャーコアプシティーを計画する</strong>：virt-controller、virt-api、CDIコンポーネント（各ノードで4vCPU、8GB RAM以上を推奨）に十分なCPUとメモリが必要です</p>
+</li>
+<li>
+<p><strong>複数のインフラストラクチャーノードを使用する</strong>：高可用性のために、少なくとも2つのインフラストラクチャーノードを実行します</p>
+</li>
+<li>
+<p><strong>大規模クラスターではワークロードを分離する</strong>：VMワークロードのリソース競合を防ぐために、専用インフラストラクチャーノードを使用します</p>
+</li>
+<li>
+<p><strong>ゾーントポロジーを活用する</strong>：ノード/ポッドアフィニティーを使用してゾーンレベルでインフラストラクチャーを分散させ、より良い障害耐性を実現します</p>
+</li>
+<li>
+<p><strong>インフラストラクチャーの健全性を監視する</strong>：インフラストラクチャーポッドの障害またはリソースの枯渇のためのアラートを設定します</p>
+</li>
+<li>
+<p><strong>配置変更をテストする</strong>：開発/ステージング環境で構成変更を適用する前に実装します</p>
+</li>
+<li>
+<p><strong>ノードの役割を文書化する</strong>：各ノードの目的を明確にラベル付けして文書化します</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_クリーンアップ"><a class="anchor" href="#_クリーンアップ"></a>クリーンアップ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>デフォルトの配置（すべてのワーカーノード）に戻すには：</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># HyperConverged CRのノード配置セクションを削除します
+oc patch hyperconverged kubevirt-hyperconverged -n openshift-cnv --type=json -p='[
+  {"op": "remove", "path": "/spec/infra/nodePlacement"},
+  {"op": "remove", "path": "/spec/workloads/nodePlacement"}
+]'
+
+# インフラストラクチャーノードのラベルを削除します
+oc label node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra-
+oc label node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra-
+
+# 適用した場合のタインを削除します
+oc adm taint node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra:NoSchedule-
+oc adm taint node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra:NoSchedule-</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_要約"><a class="anchor" href="#_要約"></a>要約</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルで学んだこと：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>OpenShift仮想化インフラストラクチャーコンポーネントのデプロイ方法</p>
+</li>
+<li>
+<p>HyperConverged CRを使用してインフラストラクチャープレースメントを構成する方法</p>
+</li>
+<li>
+<p>`spec.infra.nodePlacement`と`spec.workloads.nodePlacement`の違い</p>
+</li>
+<li>
+<p>インフラストラクチャーポッドのためのノードセレクター、アフィニティー、およびタインの使用方法</p>
+</li>
+<li>
+<p>異なるクラスターサイズの一般的な配置パターン</p>
+</li>
+<li>
+<p>インフラストラクチャープレースメントの変更を検証およびトラブルシューティングする方法</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_参照"><a class="anchor" href="#_参照"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="node-placement-affinity.html" class="xref page">VMワークロードのノード配置</a></p>
+</li>
+<li>
+<p><a href="../getting-started/vm-lifecycle-states.html" class="xref page">仮想マシンのライフサイクル管理</a></p>
+</li>
+<li>
+<p><a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/latest/html/virtualization/postinstallation-configuration#virt-about-node-placement-virt-components_virt-specifying-nodes-for-virtualization-components" target="_blank" rel="noopener">仮想化コンポーネントのノード配置について</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>

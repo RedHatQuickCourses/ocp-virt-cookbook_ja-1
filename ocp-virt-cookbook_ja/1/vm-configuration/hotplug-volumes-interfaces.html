@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>ボットプラグボリュームとネットワークインターフェースの追加 :: FIXME Course Title</title>
+    <meta name="generator" content="Antora 3.2.0-alpha.12">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/collapsible.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/reading-time.css">
+    <link rel="stylesheet" href="../../../_/css/vendor/audio-transcript.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">FIXME Course Title</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ocp-virt-cookbook_ja" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">OpenShift Virtualization cookbook</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">紹介</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../getting-started/index.html">開始</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../storage/index.html">ストレージ構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-operator.html">LVM Operator のインストール</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/hostpath-provisioner.html">HostPath Provisioner</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../storage/multi-disk-configuration.html">複数ディスク VM</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#静的IP構成.adoc">静的IP構成.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#クラウドイニシャルトラブルシューティング.adoc">クラウドイニシャルトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#UDN主ネットワーク.adoc">UDN主ネットワーク.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットセカンダリ.adoc">ローカルネットセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ローカルネットVLAN.adoc">ローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CUDNローカルネットVLAN.adoc">CUDNローカルネットVLAN.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#レイヤ2セカンダリ.adoc">レイヤ2セカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Linuxブリッジ.adoc">Linuxブリッジ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#SIRIUSセカンダリ.adoc">SIRIUSセカンダリ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#VM入口ルート.adoc">VM入口ルート.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#OVSブリッジトラブルシューティング.adoc">OVSブリッジトラブルシューティング.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="index.html">仮想マシン構成</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#内部DNSの仮想マシン.adoc">内部DNSの仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシン.adoc">リモートアクセスを用いたLinux仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc">リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リモートアクセスを用いたWindows仮想マシン.adoc">リモートアクセスを用いたWindows仮想マシン.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#Windows仮想マシンのVirtioドライバー.adoc">Windows仮想マシンのVirtioドライバー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#インフラストラクチャーノードの配置.adoc">インフラストラクチャーノードの配置.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ノードのアフィニティー.adoc">ノードのアフィニティー.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#ホットプラグ可能なボリュームとインターフェース.adoc">ホットプラグ可能なボリュームとインターフェース.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#仮想マシンテンプレート.adoc">仮想マシンテンプレート.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リソース制限とQoS.adoc">リソース制限とQoS.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#CPUピニング.adoc">CPUピニング.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#NUMA大ページ.adoc">NUMA大ページ.adoc</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#リアルタイム仮想マシン.adoc">リアルタイム仮想マシン.adoc</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../manifests/index.html">マニフェスト</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/index.html">API ガイド</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../appendix/glossary.html">glossary</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Virtualization cookbook</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">OpenShift Virtualization cookbook</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
+    <li><a href="hotplug-volumes-interfaces.html">ボットプラグボリュームとインターフェース</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">ボットプラグボリュームとネットワークインターフェースの追加</h1>
+<div class="sect1">
+<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルでは、実行中の仮想マシンにストレージボリュームを動的に追加および削除する方法を示します。ボットプラグは、ストレージのゼロダウンタイム拡張、柔軟なリソース割り当て、メンテナンスウィンドウの短縮を可能にします。</p>
+</div>
+<div class="paragraph">
+<p><code>virtctl addvolume</code> を使用して、新しい PVC を実行中の VM にアタッチし、ゲスト内で新しいブロックデバイスとして表示されるかどうかを確認し、次に <code>virtctl removevolume</code> を使用して削除します。このチュートリアルでは、ボットプラグネットワークインターフェースの概念と要件もカバーします。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><strong>OpenShift 4.18+</strong> に OpenShift Virtualization オペレーターがインストールされている</p>
+</li>
+<li>
+<p><strong>クラスター管理者権限</strong> (<code>system:admin</code> または等価)</p>
+</li>
+<li>
+<p><strong><code>oc</code> CLI</strong> と <strong><code>virtctl</code> CLI</strong> がインストールされている</p>
+</li>
+<li>
+<p><strong>デフォルトの StorageClass</strong> が構成されている</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>テスト済みバージョン:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>OpenShift 4.20、4.21</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_1_ネームスペースとベース_vm_の作成"><a class="anchor" href="#_ステップ_1_ネームスペースとベース_vm_の作成"></a>ステップ 1: ネームスペースとベース VM の作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>実行中のボットプラグターゲットとして使用するネームスペースを作成し、VM をデプロイします。</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc create namespace hotplug-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>警告: この例の cloud-init パスワードはデモ目的のみです。実際の環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。</p>
+</div>
+<div class="paragraph">
+<p><a href="#attachment$hotplug-volumes-interfaces/vm-hotplug.yaml" class="xref unresolved">vm-hotplug.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: hotplug-vm
+  namespace: hotplug-demo
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: hotplug-vm
+    spec:
+      domain:
+        devices:
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+        resources:
+          requests:
+            memory: 1Gi
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: rootdisk
+        containerDisk:
+          image: quay.io/containerdisks/fedora:latest
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            password: redhat
+            chpasswd:
+              expire: false
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>VM が開始されるまで待ちます:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vm -n hotplug-demo -w</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>STATUS=Running</code> および <code>READY=True</code> のときに、続行します。<code>Ctrl+C</code> を押してウォッチを終了します。</p>
+</div>
+<div class="paragraph">
+<p>初期ディスクレイアウトを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vmi hotplug-vm -n hotplug-demo -o jsonpath='{range .status.volumeStatus[*]}{.name}: {.target}{"\n"}{end}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>rootdisk: vda
+cloudinitdisk: vdb</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_2_ボットプラグ用の_pvc_の作成"><a class="anchor" href="#_ステップ_2_ボットプラグ用の_pvc_の作成"></a>ステップ 2: ボットプラグ用の PVC の作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ボットプラグされるようにする PVC を作成します。</p>
+</div>
+<div class="paragraph">
+<p><a href="#attachment$hotplug-volumes-interfaces/hotplug-pvc.yaml" class="xref unresolved">hotplug-pvc.yaml をダウンロード</a></p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hotplug-disk
+  namespace: hotplug-demo
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: lvms-vg1
+  volumeMode: Block
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>重要: ボットプラグボリュームは <code>volumeMode: Block</code> を使用する必要があります。ファイルシステムモードの PVC は事前に作成された <code>disk.img</code> ファイルが必要で、直接の空白ボリュームへのボットプラグには適していません。</p>
+</div>
+<div class="paragraph">
+<p>PVC がプロビジョニングされるまで待ちます。<code>WaitForFirstConsumer</code> バインディングモードを使用する場合、割り当てられていない場合には <code>Pending</code> 状態に留まる可能性があります:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pvc hotplug-disk -n hotplug-demo</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_3_ボットプラグボリュームの追加"><a class="anchor" href="#_ステップ_3_ボットプラグボリュームの追加"></a>ステップ 3: ボットプラグボリュームの追加</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>virtctl addvolume</code> を使用して、実行中の VM に PVC をアタッチします:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl addvolume hotplug-vm --volume-name=hotplug-disk --namespace=hotplug-demo --persist</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Successfully submitted addvolume request to VM hotplug-vm for volume hotplug-disk</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>--persist</code> フラグは、ボリュームが VM 再起動後もアタッチされていることを保証します。このフラグを使用しない場合、次のブート時にボリュームが切断されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_4_ボットプラグボリュームの確認"><a class="anchor" href="#_ステップ_4_ボットプラグボリュームの確認"></a>ステップ 4: ボットプラグボリュームの確認</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>VM ボリュームのステータスを確認して、新しいディスクが表示されているかを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vmi hotplug-vm -n hotplug-demo -o jsonpath='{range .status.volumeStatus[*]}{.name}: {.target} (hotplugVolume: {.hotplugVolume}){"\n"}{end}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>rootdisk: vda (hotplugVolume: )
+cloudinitdisk: vdb (hotplugVolume: )
+hotplug-disk: sda (hotplugVolume: {"attachPodName":"...","attachPodUID":"..."})</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ボットプラグされたボリュームは SCSI デバイス (<code>sda</code>) で表示され、<code>Ready</code> 状態です。<code>hotplugVolume</code> フィールドにアタッチポッド情報があります。</p>
+</div>
+<div class="paragraph">
+<p>PVC がバインドされていることを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pvc hotplug-disk -n hotplug-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>NAME           STATUS   VOLUME       CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+hotplug-disk   Bound    pvc-xxxx     5Gi        RWO            lvms-vg1       1m</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ゲスト内から確認します。VM コンソールにアクセスします:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl console hotplug-vm -n hotplug-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ユーザー名 <code>fedora</code> とパスワード <code>redhat</code> でログインし、ブロックデバイスをリスト表示します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">lsblk</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>新しいディスクデバイス (例: <code>sda</code>) が、PVC のサイズと一致するはずです。<code>Ctrl+]</code> を押して終了します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_5_ボットプラグボリュームのフォーマットと使用_ゲスト内"><a class="anchor" href="#_ステップ_5_ボットプラグボリュームのフォーマットと使用_ゲスト内"></a>ステップ 5: ボットプラグボリュームのフォーマットと使用 (ゲスト内)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>VM コンソール内で、新しいディスクをフォーマットします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">sudo mkfs.xfs /dev/sda</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>マウントポイントを作成し、ディスクをマウントします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">sudo mkdir -p /mnt/hotplug
+sudo mount /dev/sda /mnt/hotplug</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>テストファイルを書き込み、確認します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">echo "ボットプラグテスト" | sudo tee /mnt/hotplug/test.txt</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat /mnt/hotplug/test.txt</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ボットプラグテスト</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アンマウントする前に削除します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">sudo umount /mnt/hotplug</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Ctrl+]</code> を押してコンソールを終了します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ステップ_6_ボットプラグボリュームの削除"><a class="anchor" href="#_ステップ_6_ボットプラグボリュームの削除"></a>ステップ 6: ボットプラグボリュームの削除</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>実行中の VM からボリュームを切断します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl removevolume hotplug-vm --volume-name=hotplug-disk --namespace=hotplug-demo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Successfully submitted removevolume request to VM hotplug-vm for volume hotplug-disk</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>重要: ボットプラグボリュームを削除する前に、ゲスト内のファイルシステムをアンマウントしてデータ損失を防ぐことが重要です。</p>
+</div>
+<div class="paragraph">
+<p>ボリュームが削除されたことを確認します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get vmi hotplug-vm -n hotplug-demo -o jsonpath='{range .status.volumeStatus[*]}{.name}: {.target}{"\n"}{end}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待される出力:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>rootdisk: vda
+cloudinitdisk: vdb</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>hotplug-disk はさらにアタッチされていません。PVC はデータを保持します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pvc hotplug-disk -n hotplug-demo</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ボットプラグボリュームの参照"><a class="anchor" href="#_ボットプラグボリュームの参照"></a>ボットプラグボリュームの参照</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_persist_フラグ"><a class="anchor" href="#_persist_フラグ"></a>--persist フラグ</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">フラグ</th>
+<th class="tableblock halign-left valign-top">動作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--persist</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ボリュームが VM 仕様に追加され、再起動後もアタッチされます</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(なし)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ボリュームは現在の VMI のみにアタッチされ、再起動時に失われます</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>データディスクを永続的にアタッチする必要がある場合は <code>--persist</code> を使用します。一時的な操作 (データ移行や一度のインポートなど) には省略します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_サポートされるボリュームタイプ"><a class="anchor" href="#_サポートされるボリュームタイプ"></a>サポートされるボリュームタイプ</h3>
+<div class="paragraph">
+<p>ボットプラグは次のものをサポートします:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>PersistentVolumeClaims (PVC)</p>
+</li>
+<li>
+<p>DataVolumes</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ボットプラグは次のものをサポートしません:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>containerDisk ボリューム</p>
+</li>
+<li>
+<p>cloudInitNoCloud / cloudInitConfigDrive ボリューム</p>
+</li>
+<li>
+<p>emptyDir ボリューム</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ディスクバスタイプ"><a class="anchor" href="#_ディスクバスタイプ"></a>ディスクバスタイプ</h3>
+<div class="paragraph">
+<p>ボットプラグされたボリュームは SCSI バスを使用します ( <code>sda</code>、<code>sdb</code> など)、virtio ディスクは <code>vda</code>、<code>vdb</code> などとして表示されます。これは、virtio ディスクがブート後に PCI バスにホットプラグできないためです。SCSI はホットアドドの能力を提供します。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ネットワークインターフェースのボットプラグ_参照"><a class="anchor" href="#_ネットワークインターフェースのボットプラグ_参照"></a>ネットワークインターフェースのボットプラグ (参照)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShift Virtualization は、ネットワークインターフェースのボットプラグもサポートしています。これは、すべてのクラスターで利用可能でない可能性のある追加のインフラストラクチャが必要です。</p>
+</div>
+<div class="sect2">
+<h3 id="_要件"><a class="anchor" href="#_要件"></a>要件</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Multus CNI 厚いプラグイン</strong>: 標準の Multus デプロイメントが、厚いプラグインとして実行されている必要があります。</p>
+</li>
+<li>
+<p><strong>Multus 動的ネットワークコントローラー</strong>: 変更を監視し、Multus を新しいアタッチメントを構成するために Multus にトリガーするデーモンです。</p>
+</li>
+<li>
+<p><strong>マルチノードクラスター</strong>: 単一ノードクラスターでは、ライブマイグレーションベースのボットプラグは使用できません。</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_どのように機能するか"><a class="anchor" href="#_どのように機能するか"></a>どのように機能するか</h3>
+<div class="paragraph">
+<p>ボットプラグボリューム ( <code>virtctl addvolume</code> を使用する) とは異なり、ネットワークインターフェースのボットプラグは VM 仕様を編集して行います:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>2 番目のネットワーク用の NetworkAttachmentDefinition (NAD) を作成します。</p>
+</li>
+<li>
+<p>VM 仕様を編集して新しいインターフェースとネットワーク定義を追加します。</p>
+</li>
+<li>
+<p>厚い Multus が利用可能な場合は、実行中の VM にインターフェースがアタッチされます (またはライブマイグレーション後)。</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_インターフェースの削除"><a class="anchor" href="#_インターフェースの削除"></a>インターフェースの削除</h3>
+<div class="paragraph">
+<p>VM 仕様でインターフェースの <code>state: absent</code> を設定します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">interfaces:
+- name: dyniface1
+  state: absent
+  bridge: {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>注: ブリッジバインディングインターフェースのみがホットアンプラグをサポートします。SR-IOV インターフェースはホットアンプラグできません。</p>
+</div>
+<div class="paragraph">
+<p>詳細なネットワークボットプラグ手順については、link:https://kubevirt.io/user-guide/network/hotplug_interfaces/[KubeVirt ネットワークインターフェースのボットプラグに関するユーザーガイドを参照してください。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_クリーンアップ"><a class="anchor" href="#_クリーンアップ"></a>クリーンアップ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルで作成されたすべてのリソースを削除します:</p>
+</div>
+<div class="listingblock execute">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc delete namespace hotplug-demo</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_要約"><a class="anchor" href="#_要約"></a>要約</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルで学んだこと:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>virtctl addvolume</code> を使用して実行中の VM に PVC ボリュームをボットプラグ</p>
+</li>
+<li>
+<p><code>--persist</code> フラグを使用して、ボットプラグされたボリュームが再起動後もアタッチされるようにする</p>
+</li>
+<li>
+<p>ボットプラグされたボリュームがゲスト内で新しいブロックデバイスとして表示されることを確認する</p>
+</li>
+<li>
+<p>VM 内でボットプラグされたストレージをフォーマットしてマウントする</p>
+</li>
+<li>
+<p><code>virtctl removevolume</code> を使用してボットプラグされたボリュームを削除する</p>
+</li>
+<li>
+<p>ネットワークインターフェースのボットプラグの要件と方法を理解する</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_参照"><a class="anchor" href="#_参照"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://kubevirt.io/user-guide/storage/hotplug_volumes/" target="_blank" rel="noopener">Hotplug Volumes - KubeVirt User Guide</a></p>
+</li>
+<li>
+<p><a href="https://kubevirt.io/user-guide/network/hotplug_interfaces/" target="_blank" rel="noopener">Hotplug Network Interfaces - KubeVirt User Guide</a></p>
+</li>
+<li>
+<p><a href="../vm-lifecycle/boot-order-boot-sources.html" class="xref page">ブート順序とブートソース</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script defer src="../../../_/js/vendor/tabs.js"></script>
+<script defer src="../../../_/js/vendor/reading-time.js"></script>
+  </body>
+</html>
