@@ -1,0 +1,473 @@
+= 仮想マシンリソース制限とQoSの構成
+:navtitle: リソース制限とQoS
+
+== 概要
+
+このチュートリアルでは、OpenShift Virtualization で仮想マシンのCPUおよびメモリー要求、制限、およびQuality of Service (QoS) クラスを設定する方法を示します。適切なリソース管理は、リソースの不足を防ぎ、仮想マシンの予測可能なパフォーマンスを確保し、クラスターの効率的な多テナント利用を可能にします。
+
+KubeVirt が仮想マシンのリソース仕様をコンテナーレベルの要求と制限に翻訳する方法、Kubernetes の QoS クラスが仮想マシンに適用される方法、およびリソースクォータと制限レンジを使用して名前空間レベルのガバナンスを実装する方法を学びます。
+
+== 前提条件
+
+* **OpenShift 4.18+** に OpenShift Virtualization オペレーターがインストールされている
+* **クラスター管理者権限** (`system:admin` または等価)
+* **`oc` CLI** と **`virtctl` CLI** がインストールされている
+* **デフォルトの StorageClass** が構成されている（仮想マシンのブートディスク用）
+
+テスト済みバージョン:
+----
+OpenShift 4.20、4.21
+----
+
+== 仮想マシンリソース管理の理解
+
+OpenShift Virtualization で仮想マシンを作成すると、KubeVirt は仮想マシンのリソース仕様を、`virt-launcher` コンテナー（仮想マシンをホストする）に要求と制限に翻訳します。このマッピングを理解することは、容量計画に不可欠です。
+
+=== CPU の割り当て
+
+* デフォルトでは、コンテナーは vCPU あたり `1/cpuAllocationRatio` の CPU を要求し、`cpuAllocationRatio` のデフォルト値は 10 です。1 vCPU の仮想マシンは 100m CPU を要求します。
+* デフォルトでは CPU 制限は設定されていません。これにより、容量が利用可能な場合に仮想マシンが要求を超えてブルストできるようになります。
+* ユーザーが仮想マシンに CPU 制限を手動で設定した場合、要求は自動的に導出されません。要求は制限に一致します。
+* vCPU の数は、`sockets * cores * threads` で計算され、デフォルトでは 1 です。
+
+=== メモリーの割り当て
+
+* 仮想マシンは、`spec.domain.memory.guest` または `spec.domain.resources.requests.memory` を使用して、必要なメモリーを指定します。
+* KubeVirt は、QEMU、ファームウェア、およびその他のハイパーバイザーコンポーネントの計算されたオーバーヘッドをゲストメモリーに加え、コンテナーメモリー要求を形成します。
+* デフォルトではメモリー制限は設定されていません。
+* メモリー制限を設定した場合、制限はゲストメモリーより 500 MiB または 2% 大きくなければなりません。これはオーバーヘッドを考慮するためです。
+
+警告: 仮想マシンにメモリー制限を設定すると、ゲスト OS またはハイパーバイザーが一時的に制限を超えてしまうと VM がクラッシュする可能性があります。制限を慎重に設定し、ゲストメモリーにオーバーヘッドを加えて設定してください。
+
+== ステップ 1: テスト用の名前空間の作成
+
+[source,bash,role=execute]
+----
+oc create namespace resource-qos-demo
+----
+
+== ステップ 2: QoS クラスが異なる仮想マシンのデプロイ
+
+Kubernetes は、リソース構成に基づいて、すべての Pod に QoS クラスを 1 つ割り当てます。VM は Pod 内にあるため、同じルールが適用されます。
+
+=== ブルスタブル QoS (デフォルト)
+
+リソース要求が設定されているが制限が設定されていない仮想マシンは、ブルスタブル QoS を受け取ります。これは OpenShift Virtualization の仮想マシンのデフォルト動作です。
+
+警告: この例では、cloud-init パスワードはデモ目的でのみ使用されます。実際の環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。
+
+xref:attachment$resource-limits-qos/vm-burstable.yaml[vm-burstable.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vm-burstable
+  namespace: resource-qos-demo
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: vm-burstable
+    spec:
+      domain:
+        memory:
+          guest: 512Mi
+        resources:
+          requests:
+            memory: 512Mi
+        devices:
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: rootdisk
+        containerDisk:
+          image: quay.io/containerdisks/fedora:latest
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            password: redhat
+            chpasswd:
+              expire: false
+EOF
+----
+
+=== ガーランテッド QoS
+
+CPU とメモリーの要求と制限が等しい仮想マシンは、ガーランテッド QoS を受け取ります。これらの VM は、スケジューリング優先度が最高で、メモリー圧力下で最後に除外されます。
+
+xref:attachment$resource-limits-qos/vm-guaranteed.yaml[vm-guaranteed.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vm-guaranteed
+  namespace: resource-qos-demo
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: vm-guaranteed
+    spec:
+      domain:
+        memory:
+          guest: 512Mi
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: "1"
+          limits:
+            memory: 1Gi
+            cpu: "1"
+        devices:
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: rootdisk
+        containerDisk:
+          image: quay.io/containerdisks/fedora:latest
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            password: redhat
+            chpasswd:
+              expire: false
+EOF
+----
+
+注意: メモリー制限 (1Gi) はゲストメモリー (512Mi) よりも大幅に大きくなければなりません。これは、ハイパーバイザーのオーバーヘッドを考慮するためです。制限がゲストメモリーに近すぎると、Pod は拒否される可能性があります。
+
+=== ベストエフォート QoS
+
+リソース要求と制限が設定されていない仮想マシンは、ベストエフォート QoS を受け取ります。これらの仮想マシンは、リソース圧力下で最初に除外されます。これは、実際の環境で推奨されない一般的な構成です。
+
+xref:attachment$resource-limits-qos/vm-besteffort.yaml[vm-besteffort.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vm-besteffort
+  namespace: resource-qos-demo
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: vm-besteffort
+    spec:
+      domain:
+        memory:
+          guest: 512Mi
+        devices:
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: rootdisk
+        containerDisk:
+          image: quay.io/containerdisks/fedora:latest
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            password: redhat
+            chpasswd:
+              expire: false
+EOF
+----
+
+== ステップ 3: QoS クラスの検証
+
+VM が起動するのを待ちます:
+
+[source,bash,role=execute]
+----
+oc get vm -n resource-qos-demo
+----
+
+期待される出力:
+----
+NAME             AGE   STATUS    READY
+vm-besteffort    30s   Running   True
+vm-burstable     60s   Running   True
+vm-guaranteed    45s   Running   True
+----
+
+各 VM の Pod に割り当てられた QoS クラスを確認します。
+
+ブルスタブル VM の場合:
+
+[source,bash,role=execute]
+----
+oc get pod -n resource-qos-demo -l kubevirt.io/domain=vm-burstable -o jsonpath='{.items[0].status.qosClass}{"\n"}'
+----
+
+期待される出力:
+----
+Burstable
+----
+
+ガーランテッド VM の場合:
+
+[source,bash,role=execute]
+----
+oc get pod -n resource-qos-demo -l kubevirt.io/domain=vm-guaranteed -o jsonpath='{.items[0].status.qosClass}{"\n"}'
+----
+
+期待される出力:
+----
+Guaranteed
+----
+
+ベストエフォート VM の場合:
+
+[source,bash,role=execute]
+----
+oc get pod -n resource-qos-demo -l kubevirt.io/domain=vm-besteffort -o jsonpath='{.items[0].status.qosClass}{"\n"}'
+----
+
+期待される出力:
+----
+Burstable
+----
+
+注意: vm-besteffort も Burstable を示すのは、KubeVirt が virt-launcher コンテナーのベースリソース要求を常に追加するためです。
+
+virt-launcher Pod の実際のリソース値を検査します。
+
+ブルスタブル VM の場合:
+
+[source,bash,role=execute]
+----
+oc get pod -n resource-qos-demo -l kubevirt.io/domain=vm-burstable -o yaml
+----
+
+ガーランテッド VM の場合:
+
+[source,bash,role=execute]
+----
+oc get pod -n resource-qos-demo -l kubevirt.io/domain=vm-guaranteed -o yaml
+----
+
+ベストエフォート VM の場合:
+
+[source,bash,role=execute]
+----
+oc get pod -n resource-qos-demo -l kubevirt.io/domain=vm-besteffort -o yaml
+----
+
+== ステップ 4: リソースクォータの適用
+
+リソースクォータは、名前空間内のすべての VM と Pod の合計リソース制限をエンフォースします。リソースクォータに制限が含まれている場合、KubeVirt は自動的に仮想マシンにリソース制限を設定します。
+
+xref:attachment$resource-limits-qos/resource-quota.yaml[resource-quota.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: vm-resource-quota
+  namespace: resource-qos-demo
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    pods: "10"
+EOF
+----
+
+クォータを確認します:
+
+[source,bash,role=execute]
+----
+oc describe resourcequota vm-resource-quota -n resource-qos-demo
+----
+
+この出力は、名前空間の現在使用量とハード制限を示します。この名前空間で作成される新しい VM は、CPU 制限 (1 つあたりの vCPU) とメモリー制限 (要求の 2 倍) を自動的に受け取ります。これは、クォータに制限フィールドが含まれているためです。
+
+=== 自動メモリー制限比のカスタマイズ
+
+デフォルトでは、自動メモリー制限は要求の 2 倍になっています。名前空間ごとにカスタマイズできます:
+
+[source,bash,role=execute]
+----
+oc label namespace resource-qos-demo alpha.kubevirt.io/auto-memory-limits-ratio=1.5
+----
+
+これにより、名前空間内のすべての新しい VM に自動メモリー制限比が 1.5 倍に設定されます。
+
+== ステップ 5: 制限レンジの適用
+
+制限レンジは、名前空間内の各 Pod にリソースのデフォルト値と上限値を設定し、すべての VM が最小リソース割り当てを確保します。
+
+xref:attachment$resource-limits-qos/limit-range.yaml[limit-range.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: vm-limit-range
+  namespace: resource-qos-demo
+spec:
+  limits:
+  - type: Pod
+    max:
+      cpu: "4"
+      memory: 8Gi
+    min:
+      cpu: 100m
+      memory: 256Mi
+  - type: Container
+    default:
+      cpu: 500m
+      memory: 1Gi
+    defaultRequest:
+      cpu: 100m
+      memory: 512Mi
+    max:
+      cpu: "4"
+      memory: 8Gi
+    min:
+      cpu: 50m
+      memory: 128Mi
+EOF
+----
+
+確認します:
+
+[source,bash,role=execute]
+----
+oc describe limitrange vm-limit-range -n resource-qos-demo
+----
+
+この制限レンジが設定されている場合、リソース要求または制限を指定していない新しい Pod (仮想マシンの virt-launcher Pod を含む) はデフォルト値を受け取ります。
+
+== リソース使用状況の監視
+
+VM Pod の実際のリソース消費を確認します:
+
+[source,bash,role=execute]
+----
+oc adm top pods -n resource-qos-demo
+----
+
+これにより、各 virt-launcher Pod の現在の CPU とメモリー使用量が表示されます。これらの値を要求と制限と比較して、調整の機会を特定します。
+
+名前空間レベルのリソース消費をクォータと比較します:
+
+[source,bash,role=execute]
+----
+oc describe resourcequota vm-resource-quota -n resource-qos-demo
+----
+
+== QoS クラスの要約
+
+[cols="1,1,1,1",options="header"]
+|===
+| QoS クラス
+| 構成
+| 除外優先度
+| 使用ケース
+
+| ガーランテッド
+| CPU とメモリーの要求と制限が等しい
+| 最後に除外される
+| 生産データベース、重要なアプリケーション
+
+| ブルスタブル
+| 要求が設定されているが制限が設定されていない
+| ベストエフォートより後に除外される
+| 一般的なワークロード、開発 VM
+
+| ベストエフォート
+| 要求または制限が設定されていない
+| 最初に除外される
+| 一時的、捨て身のワークロード
+|===
+
+== 調整の推奨事項
+
+* **新しいワークロードのためにブルスタブルを使用する**: 予想される使用量にメモリー要求を設定し、必要に応じて VM がブルストできるようにします。
+* **プロダクション VM のためにガーランテッドを使用する**: 予測可能なパフォーマンスが必要で、除外されるべきではない VM には使用します。
+* **メモリー制限を慎重に設定する**: ゲストメモリーにオーバーヘッドとメモリースパイクを考慮して、少なくとも 2 倍に設定します。
+* **制限を適用する前に監視する**: `oc adm top pods` を使用して、実際の使用量を観察します。
+* **名前空間レベルでリソースクォータを使用する**: 単一のチームがクラスターのすべてのリソースを消費するのを防ぎます。
+* **制限レンジを使用する**: すべての VM に最小リソース割り当てと理想的なデフォルト値を設定します。
+
+== クリーンアップ
+
+このチュートリアルで作成されたすべてのリソースを削除します:
+
+[source,bash,role=execute]
+----
+oc delete namespace resource-qos-demo
+----
+
+== 要約
+
+このチュートリアルで学んだこと:
+
+* 仮想マシンの CPU とメモリー要求と制限の構成
+* KubeVirt が仮想マシンリソースをコンテナーリソースにマッピングする方法の理解
+* ガーランテッド、ブルスタブル、およびベストエフォート QoS クラスを使用して仮想マシンをデプロイする方法
+* 名前空間レベルのリソースガバナンスを実装するためのリソースクォータの適用
+* 名前空間内の各 Pod にデフォルト値と境界を設定するための制限レンジの適用
+* VM リソース使用状況の監視と調整
+* 名前空間ごとに自動メモリー制限比をカスタマイズする方法
+
+== 参照
+
+* link:https://kubevirt.io/user-guide/compute/resources_requests_and_limits/[KubeVirt リソース要求と制限 - ユーザーガイド,window=_blank]
+* link:https://docs.openshift.com/container-platform/4.18/virt/managing_vms/advanced_vm_management/virt-working-with-resource-quotas-for-vms.html[仮想マシン用のリソースクォータの操作 - OpenShift ドキュメント,window=_blank]
+* link:https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/[Pod の QoS 設定 - Kubernetes ドキュメント,window=_blank]
+* link:https://docs.openshift.com/container-platform/4.18/applications/quotas/quotas-setting-per-project.html[プロジェクトごとのリソースクォータ - OpenShift ドキュメント,window=_blank]

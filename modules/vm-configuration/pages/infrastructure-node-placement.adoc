@@ -1,0 +1,630 @@
+= OpenShift仮想化インフラストラクチャーノード配置
+:navtitle: インフラストラクチャーノード配置
+
+== 概要
+
+OpenShift仮想化インフラストラクチャーコンポーネント（virt-controller、virt-api、virt-handler、CDI）は、`openshift-cnv`名前空間内のポッドで実行されます。生産環境では、仮想化インフラストラクチャーを特定のノードに専用にするか、仮想マシンワークロードと分離するか、またはゾーン間で高可用性を最適化する必要があります。
+
+このチュートリアルでは、HyperConvergedカスタムリソースを使用してOpenShift仮想化インフラストラクチャーコンポーネントのノード配置を構成する方法を説明します。
+
+=== 学習目標
+
+* OpenShift仮想化インフラストラクチャーコンポーネントの動作方法
+* HyperConverged CRを使用してインフラストラクチャープレースメントを構成する方法
+* インフラストラクチャーポッドのノードセレクターとアフィニティーの構成
+* 異なるクラスターサイズの一般的な配置パターン
+* 専用インフラストラクチャーノードのためのタインとトレーリーションの使用方法
+
+== 前提条件
+
+* OpenShift 4.18+ で OpenShift仮想化がインストールされている
+* HyperConverged CRを変更するためのクラスター管理者アクセス権
+* `oc` CLIツールがインストールされている
+* 複数のワーカーノード（有意義な配置のために推奨）
+
+== インフラストラクチャーコンポーネントの理解
+
+OpenShift仮想化のインフラストラクチャーには、いくつかの主要なコンポーネントがあります：
+
+[cols="1,2,1",options="header"]
+|===
+|コンポーネント |目的 |デプロイタイプ
+
+|virt-controller
+|仮想マシンのライフサイクルとオーケストレーションを管理します
+|デプロイメント（2レプリカ）
+
+|virt-api
+|仮想化リソース用のAPIサーバーを提供します
+|デプロイメント（2レプリカ）
+
+|virt-handler
+|各ノード上の仮想マシンインスタンスを管理します
+|デーモンセット
+
+|cdi-controller
+|ディスクインポート用のContainerized Data Importerを管理します
+|デプロイメント（1レプリカ）
+
+|cdi-uploadproxy
+|Webコンソールを介したVMディスクのアップロードを処理します
+|デプロイメント（1レプリカ）
+
+|cdi-apiserver
+|CDI APIエンドポイントを提供します
+|デプロイメント（1レプリカ）
+
+|hco-webhook
+|HyperConverged CRの変更を検証します
+|デプロイメント（1レプリカ）
+|===
+
+== 現在のインフラストラクチャープレースメントの表示
+
+インフラストラクチャーポッドが現在どのノードで実行されているかを確認します：
+
+[source,bash,role=execute]
+----
+# openshift-cnv名前空間内のすべての仮想化インフラストラクチャーポッドとノードを表示します
+oc get pods -n openshift-cnv -o wide
+----
+
+例出力：
+[source,text]
+----
+NAME                                   READY   STATUS    NODE
+virt-api-6d9f8c7b9d-4xk2l              1/1     Running   ip-10-0-24-89.ec2.internal
+virt-api-6d9f8c7b9d-8tz5p              1/1     Running   ip-10-0-43-58.ec2.internal
+virt-controller-7c8d9f5b6d-5nvlm       1/1     Running   ip-10-0-24-89.ec2.internal
+virt-controller-7c8d9f5b6d-9kqwz       1/1     Running   ip-10-0-43-58.ec2.internal
+virt-handler-8zkgp                     1/1     Running   ip-10-0-24-89.ec2.internal
+virt-handler-f2nlb                     1/1     Running   ip-10-0-43-58.ec2.internal
+virt-handler-q7xmc                     1/1     Running   ip-10-0-82-27.ec2.internal
+cdi-apiserver-5f8c9d7b6c-7nlqx         1/1     Running   ip-10-0-24-89.ec2.internal
+cdi-deployment-7c8f9b5d6e-2kxmp        1/1     Running   ip-10-0-43-58.ec2.internal
+cdi-uploadproxy-6d9f8c7b9d-5pqrs       1/1     Running   ip-10-0-24-89.ec2.internal
+----
+
+特定のコンポーネントを確認します：
+
+[source,bash,role=execute]
+----
+# virt-controllerポッドを表示します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-controller -o wide
+
+# virt-apiポッドを表示します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-api -o wide
+
+# virt-handlerデーモンセットを表示します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-handler -o wide
+
+# CDIコンポーネントを表示します
+oc get pods -n openshift-cnv -l app.kubernetes.io/component=storage -o wide
+----
+
+== HyperConvergedカスタムリソース
+
+インフラストラクチャープレースメントはHyperConverged CRを通じて構成されます：
+
+[source,bash,role=execute]
+----
+# 現在のHyperConverged構成を表示します
+oc get hyperconverged kubevirt-hyperconverged -n openshift-cnv -o yaml
+----
+
+HyperConverged CRは、2つの主要な配置構成を提供します：
+
+[cols="1,2",options="header"]
+|===
+|フィールド |制御
+
+|`spec.infra.nodePlacement`
+|virt-api、virt-controller、CDIコントローラー、CDIアップロードプロキシー
+
+|`spec.workloads.nodePlacement`
+|virt-handlerデーモンセット（1つのノードあたり）
+|===
+
+重要：HyperConverged CRはOpenShift仮想化オペレーターによって管理されます。変更はクラスター全体に適用され、すべてのインフラストラクチャーコンポーネントに自動的に伝播されます。
+
+== 配置オプション
+
+=== ノードセレクターの使用
+
+ノードセレクターは、ラベルベースの単純な配置を提供します：
+
+[source,bash,role=execute]
+----
+# 仮想化インフラストラクチャー用のノードをラベル付けします
+oc label node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra=
+oc label node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra=
+----
+
+HyperConverged CRを編集します：
+
+[source,bash,role=execute]
+----
+oc edit hyperconverged kubevirt-hyperconverged -n openshift-cnv
+----
+
+ノードセレクター構成を追加します：
+
+[source,yaml]
+----
+apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""
+----
+
+この構成：
+
+* **制御プレーンコンポーネント**（virt-api、virt-controller、CDI）は、`node-role.kubernetes.io/infra`ラベルを持つノードでのみ実行されます
+* **virt-handlerデーモンセット**は、`node-role.kubernetes.io/worker`ラベルを持つすべてのノードで実行されます
+
+=== ノードアフィニティーの使用
+
+より複雑な配置ルールのために、ノードアフィニティーを使用します：
+
+[source,yaml]
+----
+apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/infra
+                operator: Exists
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - us-east-1a
+                - us-east-1b
+----
+
+この構成：
+
+* **インフラストラクチャーノード**（強制的な制約）
+* **特定の可用性ゾーン**（柔軟な制約）
+
+=== タインとトレーリーションを使用した専用インフラストラクチャーノード
+
+インフラストラクチャーノードをタインして、通常のワークロードが実行されないようにします：
+
+[source,bash,role=execute]
+----
+# インフラストラクチャーノードをタインします
+oc adm taint node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra=:NoSchedule
+oc adm taint node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra=:NoSchedule
+----
+
+HyperConverged CRに対応するトレーリーションを追加します：
+
+[source,yaml]
+----
+apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""
+----
+
+これで、マッチングのタインを持つポッドのみがタインされたインフラストラクチャーノードで実行できます。
+
+=== ポッド反アフィニティーを使用した高可用性
+
+可用性を向上させるために、ゾーン内でインフラストラクチャーコンポーネントを分散させます：
+
+[source,yaml]
+----
+apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  kubevirt.io: virt-api
+              topologyKey: topology.kubernetes.io/zone
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  kubevirt.io: virt-controller
+              topologyKey: topology.kubernetes.io/zone
+      tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        kubevirt.io/schedulable: "true"
+----
+
+これにより、virt-apiとvirt-controllerの複数のレプリカが異なるゾーンに分散されます。
+
+== 一般的なデプロイメントパターン
+
+=== パターン1：小規模クラスター（3-6ノード）
+
+仮想化インフラストラクチャーとVMワークロードを同じワーカーノードで実行します：
+
+[source,yaml]
+----
+apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""
+----
+
+**使用例**：開発、テスト、または小規模の生産クラスターで、専用ノードを割り当てることがコスト効率的ではない場合。
+
+=== パターン2：中規模クラスターに専用インフラストラクチャー
+
+仮想化インフラストラクチャーをVMワークロードと分離します：
+
+[source,bash,role=execute]
+----
+# インフラストラクチャーノードをラベル付けします
+oc label node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra=
+oc label node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra=
+
+# インフラストラクチャーノードをタインします
+oc adm taint node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra=:NoSchedule
+oc adm taint node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra=:NoSchedule
+
+# VMワークロード用のワーカーノードをラベル付けします
+oc label node ip-10-0-82-27.ec2.internal kubevirt.io/schedulable=true
+----
+
+HyperConverged構成：
+
+[source,yaml]
+----
+apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        kubevirt.io/schedulable: "true"
+----
+
+**使用例**：予想可能なインフラストラクチャー性能を保証し、VMワークロードのリソース競合から分離した予想可能なインフラストラクチャー性能を保証したい生産クラスター。
+
+=== パターン3：大規模多ゾーンの高可用性
+
+可用性を向上させるために、ゾーン内でインフラストラクチャーを分散させます：
+
+[source,yaml]
+----
+apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  infra:
+    nodePlacement:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - us-east-1a
+                - us-east-1b
+                - us-east-1c
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  kubevirt.io: virt-api
+              topologyKey: topology.kubernetes.io/zone
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  kubevirt.io: virt-controller
+              topologyKey: topology.kubernetes.io/zone
+      tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        kubevirt.io/schedulable: "true"
+----
+
+**使用例**：厳格な可用性SLAを要求するエンタープライズ生産環境で、ゾーンレベルの障害耐性が必要です。
+
+== 変更の適用
+
+=== HyperConverged CRを直接編集
+
+[source,bash,role=execute]
+----
+oc edit hyperconverged kubevirt-hyperconverged -n openshift-cnv
+----
+
+=== HyperConverged CRをパッチ
+
+[source,bash,role=execute]
+----
+oc patch hyperconverged kubevirt-hyperconverged -n openshift-cnv --type=merge -p '
+{
+  "spec": {
+    "infra": {
+      "nodePlacement": {
+        "nodeSelector": {
+          "node-role.kubernetes.io/infra": ""
+        }
+      }
+    }
+  }
+}'
+----
+
+=== 変更が適用されたことの確認
+
+インフラストラクチャーポッドがマッチングノードで終了され、再起動されるのを観察します：
+
+[source,bash,role=execute]
+----
+# リアルタイムでポッドの変更を監視します
+oc get pods -n openshift-cnv -w
+
+# 変更が適用された後の新しい配置を確認します
+oc get pods -n openshift-cnv -o wide
+
+# 特定のコンポーネントの配置を確認します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-api -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.nodeName}{"\n"}{end}'
+----
+
+期待される動作：
+
+* インフラストラクチャーポッドはノードセレクターやアフィニティールールにマッチしない場合に終了され、再起動されます
+* virt-handlerデーモンセットはノードセレクターの変更に基づいてポッドを追加または削除します
+* 変更は通常2-5分で完了します
+
+== モニタリングと検証
+
+=== ノード間のポッド分布の確認
+
+[source,bash,role=execute]
+----
+# ノードごとにポッドをグループ化します
+oc get pods -n openshift-cnv -o jsonpath='{range .items[*]}{.spec.nodeName}{"\t"}{.metadata.name}{"\n"}{end}' | sort | column -t
+
+# ノードごとのポッドの数をカウントします
+oc get pods -n openshift-cnv -o jsonpath='{range .items[*]}{.spec.nodeName}{"\n"}{end}' | sort | uniq -c
+----
+
+=== タインが適用されていることの確認
+
+[source,bash,role=execute]
+----
+# virt-apiポッドが正しいタインを持っているかを確認します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-api -o jsonpath='{.items[0].spec.tolerations}' | jq
+----
+
+=== 適用されたノードアフィニティーの確認
+
+[source,bash,role=execute]
+----
+# virt-controllerのノードアフィニティーを表示します
+oc get pods -n openshift-cnv -l kubevirt.io=virt-controller -o jsonpath='{.items[0].spec.affinity}' | jq
+----
+
+== トラブルシューティング
+
+=== インフラストラクチャーポッドが保留中
+
+**問題**：配置構成を変更した後、インフラストラクチャーポッドが保留中の状態になっています。
+
+**診断**：
+
+[source,bash,role=execute]
+----
+# ポッドのイベントを確認します
+oc describe pod <pod-name> -n openshift-cnv
+
+# スケジューリングエラーを探します
+oc get events -n openshift-cnv --sort-by='.lastTimestamp' | grep -i failedscheduling
+----
+
+**一般的な原因**：
+
+* ノードセレクターやアフィニティールールにマッチするノードがない
+* ノードがタインされているがタインを持たない
+* マッチングノードのリソースが不足しています
+
+**解決策**：
+
+[source,bash,role=execute]
+----
+# ノードが必要なラベルを持っていることを確認します
+oc get nodes -L node-role.kubernetes.io/infra
+
+# ノードのタインを確認します
+oc get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.taints}{"\n"}{end}'
+
+# マッチングノードの容量を確認します
+oc describe nodes | grep -A 5 "Allocated resources"
+----
+
+=== virt-handlerがすべてのノードで実行されていない
+
+**問題**：virt-handlerデーモンセットが、一部のノードでポッドが欠落していることがわかりました。
+
+**診断**：
+
+[source,bash,role=execute]
+----
+# virt-handlerデーモンセットの状況を確認します
+oc get daemonset virt-handler -n openshift-cnv
+
+# 期待されるポッドと現在のポッドを比較します
+oc describe daemonset virt-handler -n openshift-cnv | grep -E "Desired|Current|Ready"
+----
+
+**解決策**：`spec.workloads.nodePlacement`セレクターがノードに一致しているかどうかを確認します：
+
+[source,bash,role=execute]
+----
+# ワークロードのノードセレクターを表示します
+oc get hyperconverged kubevirt-hyperconverged -n openshift-cnv -o jsonpath='{.spec.workloads.nodePlacement}' | jq
+
+# セレクターに一致するノードを確認します
+oc get nodes --selector=<label-from-workloads-nodeSelector>
+----
+
+=== 変更が適用されなかった
+
+**問題**：HyperConverged CRを編集したが、インフラストラクチャーポッドが変更されませんでした。
+
+**HyperConverged CRの状況を確認**：
+
+[source,bash,role=execute]
+----
+# HyperConvergedの状況を表示します
+oc get hyperconverged kubevirt-hyperconverged -n openshift-cnv -o yaml | grep -A 10 status:
+
+# 検証エラーを確認します
+oc get events -n openshift-cnv --sort-by='.lastTimestamp' | grep HyperConverged
+----
+
+**再同期を強制する**：
+
+[source,bash,role=execute]
+----
+# 再同期をトリガーするためのアノテーションを追加します
+oc annotate hyperconverged kubevirt-hyperconverged -n openshift-cnv reconcile-trigger="$(date +%s)" --overwrite
+----
+
+== ベストプラクティス
+
+1. **インフラストラクチャーコアプシティーを計画する**：virt-controller、virt-api、CDIコンポーネント（各ノードで4vCPU、8GB RAM以上を推奨）に十分なCPUとメモリが必要です
+
+2. **複数のインフラストラクチャーノードを使用する**：高可用性のために、少なくとも2つのインフラストラクチャーノードを実行します
+
+3. **大規模クラスターではワークロードを分離する**：VMワークロードのリソース競合を防ぐために、専用インフラストラクチャーノードを使用します
+
+4. **ゾーントポロジーを活用する**：ノード/ポッドアフィニティーを使用してゾーンレベルでインフラストラクチャーを分散させ、より良い障害耐性を実現します
+
+5. **インフラストラクチャーの健全性を監視する**：インフラストラクチャーポッドの障害またはリソースの枯渇のためのアラートを設定します
+
+6. **配置変更をテストする**：開発/ステージング環境で構成変更を適用する前に実装します
+
+7. **ノードの役割を文書化する**：各ノードの目的を明確にラベル付けして文書化します
+
+== クリーンアップ
+
+デフォルトの配置（すべてのワーカーノード）に戻すには：
+
+[source,bash,role=execute]
+----
+# HyperConverged CRのノード配置セクションを削除します
+oc patch hyperconverged kubevirt-hyperconverged -n openshift-cnv --type=json -p='[
+  {"op": "remove", "path": "/spec/infra/nodePlacement"},
+  {"op": "remove", "path": "/spec/workloads/nodePlacement"}
+]'
+
+# インフラストラクチャーノードのラベルを削除します
+oc label node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra-
+oc label node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra-
+
+# 適用した場合のタインを削除します
+oc adm taint node ip-10-0-24-89.ec2.internal node-role.kubernetes.io/infra:NoSchedule-
+oc adm taint node ip-10-0-43-58.ec2.internal node-role.kubernetes.io/infra:NoSchedule-
+----
+
+== 要約
+
+このチュートリアルで学んだこと：
+
+* OpenShift仮想化インフラストラクチャーコンポーネントのデプロイ方法
+* HyperConverged CRを使用してインフラストラクチャープレースメントを構成する方法
+* `spec.infra.nodePlacement`と`spec.workloads.nodePlacement`の違い
+* インフラストラクチャーポッドのためのノードセレクター、アフィニティー、およびタインの使用方法
+* 異なるクラスターサイズの一般的な配置パターン
+* インフラストラクチャープレースメントの変更を検証およびトラブルシューティングする方法
+
+== 参照
+
+* xref:node-placement-affinity.adoc[VMワークロードのノード配置]
+* xref:getting-started:vm-lifecycle-states.adoc[仮想マシンのライフサイクル管理]
+* link:https://docs.redhat.com/ja/documentation/openshift_container_platform/latest/html/virtualization/postinstallation-configuration#virt-about-node-placement-virt-components_virt-specifying-nodes-for-virtualization-components[仮想化コンポーネントのノード配置について,window=_blank]

@@ -1,0 +1,608 @@
+= ローカルストレージにHostPath Provisioner
+:navtitle: HostPath Provisioner
+
+== 概要
+
+HostPath Provisioner (HPP) は、OpenShift Virtualization ワークロード用にノード上のローカルストレージを簡単に使用できる方法を提供します。OpenShift Virtualization オペレーターに含まれており、ホストファイルシステム上のディレクトリーに基づく永続ボリュームを作成します。
+
+=== HostPath Provisioner の使用法
+
+HPP は、次のようなシナリオに適しています。
+
+* **開発とテスト環境**: 複雑なストレージインフラストラクチャなしでクイックなセットアップ
+* **単一ノードクラスター**: 分散ストレージが必要ない場合
+* **プロトタイピング**: プロダクションストレージデプロイメントの前に迅速なイテレーション
+* **エッジデプロイメント**: インフラストラクチャーの最小限の要件
+
+=== LVM Storage との比較
+
+[cols="2,2,2"]
+|===
+|機能 |HostPath Provisioner |LVM Storage
+
+|セットアップの複雑さ
+|単純 (ディレクトリーベース)
+|中程度 (専用ディスクが必要)
+
+|スナップショット
+|いいえ
+|いいえ
+
+|スペースの効率
+|低い (フル割り当て)
+|高い (スナップショット)
+
+|マルチノードサポート
+|はい (ノードごとのストレージプール)
+|はい
+
+|プロダクション準備
+|開発/テストに推奨
+|プロダクション準備
+
+|===
+
+プロダクションデプロイメントでスナップショットやスナップショットなどの高度な機能が必要な場合は、xref:lvm-operator.adoc[LVM Storage Operator] タウトリアルを参照してください。
+
+=== 学んだこと
+
+* HostPathProvisioner をローカルストレージに構成する
+* HPP 用の StorageClass を作成する
+* 適切な SELinux コンテキストを持つノードディレクトリーを準備する
+* PVC を使用して VM に使用する
+
+テストされたバージョン:
+----
+OpenShift 4.21+
+OpenShift Virtualization 4.21+
+----
+
+== 前提条件
+
+* **OpenShift 4.21+** に OpenShift Virtualization がインストールされている
+* **クラスター管理者権限**: HostPathProvisioner と StorageClass リソースを作成するために必要
+* **利用可能なローカルディスク空き容量**: ワーカーノードで VM ストレージ用の十分な空き容量がある
+* **oc CLI**: インストールおよび構成済み
+* **virtctl CLI**: VM コンソールへのアクセスのために必要
+
+OpenShift Virtualization がインストールされているかどうかを確認する:
+
+[source,bash,role=execute]
+----
+oc get csv -n openshift-cnv | grep kubevirt
+----
+
+期待される出力 (バージョンは異なる):
+----
+kubevirt-hyperconverged-operator.v4.x.x   OpenShift Virtualization   4.x.x   Succeeded
+----
+
+== ステップ 1: ホストディレクトリーの準備
+
+HPP は、ボリュームが格納されるノード上にディレクトリーが必要です。このディレクトリーは存在し、適切な SELinux コンテキストを持っている必要があります。
+
+=== オプション A: MachineConfig を使用する (生産環境に推奨)
+
+MachineConfig を作成して、すべてのワーカーノードでディレクトリーが存在し、リブート後にも存在し続けるようにします:
+
+xref:attachment$hostpath-provisioner/hpp-machineconfig.yaml[hpp-machineconfig.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  name: 50-hpp-directory
+  labels:
+    machineconfiguration.openshift.io/role: worker
+spec:
+  config:
+    ignition:
+      version: 3.2.0
+    systemd:
+      units:
+      - name: create-hpp-directory.service
+        enabled: true
+        contents: |
+          [Unit]
+          Description=Create HostPath Provisioner directory
+          Before=kubelet.service
+
+          [Service]
+          Type=oneshot
+          ExecStart=/bin/mkdir -p /var/hpvolumes
+          ExecStart=/bin/chcon -Rt container_file_t /var/hpvolumes
+          RemainAfterExit=yes
+
+          [Install]
+          WantedBy=multi-user.target
+EOF
+----
+
+注: MachineConfig を適用すると、ワーカーノードのローリングリブートがトリガーされます。すべてのノードが更新されるまで待機してください。
+
+MachineConfig のロールアウトを監視する:
+
+[source,bash,role=execute]
+----
+oc get mcp worker
+----
+
+`UPDATED` が `True` で、`UPDATING` が `False` であるまで待機します:
+----
+NAME     CONFIG                                             UPDATED   UPDATING   DEGRADED   MACHINECOUNT   READYMACHINECOUNT
+worker   rendered-worker-abc123                             True      False      False      6              6
+----
+
+=== オプション B: 手動ディレクトリーの作成 (クイックテスト)
+
+クイックテストのために、各ワーカーノードで手動でディレクトリーを作成します。
+
+まず、ワーカーノードのリストを取得します:
+
+[source,bash,role=execute]
+----
+oc get nodes -l node-role.kubernetes.io/worker
+----
+
+次に、各ワーカーノードで次のコマンドを実行します (実際のノード名 `<worker-node-name>` を使用):
+
+[source,bash,role=execute]
+----
+oc debug node/<worker-node-name> -- chroot /host mkdir -p /var/hpvolumes
+----
+
+[source,bash,role=execute]
+----
+oc debug node/<worker-node-name> -- chroot /host chcon -Rt container_file_t /var/hpvolumes
+----
+
+注: マニュアルディレクトリーの作成は、ノードのリブート後に持続しません。MachineConfig を使用して永続的な構成を設定してください。
+
+=== ディレクトリーの作成を確認する
+
+正しい SELinux コンテキストがあることを確認します:
+
+[source,bash,role=execute]
+----
+oc debug node/<worker-node-name> -- chroot /host ls -laZ /var/hpvolumes
+----
+
+期待される出力:
+----
+total 0
+drwxr-xr-x. 2 root root system_u:object_r:container_file_t:s0 6 Mar 19 10:00 .
+drwxr-xr-x. 22 root root system_u:object_r:var_t:s0          4096 Mar 19 10:00 ..
+----
+
+`container_file_t` SELinux コンテキストにより、このディレクトリーにコンテナーが読み取りと書き込みを行うことができます。
+
+== ステップ 2: HostPathProvisioner の作成
+
+HostPathProvisioner カスタムリソースを使用して、CSI ドライバーを構成します:
+
+xref:attachment$hostpath-provisioner/hpp-hostpathprovisioner.yaml[hpp-hostpathprovisioner.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: hostpathprovisioner.kubevirt.io/v1beta1
+kind: HostPathProvisioner
+metadata:
+  name: hostpath-provisioner
+spec:
+  imagePullPolicy: IfNotPresent
+  storagePools:
+  - name: local
+    path: /var/hpvolumes
+  workload:
+    nodeSelector:
+      kubernetes.io/os: linux
+EOF
+----
+
+=== 構成パラメーター
+
+* **`storagePools`**: 1 つ以上のストレージプールを定義し、それぞれに一意の名前とパス
+** `name`: StorageClass でこのプールを参照するための識別子
+** `path`: ホストノード上でボリュームが作成されるディレクトリー
+* **`workload.nodeSelector`**: HPP CSI ポッドが実行されるノードを制御します
+* **`imagePullPolicy`**: コンテナーイメージのプルポリシー
+
+=== HostPathProvisioner の確認
+
+HostPathProvisioner の状態を確認します:
+
+[source,bash,role=execute]
+----
+oc get hostpathprovisioner hostpath-provisioner
+----
+
+期待される出力:
+----
+NAME                   AGE
+hostpath-provisioner   30s
+----
+
+ワーカーノード上で CSI ポッドが実行されていることを確認します:
+
+[source,bash,role=execute]
+----
+oc get pods -n openshift-cnv -l k8s-app=hostpath-provisioner
+----
+
+期待される出力 (ワーカーノードあたり 1 つのポッド):
+----
+NAME                                           READY   STATUS    RESTARTS   AGE
+hostpath-provisioner-csi-xxxxx                 4/4     Running   0          2m
+hostpath-provisioner-csi-yyyyy                 4/4     Running   0          2m
+hostpath-provisioner-csi-zzzzz                 4/4     Running   0          2m
+----
+
+== ステップ 3: StorageClass の作成
+
+HostPath Provisioner を使用する StorageClass を作成します:
+
+xref:attachment$hostpath-provisioner/hpp-storageclass.yaml[hpp-storageclass.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: hostpath-csi
+provisioner: kubevirt.io.hostpath-provisioner
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  storagePool: local
+EOF
+----
+
+=== 構成パラメーター
+
+* **`provisioner`**: `kubevirt.io.hostpath-provisioner` でなければなりません
+* **`reclaimPolicy`**: `Delete` は PVC が削除されたときに PV データを削除します。`Retain` を使用してデータを保持する
+* **`volumeBindingMode`**: `WaitForFirstConsumer` は、PVC を使用する前に PV の作成を遅らせ、ポッドがスケジュールされたノードでボリュームが作成されるようにします
+* **`parameters.storagePool`**: HostPathProvisioner で定義したストレージプールの名前を参照します
+
+=== StorageClass の確認
+
+[source,bash,role=execute]
+----
+oc get storageclass hostpath-csi
+----
+
+期待される出力:
+----
+NAME           PROVISIONER                        RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+hostpath-csi   kubevirt.io.hostpath-provisioner   Delete          WaitForFirstConsumer   false                  10s
+----
+
+=== オプション: デフォルト StorageClass に設定する
+
+HPP をデフォルト StorageClass に設定する (開発/テストクラスターで他のストレージがない場合に便利):
+
+[source,bash,role=execute]
+----
+oc patch storageclass hostpath-csi -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+----
+
+注: クラスターには 1 つのデフォルト StorageClass しかないべきです。他のデフォルト StorageClass が存在する場合は、まずそのアノテーションを削除してください:
+
+[source,bash,role=execute]
+----
+# 既存のデフォルトからアノテーションを削除
+oc patch storageclass <existing-default> -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+----
+
+== ステップ 4: ストレージプロビジョニングのテスト
+
+HPP が機能していることを確認するためのテスト PVC を作成します:
+
+xref:attachment$hostpath-provisioner/hpp-test-pvc.yaml[hpp-test-pvc.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hpp-test-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: hostpath-csi
+EOF
+----
+
+PVC の状態を確認します:
+
+[source,bash,role=execute]
+----
+oc get pvc hpp-test-pvc
+----
+
+`WaitForFirstConsumer` で、ポッドの作成後に PVC は `Pending` 状態に残ります:
+----
+NAME           STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+hpp-test-pvc   Pending                                      hostpath-csi   <unset>                 5s
+----
+
+ボリュームバインディングをトリガーするためにテスト Pod を作成します:
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hpp-test-pod
+  namespace: default
+spec:
+  containers:
+  - name: test
+    image: registry.access.redhat.com/ubi9/ubi:latest
+    command: ["sleep", "3600"]
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: hpp-test-pvc
+EOF
+----
+
+PVC がバインドされていることを確認します:
+
+[source,bash,role=execute]
+----
+oc get pvc hpp-test-pvc
+----
+
+期待される出力:
+----
+NAME           STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+hpp-test-pvc   Bound    pvc-abc12345-6789-def0-1234-567890abcdef   5Gi        RWO            hostpath-csi   <unset>                 30s
+----
+
+注: HPP は、ホストパスベースのストレージのために、ホストパス上で利用可能な全容量を報告する可能性があります。これは、ホストパスベースのストレージの標準的な動作です。
+
+ボリュームに書き込みをテストします:
+
+[source,bash,role=execute]
+----
+oc exec hpp-test-pod -- sh -c "echo 'HPP Storage Test' > /data/test.txt && cat /data/test.txt"
+----
+
+期待される出力:
+----
+HPP Storage Test
+----
+
+テストリソースをクリーンアップします:
+
+[source,bash,role=execute]
+----
+oc delete pod hpp-test-pod
+oc delete pvc hpp-test-pvc
+----
+
+== ステップ 5: VM に使用する
+
+HPP バックされたストレージを使用する VM を作成します:
+
+警告: この例の cloud-init パスワードは、デモのためのものです。実際のプロダクション環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。
+
+xref:attachment$hostpath-provisioner/hpp-test-vm.yaml[hpp-test-vm.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: hpp-test-vm
+  namespace: default
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: hpp-test-vm
+    spec:
+      domain:
+        cpu:
+          cores: 1
+        devices:
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+        resources:
+          requests:
+            memory: 1Gi
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: rootdisk
+        dataVolume:
+          name: hpp-test-vm-rootdisk
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            user: fedora
+            password: fedora
+            chpasswd:
+              expire: false
+  dataVolumeTemplates:
+  - metadata:
+      name: hpp-test-vm-rootdisk
+    spec:
+      storage:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: hostpath-csi
+      source:
+        registry:
+          url: docker://quay.io/containerdisks/fedora:latest
+EOF
+----
+
+DataVolume のインポート進行状況を監視します:
+
+[source,bash,role=execute]
+----
+# DataVolume のインポート進行状況を監視
+oc get dv -n default hpp-test-vm-rootdisk -w
+----
+
+期待される進行:
+----
+NAME                    PHASE              PROGRESS   RESTARTS   AGE
+hpp-test-vm-rootdisk    ImportScheduled    N/A                   5s
+hpp-test-vm-rootdisk    ImportInProgress   0.00%                 10s
+hpp-test-vm-rootdisk    ImportInProgress   45.50%                30s
+hpp-test-vm-rootdisk    Succeeded          100.0%                1m
+----
+
+VM の状態を確認します:
+
+[source,bash,role=execute]
+----
+oc get vm hpp-test-vm
+oc get vmi hpp-test-vm
+----
+
+期待される出力:
+----
+NAME          AGE   STATUS    READY
+hpp-test-vm   2m    Running   True
+
+NAME          AGE   PHASE     IP             NODENAME   READY
+hpp-test-vm   2m    Running   10.x.x.x       workerXX   True
+----
+
+VM コンソールにアクセスします:
+
+[source,bash,role=execute]
+----
+virtctl console hpp-test-vm
+----
+
+VM リソースをクリーンアップします:
+
+[source,bash,role=execute]
+----
+oc delete vm hpp-test-vm
+----
+
+== トラブルシューティング
+
+=== PVC が Pending に残る
+
+ポッドの作成後に PVC が Pending に残る場合:
+
+[source,bash,role=execute]
+----
+# PVC のイベントを確認
+oc describe pvc <pvc-name>
+
+# HPP Pod のログを確認
+oc logs -n openshift-cnv -l k8s-app=hostpath-provisioner -c hostpath-provisioner
+----
+
+一般的な原因:
+
+* **ディレクトリーが存在しない**: 対象ノード上の `/var/hpvolumes` が存在していることを確認してください
+* **SELinux コンテキストが不正**: `chcon -Rt container_file_t /var/hpvolumes` が適用されていることを確認してください
+* **HPP Pod が実行されていない**: ワーカーノード上で HPP CSI Pod が実行されていることを確認してください
+
+=== 許可エラー
+
+ポッドが書き込み時に許可エラーが発生する場合:
+
+[source,bash,role=execute]
+----
+# ホスト上の SELinux コンテキストを確認
+oc debug node/<worker-node-name> -- chroot /host ls -laZ /var/hpvolumes
+
+# 必要に応じて SELinux コンテキストを再適用
+oc debug node/<worker-node-name> -- chroot /host chcon -Rt container_file_t /var/hpvolumes
+----
+
+=== HPP Pod が開始しない
+
+HostPathProvisioner の状態とイベントを確認します:
+
+[source,bash,role=execute]
+----
+oc describe hostpathprovisioner hostpath-provisioner
+
+# openshift-cnv 名前空間で問題を確認
+oc get events -n openshift-cnv --sort-by='.lastTimestamp' | tail -20
+----
+
+=== ボリュームが予期されるノードで作成されない
+
+`WaitForFirstConsumer` で、ポッドがスケジュールされたノードでボリュームが作成されます。ノード配置を制御する必要がある場合は:
+
+[source,yaml]
+----
+# Pod 仕様に nodeSelector を追加
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: <worker-node-name>
+----
+
+== クリーンアップ
+
+HPP をクラスターから削除する:
+
+[source,bash,role=execute]
+----
+# StorageClass を削除
+oc delete storageclass hostpath-csi
+
+# HostPathProvisioner を削除
+oc delete hostpathprovisioner hostpath-provisioner
+
+# オプション: MachineConfig (ノードリブートをトリガー) を削除
+oc delete machineconfig 50-hpp-directory
+----
+
+注: HostPathProvisioner を削除すると、既存の PV が削除されません。PVC を削除して、すべてのデータをクリーンアップする場合は、PVC を削除してください。
+
+== 要約
+
+* OpenShift でローカルストレージに HostPath Provisioner を構成する
+* HPP 用のストレージプールと StorageClass を作成する
+* 適切な SELinux コンテキストを持つノードディレクトリーを準備する
+* HPP ストレージを使用する Pod と VM
+* HPP の一般的な問題をトラブルシューティングする
+
+HPP は、開発とテストに適したシンプルで軽量なストレージソリューションです。プロダクションワークロードでスナップショットやスナップショットなどの高度な機能が必要な場合は、xref:lvm-operator.adoc[LVM Storage Operator] を考慮してください。
+
+== 参照
+
+* xref:lvm-operator.adoc[LVM Storage Operator] - スナップショットとスナップショットをサポートするプロダクション準備のローカルストレージ
+* xref:lvm-troubleshooting.adoc[LVM Storage Troubleshooting] - ストレージ問題の診断
+* link:https://docs.redhat.com/ja/documentation/openshift_container_platform/4.21/html/virtualization/storage#virt-configuring-local-storage-with-hpp[OpenShift Virtualization: HPP を使用したローカルストレージの構成,window=_blank]

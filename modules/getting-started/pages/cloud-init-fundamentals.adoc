@@ -1,0 +1,509 @@
+= クラウドインイニシャライゼーションの基礎 - OpenShift Virtualization VM
+:navtitle: クラウドインイニシャライゼーションの基礎
+
+== 概要
+
+クラウドインイニシャライゼーションは、仮想マシンの最初のブート時に自動化するための業界標準ツールです。OpenShift Virtualizationでは、ほとんどのVMがクラウドインイニシャライゼーションを使用してユーザーの作成、パスワードの設定、SSHキーのインジェクション、パッケージのインストール、ネットワークアドレスの割り当てを行います。このチュートリアルでは、クラウドインイニシャライゼーションの仕組み、KubeVirtがVMにそれを提供する方法、およびVirtualMachineマニフェストにクラウドインイニシャライゼーション構成を埋め込む方法を紹介します。
+
+=== 学習目標
+
+* クラウドインイニシャライゼーションと、VM自動化におけるその重要性
+* クラウドインイニシャライゼーションの3つのデータタイプ：userData、networkData、metadata
+* KubeVirtがVMにクラウドインイニシャライゼーションデータをNoCloudデータソースとして提供する方法
+* ユーザー作成、パッケージインストール、スクリプト実行のための一般的なcloud-configモジュール
+* VirtualMachineマニフェストにクラウドインイニシャライゼーションを埋め込むための2つのパターン（インラインとSecret参照）
+* クラウドインイニシャライゼーションが成功して実行されたことを確認する方法
+
+バージョン:
+[source,text]
+----
+OpenShift 4.18+
+----
+
+== 前提条件
+
+* OpenShift 4.18+にOpenShift Virtualizationがインストールされている
+* `oc`と`virtctl` CLIツールがインストールされている（xref:virtctl-basics.adoc[]を参照）
+* YAML構文の基本的な理解
+* VMの作成についての基本的な知識（xref:create-vm-web-console.adoc[]を参照）
+
+== クラウドインイニシャライゼーションは何ですか？
+
+クラウドインイニシャライゼーションは、仮想マシンの最初のブート時に実行されるオープンソースフレームワークです。外部ソースからの構成データを読み取り、それを使用して手動設定を必要とするタスクを自動化します。例えば、ユーザーの作成、SSHアクセスの設定、パッケージのインストール、構成ファイルの書き出し、スクリプトの実行です。
+
+クラウドインイニシャライゼーションは、Fedora、RHEL、CentOS、Ubuntu、Debianなどの多くのLinuxディストリビューションに対応しています。また、AWS、Azure、GCPなどの主要なクラウドプラットフォーム、およびKubeVirtなどの仮想化プラットフォームで標準的な初期化メカニズムとして使用されています。KubeVirtはOpenShift Virtualizationの背後にあるものです。
+
+注: クラウドインイニシャライゼーションはデフォルトでは、VMの最初のブート時にのみ実行されます。インスタンスデータが明示的にクリアされない限り、後続のリブートではスキップされます。
+
+== KubeVirtがクラウドインイニシャライゼーションをどのように提供するか？
+
+伝統的なクラウド環境では、VMはメタデータサービス（HTTPエンドポイント`169.254.169.254`から）からクラウドインイニシャライゼーションデータを取得します。KubeVirtは、異なるアプローチである*NoCloudデータソース*を使用します。
+
+NoCloudでは、KubeVirtは以下のように行います。
+
+. VirtualMachineマニフェスト（または参照されるSecretから）からクラウドインイニシャライゼーションデータを読み取る
+. データをISO形式の仮想ディスクにパッケージ化する
+. virtioデバイスを使用してVMにディスクを接続する
+. 仮想OS内のクラウドインイニシャライゼーションがディスクを検出し、データを読み取り、構成を適用する
+
+これにより、クラウドインイニシャライゼーション構成はKubernetesリソース内に完全に含まれます。外部メタデータサービスは必要ありません。
+
+[source,yaml]
+----
+spec:
+  template:
+    spec:
+      volumes:
+        - name: cloudinitdisk
+          cloudInitNoCloud:        # <1>
+            userData: |
+              #cloud-config
+              ssh_pwauth: true
+              user:
+                name: fedora
+                lock_passwd: false
+                plain_text_passwd: changeme
+----
+<1> `cloudInitNoCloud`ボリュームタイプは、NoCloudデータソースディスクを作成するようにKubeVirtに指示します。
+
+== クラウドインイニシャライゼーションのデータタイプ
+
+クラウドインイニシャライゼーションは、3つの種類の構成データを受け入れます。KubeVirtでは、これらは`cloudInitNoCloud`ボリュームの下のフィールドにマッピングされます。
+
+=== userData (cloud-config)
+
+主構成チャネル。userDataには、#cloud-configヘッダーを持つYAMLファイルが含まれます。ここでユーザー、パッケージ、スクリプト、ファイル、およびVMの大部分のカスタマイズを定義します。
+
+[source,yaml]
+----
+cloudInitNoCloud:
+  userData: |
+    #cloud-config
+    ssh_pwauth: true
+    user:
+      name: fedora
+      lock_passwd: false
+      plain_text_passwd: s3cur3p4ss
+      ssh_authorized_keys:
+        - ssh-ed25519 AAAA...user@workstation
+    packages:
+      - vim
+      - tmux
+----
+
+重要: 最初の行に#cloud-configヘッダーが必須です。これがないと、クラウドインイニシャライゼーションはデータをcloud-configドキュメントとして認識せず、処理を無視します。
+
+=== networkData (network-config v2)
+
+VMインターフェースのネットワーク構成。Netplan互換の*network-configバージョン2*形式を使用します。静的IP、カスタムDNS、またはマルチインターフェース設定が必要な場合に使用します。
+
+単純なDHCP構成:
+
+[source,yaml]
+----
+cloudInitNoCloud:
+  networkData: |
+    version: 2
+    ethernets:
+      enp1s0:
+        dhcp4: true
+----
+
+静的IP構成とDNS、ルート:
+
+[source,yaml]
+----
+cloudInitNoCloud:
+  networkData: |
+    version: 2
+    ethernets:
+      enp1s0:
+        addresses:
+          - 192.168.1.100/24             # <1>
+        nameservers:
+          addresses:
+            - 192.168.1.1
+            - 8.8.8.8                    # <2>
+        routes:
+          - to: default
+            via: 192.168.1.1             # <3>
+          - to: 10.0.0.0/8
+            via: 192.168.1.254           # <4>
+----
+<1> CIDR形式の静的IPアドレスとサブネットマスク。
+<2> DNSレスolverのアドレス。
+<3>デフォルトゲートウェイをルートとして定義（`gateway4`は非推奨です）。
+<4>特定のゲートウェイを使用して`10.0.0.0/8`ネットワークにアクセスするための追加ルート。
+
+インターフェース名ではなくMACアドレスを使用してインターフェースをマッチングすることもできます。インターフェース名が予測不可能な場合に役立ちます:
+
+[source,yaml]
+----
+cloudInitNoCloud:
+  networkData: |
+    version: 2
+    ethernets:
+      primary:
+        match:
+          macaddress: "52:54:00:12:34:56"
+        addresses:
+          - 192.168.1.100/24
+        routes:
+          - to: default
+            via: 192.168.1.1
+----
+
+注: KubeVirtのVMでは、通常、最初のインターフェースは`enp1s0`、2番目のインターフェースは`enp2s0`です。これらの名前はVirtualMachine仕様でインターフェースを定義する順序に基づいていますが、NetworkAttachmentDefinitionsの順序ではありません。
+
+複数インターフェース設定、VLAN、高度なシナリオについては、xref:networking:static-ip-configuration.adoc[静的IP構成]を参照してください。
+
+=== metadata
+
+VMインスタンスメタデータ（例：`instance-id`と`local-hostname`）。KubeVirtは、VirtualMachineリソースからメタデータを自動的に設定する場合が多いため、手動で設定する必要はあまりありません。
+
+[source,yaml]
+----
+cloudInitNoCloud:
+  metadata: |
+    instance-id: my-vm-001
+    local-hostname: my-vm
+----
+
+ヒント: ホスト名のみを設定する必要がある場合は、`hostname`モジュールを使用してuserDataに、メタデータを設定することをお勧めします。
+
+== クラウドインイニシャライゼーションの実行ステージ
+
+クラウドインイニシャライゼーションは、ブートプロセス中に5つのステージで実行されます。これらのステージを理解することで、構成が有効になるタイミングを予測できます。
+
+[cols="1,2,2",options="header"]
+|===
+|ステージ |実行時
+
+|ジェネレーター
+|非常に早いブート（systemdジェネレーター）
+|クラウドインイニシャライゼーションが実行されるかどうかを決定する
+
+|ローカル
+|ネットワークが利用可能前
+|networkDataからのネットワーク構成を適用する
+
+|ネットワーク
+|ネットワークが利用可能
+|残りのデータソース情報を取得し、ホスト名を設定する
+
+|構成
+|ネットワークステージ後
+|構成モジュールを実行する：ユーザーの作成、ファイルの書き出し、SSHキーのインストール
+
+|最終
+|ブートの終わり近く
+|runcmdコマンドを実行し、パッケージをインストールし、最終スクリプトを実行する
+|===
+
+この順序により、networkData（ネットワーク構成）がuserData（ユーザー/ファイル構成）よりも先に適用されます。`runcmd`で指定されたコマンドは最後に実行され、すべての他のモジュールが実行された後です。
+
+== 一般的なcloud-configモジュール
+
+以下のモジュールは、VMの初期化タスクの一般的なケースをカバーします。各例は#cloud-configヘッダーを持つuserDataドキュメントの関連部分を示しています。
+
+=== ユーザーの作成とパスワードの設定
+
+[source,yaml]
+----
+#cloud-config
+ssh_pwauth: true
+user:
+  name: fedora
+  lock_passwd: false
+  plain_text_passwd: s3cur3p4ss
+  ssh_authorized_keys:
+    - ssh-ed25519 AAAA...key-data... user@workstation
+----
+
+`user`キーはデフォルトユーザーを設定します。`lock_passwd: false`と`plain_text_passwd`を有効にすると、パスワードログインを許可できます。トップレベルで`ssh_pwauth: true`を追加すると、SSHパスワード認証を有効にできます（多くのクラウドイメージではデフォルトで無効にされます）。
+
+デフォルトユーザー以外の追加ユーザーについては、`users`リストを使用します。
+
+[source,yaml]
+----
+#cloud-config
+users:
+  - name: admin
+    groups: wheel
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAA...key-data...
+  - name: developer
+    shell: /bin/bash
+----
+
+=== パッケージのインストール
+
+[source,yaml]
+----
+#cloud-config
+package_update: true
+packages:
+  - vim
+  - git
+  - tmux
+  - python3
+----
+
+注: パッケージインストールは、*final*ステージで実行されます。パッケージがインストールされるまでにコンソールにアクセスできます。
+
+=== コマンドの実行
+
+[source,yaml]
+----
+#cloud-config
+runcmd:
+  - systemctl enable --now cockpit.socket
+  - echo "VM initialized at $(date)" >> /var/log/vm-init.log
+----
+
+コマンドは、*final*ステージで順次実行されます。各エントリーは、`/bin/sh`を介して実行される文字列または直接実行されるリストです。
+
+=== ファイルの書き出し
+
+[source,yaml]
+----
+#cloud-config
+write_files:
+  - path: /etc/motd
+    content: |
+      Welcome to the OpenShift Virtualization VM.
+      Managed by cloud-init.
+    permissions: '0644'
+  - path: /etc/myapp/config.yaml
+    content: |
+      database: postgres
+      port: 5432
+    owner: root:root
+    permissions: '0600'
+----
+
+ヒント: `write_files`によって書き出されたファイルは、*config*ステージ（`runcmd`が実行される前）で作成されます。これにより、ファイルを書き出し、その後、そのファイルに依存するサービスを`runcmd`で開始できるようになります。
+
+== VirtualMachineマニフェストにクラウドインイニシャライゼーションを埋め込む
+
+VirtualMachineにクラウドインイニシャライゼーションデータを提供するには、2つのパターンがあります。
+
+=== インラインのcloudInitNoCloud
+
+最も単純な方法です。VirtualMachineマニフェストにクラウドインイニシャライゼーションデータを直接埋め込みます。
+
+xref:attachment$minimal-cloud-init-vm.yaml[最小限のクラウドインイニシャライゼーションVMをダウンロード]
+
+[source,yaml]
+----
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fedora-cloud-init-demo
+  namespace: demo
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        app: fedora-cloud-init-demo
+    spec:
+      domain:
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              name: default
+        resources:
+          requests:
+            memory: 2Gi
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - dataVolume:
+            name: fedora-cloud-init-demo
+          name: rootdisk
+        - cloudInitNoCloud:                    # <1>
+          userData: |                        # <2>
+            #cloud-config
+            ssh_pwauth: true
+            user:
+              name: fedora
+              lock_passwd: false
+              plain_text_passwd: s3cur3p4ss
+              ssh_authorized_keys:
+                - 'ssh-ed25519 AAAA...your-key... user@workstation'
+            users:
+              - name: userone
+                lock_passwd: false
+                plain_text_passwd: s3cur3p4ss
+                ssh_authorized_keys:
+                  - 'ssh-ed25519 AAAA...your-key... user@workstation'
+            packages:
+              - vim
+              - git
+            runcmd:
+              - echo "Cloud-init complete" > /tmp/cloud-init-done
+          name: cloudinitdisk
+  dataVolumeTemplates:
+    - metadata:
+        name: fedora-cloud-init-demo
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: fedora
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+----
+<1> `cloudInitNoCloud`ボリュームタイプは、NoCloudデータソースディスクを作成します。
+<2> `userData`フィールドには、#cloud-configヘッダーを持つcloud-configYAMLが含まれています。
+
+このパターンは単純な構成に適しています。複雑な構成またはクラウドインイニシャライゼーションデータに機密情報（パスワード、トークン）が含まれている場合は、Secret参照を使用します。
+
+=== Secret参照
+
+複雑な構成またはクラウドインイニシャライゼーションデータに機密情報が含まれている場合は、Kubernetes Secretにデータを保存し、VirtualMachineから参照します。
+
+xref:attachment$cloud-init-secret-vm.yaml[cloud-init-secret-vm.yamlをダウンロード]
+
+まず、Secretを作成します:
+
+[source,bash,role=execute]
+----
+oc create secret generic my-vm-cloud-init \
+  --from-literal=userdata='#cloud-config
+ssh_pwauth: true
+user:
+  name: fedora
+  lock_passwd: false
+  plain_text_passwd: s3cur3p4ss
+  ssh_authorized_keys:
+    - ssh-ed25519 AAAA...your-key... user@workstation
+users:
+  - name: userone
+    lock_passwd: false
+    plain_text_passwd: s3cur3p4ss
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAA...your-key... user@workstation
+packages:
+  - vim
+  - git
+' \
+  -n demo
+----
+
+次に、VirtualMachineマニフェストで参照します:
+
+[source,yaml]
+----
+volumes:
+  - cloudInitNoCloud:
+      secretRef:
+        name: my-vm-cloud-init         # <1>
+    name: cloudinitdisk
+----
+<1> KubeVirtは、Secretから`userdata`キーを読み取り、クラウドインイニシャライゼーションのuserDataとして提供します。
+
+== クラウドインイニシャライゼーションが実行されたことを確認する
+
+VMがブート後に、クラウドインイニシャライゼーションが構成を成功して処理したかどうかを確認します。
+
+VMコンソールにアクセスします:
+
+[source,bash,role=execute]
+----
+virtctl console fedora-cloud-init-demo -n demo
+----
+
+クラウドインイニシャライゼーションのステータスを確認します:
+
+[source,bash,role=execute]
+----
+cloud-init status --long
+----
+
+成功した実行の期待される出力:
+
+[source,text]
+----
+status: done
+extended_status: done
+boot_status_code: enabled-by-generator
+detail:
+DataSourceNoCloud [seed=/dev/vdb]
+----
+
+クラウドインイニシャライゼーションがエラーを報告する場合は、ログを確認します:
+
+[source,bash,role=execute]
+----
+cat /var/log/cloud-init.log | tail -50
+----
+
+詳細な診断手順および一般的な問題の解決策については、xref:networking:cloud-init-troubleshooting.adoc[クラウドインイニシャライゼーションのトラブルシューティング]を参照してください。
+
+== 一般的なミス
+
+* `#cloud-config`ヘッダーの欠落*::
+userDataの最初の行は、正確に`#cloud-config`でなければなりません。これがないと、クラウドインイニシャライゼーションはデータブロックを無視し、エラーが表示されません。
+
+*YAMLインデントエラー*::
+クラウドインイニシャライゼーションはYAMLです。インデントの不整合（タブと空白の混在、不適切なネスト深度）は、パースエラーが発生します。VM内で`cloud-init devel schema --config-file /path/to/config.yaml`を使用して、構文を検証できます。
+
+*ネットワーク構成をuserDataに配置する*::
+ネットワークインターフェース構成は`networkData`に配置する必要があります。userDataにNetplan v2形式のnetwork-config YAMLを配置すると、効果はありません。
+
+*リブート時にクラウドインイニシャライゼーションを再実行する期待*::
+クラウドインイニシャライゼーションは最初のブート時に1回実行されます。再実行するには、クラウドインイニシャライゼーションの状態をクリアする必要があります：`cloud-init clean`を続けてリブートします。
+
+*Secretキーの名前が間違っている*::
+`secretRef`を使用する場合、Secretには、小文字の`userdata`（すべて小文字）のキーが必要です。`userData`または`user-data`のキーは見つからません。
+
+== Windows VM: Sysprep
+
+クラウドインイニシャライゼーションはLinux専用のツールです。Windows VMについては、OpenShift Virtualizationは、Microsoft System Preparationツール（Sysprep）をサポートしています。これは、クラウドインイニシャライゼーションと同様の最初のブート時のカスタマイズ（ホスト名、管理者パスワード、ドメイン加入、無人セットアップ）を行います。
+
+Windows VMの構成については、xref:vm-configuration:remote-access-windows-vms.adoc[リモートアクセスを通じたWindows VMの構成]を参照してください。
+
+== クリーンアップ
+
+このチュートリアルで作成したデモリソースを削除します:
+
+[source,bash,role=execute]
+----
+oc delete vm fedora-cloud-init-demo -n demo
+oc delete vm fedora-cloud-init-secret-demo -n demo
+oc delete secret my-vm-cloud-init -n demo
+oc delete namespace demo
+----
+
+== 要約
+
+このチュートリアルで学んだこと:
+
+* クラウドインイニシャライゼーションは、Linux VMの標準的な初期化フレームワークであり、最初のブート時に実行され、構成を自動化します
+* KubeVirtは、NoCloudデータソースを使用してVMにクラウドインイニシャライゼーションデータを提供し、これを仮想ディスクとしてパッケージ化します
+* 3つのデータタイプ：userData（cloud-configでユーザー、パッケージ、スクリプト）、networkData（network-config v2）、metadata（インスタンスのアイデンティティ）
+* クラウドインイニシャライゼーションは、ネットワーク構成が最初に適用され、次にユーザー/ファイル構成、最後にコマンドとパッケージが実行されます
+* 単純な場合にはインラインの`cloudInitNoCloud`、複雑な場合や機密データを含む場合はSecret参照
+* `cloud-init status --long`と`/var/log/cloud-init.log`を使用して確認
+
+== 参照
+
+* xref:networking:static-ip-configuration.adoc[] - cloud-initの静的IP、DHCP、複数インターフェース、VLANの詳細
+* xref:networking:cloud-init-troubleshooting.adoc[] - cloud-initの診断手順と一般的な問題の解決策
+* xref:vm-configuration:remote-access-windows-vms.adoc[] - Sysprepを使用したWindows VMの構成
+* link:https://cloudinit.readthedocs.io/en/latest/[クラウドインの公式ドキュメント、window=_blank]
+* link:https://cloudinit.readthedocs.io/en/latest/reference/modules.html[クラウドインモジュール参照、window=_blank]
+* link:https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#cloudinitnocloud[KubeVirtのcloudInitNoCloudドキュメント、window=_blank]

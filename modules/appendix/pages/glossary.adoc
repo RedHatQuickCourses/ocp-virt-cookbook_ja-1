@@ -1,0 +1,39 @@
+= グロサリー
+:navtitle: グロサリー
+
+== OpenShift仮想化用語
+
+**CNV**:: コンテナネイティブ仮想化、Red HatがOpenShift仮想化を呼ぶ名前
+
+**NAD**:: NetworkAttachmentDefinition、ポッド/VMに追加のネットワークを定義する
+
+**NNCP**:: NodeNetworkConfigurationPolicy、NMState CRでノードネットワークの構成を行う
+
+**UDN**:: User Defined Network、レイヤ2またはレイヤ3接続を持つカスタムネットワーク
+
+**VLAN**:: Virtual LAN、VLANタグ付けによるネットワーク分割
+
+**OVS**:: Open vSwitch、ソフトウェアベースのネットワークスイッチ
+
+**IPAM**:: IPアドレス管理、自動IP割り当て
+
+**PVC**:: PersistentVolumeClaim、ストレージ要求
+
+**DataVolume**:: CDI CRでVM用のストレージのプロビジョニング
+
+**VMI**:: VirtualMachineInstance、実行中のVMインスタンス
+
+**SCC**:: SecurityContextConstraint、OpenShiftポッドセキュリティーポリシー
+
+**RBAC**:: Role-Based Access Control、Kubernetesの認可
+
+**Localnet**:: 直接物理ネットワークへのアクセスを提供するネットワークトポロジー
+
+**Cloud-init**:: VMの初期化ツールで、構成を行う
+
+**Virtctl**:: VM管理用のCLIツール
+
+== 関連項目
+
+* xref:getting-started:index.adoc[] - OpenShift仮想化の旅を始める
+* xref:ROOT:index.adoc[] - コックブックのホームページに戻る

@@ -1,0 +1,365 @@
+= OpenShift への VM の HTTP/HTTPS トラフィックの統合
+:navtitle: VM イングレスとルート
+
+== 概要
+
+このチュートリアルでは、OpenShift ルートとサービスを使用して、OpenShift Virtualization VM 内の実行中のアプリケーションを外部クライアントに公開する方法を示します。クラスター内の VM にアクセスするためのクラスター IP サービスを作成し、OpenShift ルートを使用して外部に公開します。このアプローチは、コンテナワークロードをサービスするために使用される同じ OpenShift Ingress インフラストラクチャを使用し、VM と Pod の両方に一貫した外部アクセスモデルを提供します。
+
+== 前提条件
+
+* OpenShift 4.18+ に OpenShift Virtualization オペレーターがインストールされている
+* クラスター管理者権限 (`system:admin` または等価)
+* `oc` CLI と `virtctl` CLI がインストールされている
+* デフォルトの StorageClass が構成されている
+* イングレスコントローラーが実行中 (OpenShift インストール時のデフォルト)
+
+テスト済みバージョン:
+----
+OpenShift 4.20
+----
+
+== ステップ 1: ネームスペースの作成
+
+[source,bash,role=execute]
+----
+oc create namespace ingress-demo
+----
+
+== ステップ 2: Web サーバーが搭載された VM のデプロイ
+
+クラウド-init を使用して自動的に Nginx Web サーバーが開始されるように、Fedora VM をデプロイします。VM はサービスが選択できるようにラベル付けされています。
+
+警告: この例では、デモのための cloud-init パスワードが使用されています。実際の生産環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。
+
+xref:attachment$vm-ingress-routes/vm-webserver.yaml[vm-webserver.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: web-vm
+  namespace: ingress-demo
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: web-vm
+        app: web-vm
+    spec:
+      domain:
+        devices:
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+        resources:
+          requests:
+            memory: 1Gi
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: rootdisk
+        containerDisk:
+          image: quay.io/containerdisks/fedora:latest
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            password: redhat
+            chpasswd:
+              expire: false
+            packages:
+            - nginx
+            write_files:
+            - path: /usr/share/nginx/html/index.html
+              content: |
+                <html>
+                <head><title>OpenShift Virt - Ingress Demo</title></head>
+                <body>
+                <h1>Hello from OpenShift Virtualization</h1>
+                <p>このページは、VM 内の Nginx で提供されています。OpenShift ルートによって外部に公開されています。</p>
+                </body>
+                </html>
+            runcmd:
+            - systemctl enable nginx
+            - systemctl start nginx
+EOF
+----
+
+VM テンプレートに定義されたラベルを `spec.template.metadata.labels` に渡すことで、サービスが選択できます。
+
+VM が実行状態に達したら、待機します:
+
+[source,bash,role=execute]
+----
+oc get vm -n ingress-demo -w
+----
+
+VM が `Running` 状態で、`Ready=True` になったら、次のステップに進みます。`Ctrl+C` を押して待機を終了します。
+
+== ステップ 3: Web サーバーの検証
+
+cloud-init が Nginx をインストールして開始した後 (VM が実行状態に達した後に 1-2 分かかる場合があります)、接続します。
+
+[source,bash,role=execute]
+----
+virtctl console web-vm -n ingress-demo
+----
+
+ユーザー名 `fedora` とパスワード `redhat` でログインし、以下のコマンドを実行します:
+
+[source,bash]
+----
+curl -s http://localhost
+----
+
+カスタム HTML ページが表示されるはずです。`Ctrl+]` を押してコンソールから退出します。
+
+== ステップ 4: サービスの作成
+
+ポート 80 をターゲットにするクラスター IP サービスを作成します。サービスのセレクターは、VM テンプレートに定義されたラベルと一致する必要があります。
+
+xref:attachment$vm-ingress-routes/service-web-vm.yaml[service-web-vm.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-vm-svc
+  namespace: ingress-demo
+spec:
+  selector:
+    app: web-vm
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP
+EOF
+----
+
+サービスが存在することを確認します:
+
+[source,bash,role=execute]
+----
+oc get svc web-vm-svc -n ingress-demo
+----
+
+エンドポイントが存在することを確認します:
+
+[source,bash,role=execute]
+----
+oc get endpoints web-vm-svc -n ingress-demo
+----
+
+期待される出力:
+----
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+web-vm-svc   ClusterIP   172.30.x.x      <none>        80/TCP    5s
+
+NAME         ENDPOINTS          AGE
+web-vm-svc   10.128.x.x:80      5s
+----
+
+エンドポイントの IP アドレスが VM の Pod IP に一致することで、サービスが VM に正しくルーティングしていることが確認されます。
+
+クラスター内で内部接続をテストします:
+
+[source,bash,role=execute]
+----
+oc run curl-test --rm -it --restart=Never --image=registry.access.redhat.com/ubi9/ubi:latest -n ingress-demo -- curl -s http://web-vm-svc.ingress-demo.svc.cluster.local
+----
+
+HTML ページの内容が表示されるはずです。
+
+== ステップ 5: OpenShift ルートによるサービスの公開
+
+=== エッジ終了 TLS (自動生成証明書)
+
+エッジ終了 TLS を使用したルートを作成します。OpenShift はルートのホスト名に対応する証明書を自動的に提供します。
+
+xref:attachment$vm-ingress-routes/route-web-vm.yaml[route-web-vm.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: web-vm-route
+  namespace: ingress-demo
+spec:
+  to:
+    kind: Service
+    name: web-vm-svc
+    weight: 100
+  port:
+    targetPort: 80
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+EOF
+----
+
+=== 構成パラメーター
+
+* **`spec.to.name`**: ステップ 4 で作成したサービスを参照します。
+* **`spec.port.targetPort`**: サービスポート (80) と一致する必要があります。
+* **`tls.termination: edge`**: ルーターで TLS が終了します。ルーターから VM へのトラフィックはプレーン HTTP です。
+* **`insecureEdgeTerminationPolicy: Redirect`**: HTTP 要求は自動的に HTTPS にリダイレクトされます。
+
+=== ルートの検証
+
+[source,bash,role=execute]
+----
+oc get route web-vm-route -n ingress-demo
+----
+
+期待される出力:
+----
+NAME           HOST/PORT                                          PATH  SERVICES     PORT  TERMINATION     WILDCARD
+web-vm-route   web-vm-route-ingress-demo.apps.ocplab01.example.com       web-vm-svc   80    edge/Redirect   None
+----
+
+=== 外部アクセスのテスト
+
+ルートのホスト名を取得します:
+
+[source,bash,role=execute]
+----
+ROUTE_HOST=$(oc get route web-vm-route -n ingress-demo -o jsonpath='{.spec.host}')
+echo "ルート URL: https://$ROUTE_HOST"
+----
+
+`curl` を使用して外部アクセスをテストします:
+
+[source,bash,role=execute]
+----
+curl -sk https://$ROUTE_HOST
+----
+
+Nginx が VM 内で HTML ページを提供しているはずです。
+
+TIP: ワークステーションからルートのホスト名が DNS で解決しない場合は、クラスター ingress IP に対する `/etc/hosts` エントリーを追加するか、`curl --resolve` を使用してください。
+
+== ステップ 6: ターゲット TLS (オプション)
+
+VM 内のアプリケーションが自身の TLS 証明書を管理する場合は、ターゲット TLS を使用します。ルーターは、VM に直接暗号化されたトラフィックを転送し、解密しません。
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: web-vm-passthrough
+  namespace: ingress-demo
+spec:
+  to:
+    kind: Service
+    name: web-vm-svc
+    weight: 100
+  port:
+    targetPort: 443
+  tls:
+    termination: passthrough
+  wildcardPolicy: None
+EOF
+----
+
+NOTE: パススルーは、VM 内のアプリケーションがターゲットポートで HTTPS を提供する必要があります。このチュートリアルでは、Nginx は HTTP のみを提供するため、このルートタイプは参照用です。TLS 証明書を VM 内の Nginx に構成するには、このルートタイプを使用する必要があります。
+
+== 仕組み
+
+OpenShift Route で VM を公開するときのトラフィックフロー:
+
+. 外部クライアントが HTTPS 要求をルートのホスト名に送信します。
+. OpenShift Ingress Controller (HAProxy ルーター) が TLS (エッジ終了) を終了します。
+. ルーターは、ポート 80 にルートサービスに要求を転送します。
+. サービスは、ポート 80 に virt-launcher Pod の IP にトラフィックをルーティングします。
+. virt-launcher Pod 内の VM の Nginx プロセスに要求が到達します。マスカレードネットワークインターフェースを介します。
+
+これは、コンテナワークロードが公開される方法と同じです。VM は OpenShift ネットワークモデルで最優先の市民です。
+
+== トラブルシューティング
+
+=== ルートが 503 サービス不可に戻す
+
+サービスには健康なエンドポイントがないためです。確認してください:
+
+[source,bash,role=execute]
+----
+oc get endpoints web-vm-svc -n ingress-demo
+----
+
+空の場合は、サービスのセレクターが VM のラベルと一致しているか確認してください:
+
+[source,bash,role=execute]
+----
+oc get pods -n ingress-demo -l app=web-vm
+----
+
+=== ルートが 504 ゲートウェイタイムアウトに戻す
+
+VM アプリケーションが予期せぬポートで応答していないためです。VM コンソールに接続します:
+
+[source,bash,role=execute]
+----
+virtctl console web-vm -n ingress-demo
+----
+
+VM 内で、Nginx が実行中で応答しているか確認してください:
+
+[source,bash]
+----
+systemctl status nginx
+curl -s http://localhost
+----
+
+=== DNS 解決が失敗する
+
+ルートのホスト名が DNS で解決しない場合は、Ingress のワイルドカード DNS が構成されているか確認してください:
+
+[source,bash,role=execute]
+----
+oc get ingresscontroller default -n openshift-ingress-operator -o jsonpath='{.status.domain}'
+----
+
+ルートのホスト名は、`<route-name>-<namespace>.<ingress-domain>` のパターンに従います。
+
+== クリーンアップ
+
+このチュートリアルで作成されたすべてのリソースを削除します:
+
+[source,bash,role=execute]
+----
+oc delete namespace ingress-demo
+----
+
+== 要約
+
+このチュートリアルで学んだこと:
+
+* cloud-init を使用して、Web サーバーが搭載された VM をデプロイする
+* VM ポートをクラスター内で公開するための Kubernetes サービスを作成する
+* OpenShift ルートとエッジ終了 TLS を使用した外部 HTTPS アクセスの作成
+* VM が自身の TLS 証明書を管理する場合のパススルー TLS の理解
+* VM に関するサービスとルートの一般的な問題のトラブルシューティング
+
+== 参照
+
+* link:https://docs.openshift.com/container-platform/4.18/virt/vm_networking/virt-exposing-vm-with-service.html[OpenShift 文書: VM をサービスを使用して公開 - OpenShift 文書,window=_blank]
+* link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/ingress_and_load_balancing/index[OpenShift 文書: ルート構成 - OpenShift 文書,window=_blank]

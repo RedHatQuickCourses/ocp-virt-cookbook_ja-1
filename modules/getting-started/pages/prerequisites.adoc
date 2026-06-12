@@ -1,0 +1,115 @@
+= 前提条件とセットアップ
+:navtitle: 前提条件
+
+== 概要
+
+このクックブックで説明されているOpenShift仮想化のための前提条件と要件をこのページで概要的に説明します。
+
+== クラスター要件
+
+=== OpenShift バージョン
+
+* OpenShift 4.18以上
+* OpenShift仮想化オペレーターがインストールされ、稼働中
+
+=== クラスターアクセス
+
+実行するタスクに応じて、適切なアクセスレベルが必要です：
+
+* **クラスター管理者**: オペレーターのインストール、ストレージ構成、ネットワーク構成のために必要
+* **名前空間管理者**: 特定の名前空間内のVMの管理に十分
+* **開発者**: 適切なRBAC権限を持っている場合、VMを作成および管理できます
+
+== 必要なCLIツール
+
+=== OpenShift CLI (oc)
+
+クラスターとの相互作用に必要なOpenShiftコマンドラインインターフェースです。
+
+link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/cli_tools/openshift-cli-oc[OpenShift CLIドキュメント]からインストールします。
+
+インストールを確認します：
+[source,bash,role=execute]
+----
+oc version
+----
+
+=== Kubernetes CLI (kubectl)
+
+`oc`が好まれる場合もありますが、`kubectl`も多くの操作で使用できます。
+
+link:https://kubernetes.io/docs/tasks/tools/[Kubernetesドキュメント]からインストールします。
+
+インストールを確認します：
+[source,bash,role=execute]
+----
+kubectl version
+----
+
+=== virtctl
+
+KubeVirt/OpenShift仮想化リソースを管理するために設計されたvirtctlツールです。
+
+link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/getting-started#virt-using-the-cli-tools[OpenShift仮想化ドキュメント]からインストールします。
+
+インストールを確認します：
+[source,bash,role=execute]
+----
+virtctl version
+----
+
+== オプションのツール
+
+ワークフローに応じて、次のものも必要になる場合があります：
+
+* **kustomize**: Kubernetes構成の管理
+* **helm**: パッケージ化されたアプリケーションのデプロイ
+* **ansible**: 自動化とオーケストレーション
+
+== クラスター構成
+
+=== ストレージ
+
+クラスターが次のものを持っていることを確認してください：
+
+* 少なくとも1つのStorageClassが構成されている
+* VMディスク用の十分なストレージ容量
+* 動的プロビジョニングをサポートするストレージプロビジョナー
+
+利用可能なStorageClassを確認します：
+[source,bash,role=execute]
+----
+oc get storageclass
+----
+
+=== ネットワーク
+
+クラスターネットワーキングが機能し、Podネットワークがアクセス可能であることを確認してください。外部ネットワークアクセスが必要な場合、VMに必要です。
+
+== 確認
+
+タウトリアルを進める前に、セットアップを確認してください：
+
+[source,bash,role=execute]
+----
+# クラスタースタータスを確認
+oc get nodes
+
+# OpenShift仮想化オペレーターを確認
+oc get csv -n openshift-cnv
+
+# 利用可能なVMテンプレートを確認
+oc get datasources -n openshift-virtualization-os-images
+----
+
+== 次のステップ
+
+前提条件を設定したら：
+
+* xref:virtctl-basics.adoc[virtctlの基本を学ぶ]
+* xref:default-storage-class.adoc[デフォルトのストレージを構成する]
+
+== 参照
+
+* link:https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html[OpenShift仮想化ドキュメント,window=_blank]
+* link:https://kubevirt.io/[KubeVirtプロジェクト,window=_blank]

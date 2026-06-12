@@ -1,0 +1,293 @@
+= クラウドインィット IP 設定トラブルシューティング ガイド
+:navtitle: クラウドインィット トラブルシューティング
+
+このガイドでは、OpenShift ビジュアライゼーションでクラウドインィットを使用して IP アドレスを設定する際の問題のトラブルシューティング手順、検証コマンド、および解決策を提供します。
+
+== 目次
+
+* <<quick-health-checks, クイック ヘルス チェック>>
+* <<debugging-cloud-init, クラウドインィット のデバッグ>>
+* <<common-issues-by-scenario, 各シナリオの一般的な問題>>
+* <<diagnostic-commands, 診断コマンド>>
+
+== クイック ヘルス チェック
+
+=== VM 状態の確認
+
+[source,bash,role=execute]
+----
+oc get vm <vm-name> -n <namespace>
+oc get vmi <vm-name> -n <namespace>
+----
+
+=== VM が IP アドレスを持っているかの確認
+
+[source,bash,role=execute]
+----
+oc get vmi <vm-name> -n <namespace> -o jsonpath='{.status.interfaces[*].ipAddress}'
+----
+
+=== ゲスト エージェントが実行中かの確認
+
+[source,bash,role=execute]
+----
+oc get vmi <vm-name> -n <namespace> -o jsonpath='{.status.guestOSInfo}'
+----
+
+空の場合、ゲスト エージェントは実行していません (<<issue-1-guest-agent-not-running, ゲスト エージェントの問題>>を参照)。
+
+== クラウドインィット のデバッグ
+
+=== VM コンソールへのアクセス
+
+[source,bash,role=execute]
+----
+virtctl console <vm-name> -n <namespace>
+----
+
+=== クラウドインィット の状態の確認
+
+VM 内:
+
+[source,bash]
+----
+# クラウドインィット 完了状況を確認
+cloud-init status
+
+# 成功の場合の期待出力:
+# status: done
+
+# 詳細な状況を確認
+cloud-init status --long
+----
+
+=== クラウドインィット ログの確認
+
+[source,bash]
+----
+# メインのクラウドインィット ログ
+cat /var/log/cloud-init.log
+
+# コマンド実行ログ (出力ログ)
+cat /var/log/cloud-init-output.log
+
+# エラーを確認
+grep -i error /var/log/cloud-init.log
+grep -i failed /var/log/cloud-init.log
+----
+
+=== 適用されたクラウドインィット 設定の表示
+
+[source,bash]
+----
+# ユーザー データの表示
+sudo cat /var/lib/cloud/instance/user-data.txt
+
+# networkData を使用している場合のネットワーク構成の表示
+sudo cat /var/lib/cloud/instance/network-config.txt
+
+# クラウドインィット データの表示
+sudo cat /var/lib/cloud/instance/cloud-config.txt
+----
+
+=== ネットワーク構成の確認
+
+[source,bash]
+----
+# インターフェースの表示
+ip addr show
+
+# ルーティング表の表示
+ip route show
+
+# DNS 設定の確認
+cat /etc/resolv.conf
+
+# NetworkManager システム (Fedora、RHEL) の場合
+nmcli device status
+nmcli connection show
+----
+
+=== 接続性のテスト
+
+[source,bash]
+----
+# ネットワーク接続性のテスト
+ping -c 3 8.8.8.8
+
+# DNS 解決のテスト
+nslookup google.com
+
+# ポッド ネットワークからのテスト
+curl http://<vm-ip>
+----
+
+== 各シナリオの一般的な問題
+
+=== シナリオ 1: DHCP 設定
+
+==== 問題: DHCP を使用して IP を取得できない
+
+**症状**:
+
+[source,bash]
+----
+$ oc get vmi fedora-dhcp-vm -n vms -o jsonpath='{.status.interfaces[0].ipAddress}'
+# 空または IP が表示されない
+----
+
+**診断**:
+
+[source,bash,role=execute]
+----
+# VM コンソールへのアクセス
+virtctl console fedora-dhcp-vm -n vms
+
+# インターフェースの状態の確認
+ip addr show enp1s0
+
+# DHCP クライアントの確認
+journalctl -u NetworkManager | grep -i dhcp
+----
+
+**一般的な原因**:
+
+* DHCP クライアントが実行されていない
+* インターフェースがダウンしている
+* クラウドインィット の DHCP 設定にエラーがある
+
+**解決策**:
+
+. VM の定義内のクラウドインィット DHCP 設定を確認:
++
+[source,yaml]
+----
+cloudInitNoCloud:
+  networkData: |
+    version: 2
+    ethernets:
+      enp1s0:
+        dhcp4: true
+----
+. マニュアルでネットワーク インターフェースを再起動:
++
+[source,bash]
+----
+sudo nmcli connection down "Wired connection 1"
+sudo nmcli connection up "Wired connection 1"
+----
+. NetworkManager のログを確認:
++
+[source,bash]
+----
+sudo journalctl -u NetworkManager --since "5 分前"
+----
+
+==== 問題: クラウドインィット で使用されているインターフェース名が間違っている
+
+**症状**:
+ネットワーク構成が適用されない、ログに "device eth0 not found" が表示される。
+
+**診断**:
+
+[source,bash]
+----
+# VM 内 - 実際のインターフェース名の確認
+ip link show
+----
+
+**一般的な原因**:
+
+* 一般的な名前 (`eth0`, `eth1`) を使用している (ゲスト OS が使用する名前ではない)
+
+**解決策**:
+
+. ゲスト OS で実際のインターフェース名を確認:
+   * 最初のインターフェース: `enp1s0`
+   * 2 番目のインターフェース: `enp2s0`
+   * 3 番目のインターフェース: `enp3s0`
+. cloud-init の networkData を更新して正しい名前を使用:
++
+[source,yaml]
+----
+networkData: |
+  version: 2
+  ethernets:
+    enp1s0:  # eth0 ではない
+      dhcp4: true
+----
+
+=== シナリオ 2: 静的 IP 設定
+
+==== 問題: 静的 IP が適用されない
+
+**症状**:
+DHCP IP を取得するのではなく、構成された静的 IP が取得される。
+
+**診断**:
+
+[source,bash]
+----
+# VM 内
+ip addr show enp1s0
+
+# cloud-init ログでエラーを確認
+grep -i "network" /var/log/cloud-init.log
+----
+
+**一般的な原因**:
+
+* networkData で使用されているインターフェース名が間違っている
+* DHCP が有効になっている
+* networkData の YAML 形式またはインデントにエラーがある
+* cloud-init が networkData を処理していない
+
+**解決策**:
+
+. networkData の YAML 形式とインデントを確認:
++
+[source,yaml]
+----
+networkData: |
+  version: 2
+  ethernets:
+    enp1s0:
+      dhcp4: false  # DHCP を無効に
+      addresses:
+        - 192.168.1.100/24
+      routes:
+        - to: default
+          via: 192.168.1.1
+      nameservers:
+        addresses:
+          - 8.8.8.8
+          - 8.8.4.4
+----
+. cloud-init のエラーを確認:
++
+[source,bash]
+----
+cloud-init status --long
+cat /var/log/cloud-init.log | grep -A 5 -B 5 "network"
+----
+. マニュアルでネットワーク構成を適用:
++
+[source,bash]
+----
+sudo nmcli connection modify "Wired connection 1" \
+  ipv4.method manual \
+  ipv4.addresses 192.168.1.100/24 \
+  ipv4.gateway 192.168.1.1 \
+  ipv4.dns "8.8.8.8 8.8.4.4"
+
+sudo nmcli connection up "Wired connection 1"
+----
+
+==== 問題: 静的 IP が適用されても接続できない
+
+**症状**:
+
+[source,bash]
+----
+# VM 内
+ip addr show enp1

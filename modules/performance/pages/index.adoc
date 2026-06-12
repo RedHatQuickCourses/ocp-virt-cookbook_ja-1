@@ -1,0 +1,55 @@
+= VM パフォーマンスチューニング
+:navtitle:
+
+== 概要
+
+このモジュールでは、OpenShift Virtualization で仮想マシンのパフォーマンスチューニングについて説明します。チュートリアルは、リソース管理の基礎から始まり、CPU ピニング、NUMA トポロジー、リアルタイムワークロードに進みます。
+
+== 学習目標
+
+* 仮想マシンの CPU とメモリーの要求、制限、QoS クラスを設定する方法
+* 低遅延ワークロード向けに VM vCPUs を専用の物理 CPU にピニングする方法
+* VM に大ページバックされたメモリーと NUMA トポロジー通過を設定する方法
+* 制限されたワーストケースレイテンシーでリアルタイム仮想マシンを実行する方法
+
+== 前提条件
+
+VM パフォーマンスチューニングを開始する前に、以下の点を確認してください。
+
+* OpenShift 4.18+ に OpenShift Virtualization オペレーターがインストールされている
+* Kubernetes リソース管理概念の理解
+* CLI ツールがインストールされている: `oc`, `virtctl`, `kubectl`
+* ノードレベルの構成 (CPU マネージャー、hugepages) にクラスター管理者アクセス権
+
+== トピック
+
+xref:resource-limits-qos.adoc[]::
+仮想マシンの CPU とメモリーの要求、制限、QoS クラスを設定する方法、リソースクォータと LimitRanges を使用した名前空間レベルのガバナンス。
+
+xref:cpu-pinning.adoc[]::
+Kubernetes CPU マネージャーの静的ポリシーを使用して、仮想マシンの vCPUs を専用の物理 CPU にピニングし、低遅延およびパフォーマンス駆動型ワークロードから CPU スティールを排除する方法。
+
+xref:numa-hugepages.adoc[]::
+仮想マシンに大ページバックされたメモリーと NUMA トポロジー通過を設定する方法、TLB オーバーヘッドを減らし、NUMA 認識のゲストスケジューリングを可能にする方法。
+
+xref:realtime-vms.adoc[]::
+専用 CPU、NUMA パススルー、hugepages、RT カーネル、SCHED_FIFO スケジューリングを使用して、制限されたワーストケースレイテンシーでリアルタイム仮想マシンを設定する方法。
+
+== 推奨読解順序
+
+パフォーマンスチュートリアルは、順序的に構築されます。
+
+. **リソース制限と QoS** -- 専用 CPU を有効にする前に、ガーランテッド QoS の要件を理解する
+. **CPU ピニング** -- CPU マネージャーの静的ポリシーを有効にし、vCPUs を専用にする
+. **NUMA と大ページ** -- 大ページメモリーと NUMA トポロジー認識を追加する
+. **リアルタイム仮想マシン** -- 上記のすべてのものを組み合わせて、RT カーネルと SCHED_FIFO スケジューリングを使用する
+
+== 関連トピック
+
+* xref:vm-configuration:index.adoc[仮想マシン構成] - 一般的な仮想マシンのセットアップとアクセス
+* xref:storage:index.adoc[ストレージ構成] - 仮想マシン用の永続ストレージ
+
+== 追加リソース
+
+* link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/about#about-virt[OpenShift Virtualization ドキュメント,window=_blank]
+* link:https://kubevirt.io/user-guide/[KubeVirt ユーザーガイド,window=_blank]

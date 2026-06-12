@@ -1,0 +1,332 @@
+= virtctl を使用した仮想マシンの管理
+:navtitle: virtctl の基本
+
+== 概要
+
+virtctl コマンドラインツールは、OpenShift Virtualization で仮想マシンを管理するためのコマンドを提供します。このガイドでは、基本的な VM 操作をカバーします。
+
+テスト済みバージョン:
+----
+OpenShift 4.20
+----
+
+== 前提条件
+
+* OpenShift 4.18+ で OpenShift Virtualization がインストールされている
+* virtctl CLI ツールがインストールされている
+
+== virtctl のダウンロードとインストール
+
+virtctl CLI ツールは、OpenShift Web コンソールから直接ダウンロードできます。
+
+. OpenShift Web コンソールで、左側のサイドバーに移動して *仮想化* → *概要* をクリックします。
++
+. OpenShift コンソールの仮想化概要
+image::virtualization-overview.png[仮想化概要メニュー]
+
+. Overview ページの右上隅にある *virtctl コマンドラインユーティリティをダウンロード* リンクをクリックします。
++
+. virtctl ダウンロードリンク
+image::virtctl-download.png[右上隅にある virtctl ダウンロードリンク]
+
+. ダウンロードページで、適切な `virtctl` バイナリを選択します。
++
+. 利用可能な virtctl バイナリ
+image::virtctl-versions.png[さまざまなプラットフォーム用の virtctl バイナリのリスト]
+
+. バイナリをダウンロードした後、実行可能に設定し、PATH に移動します。
++
+[source,bash,role=execute]
+----
+# Linux/Mac
+chmod +x virtctl
+sudo mv virtctl /usr/local/bin/
+
+# インストールを確認
+virtctl version
+----
++
+Windows の場合は、実行可能なバイナリを展開し、システム PATH に追加します。
+
+== 基本的なコマンド
+
+=== 仮想マシンのリスト表示
+
+仮想マシンを管理する前に、クラスター内の利用可能なものをリスト表示するために `oc` コマンドを使用します。
+
+[source,bash,role=execute]
+----
+# 特定の名前空間のすべての仮想マシンをリスト表示
+oc get vm -n myapp
+
+# すべての名前空間のすべての仮想マシンをリスト表示
+oc get vm -A
+----
+
+例出力:
+
+[source,text]
+----
+NAMESPACE   NAME            AGE   STATUS    READY
+myapp       fedora-app-vm   13d   Running   True
+----
+
+実行中の VM インスタンス (VMI) に関する追加情報 (IP アドレスやノード配置) を表示するには:
+
+[source,bash,role=execute]
+----
+oc get vmi -A
+----
+
+例出力:
+
+[source,text]
+----
+NAMESPACE   NAME            AGE   PHASE     IP             NODENAME   READY
+myapp       fedora-app-vm   13d   Running   10.128.1.225   ocplab01   True
+----
+
+注: `oc` を使用して仮想マシンをリスト表示および照会します。`virtctl` を使用して、開始、停止、コンソールアクセスなどの VM 操作を実行します。
+
+=== VM ライフサイクル
+
+仮想マシンを開始、停止、再起動します:
+
+[source,bash,role=execute]
+----
+# VM を開始
+virtctl start fedora-app-vm -n myapp
+
+# VM を停止
+virtctl stop fedora-app-vm -n myapp
+
+# VM を再起動
+virtctl restart fedora-app-vm -n myapp
+----
+
+=== VM へのアクセス
+
+VM に接続します:
+
+[source,bash,role=execute]
+----
+# コンソールアクセス (Ctrl+] を押して終了)
+virtctl console fedora-app-vm -n myapp
+
+# SSH アクセス (SSH が設定されている必要があります)
+virtctl ssh user@fedora-app-vm -n myapp
+
+# VNC アクセス
+virtctl vnc fedora-app-vm -n myapp
+----
+
+=== VM の情報
+
+QEMU ゲストエージェントが VM にインストールされている場合、VM の詳細を取得します:
+
+[source,bash,role=execute]
+----
+# ゲスト OS の情報
+virtctl guestosinfo fedora-app-vm -n myapp
+----
+
+例出力:
+
+[source,json]
+----
+{
+  "guestAgentVersion": "10.1.0",
+  "hostname": "fedora-app-vm",
+  "os": {
+    "name": "Fedora Linux",
+    "kernelRelease": "6.5.6-300.fc39.x86_64",
+    "version": "39",
+    "prettyName": "Fedora Linux 39 (Cloud Edition)",
+    "versionId": "39",
+    "kernelVersion": "#1 SMP PREEMPT_DYNAMIC",
+    "machine": "x86_64",
+    "id": "fedora"
+  }
+}
+----
+
+[source,bash,role=execute]
+----
+# ファイルシステムのリスト表示
+virtctl fslist fedora-app-vm -n myapp
+----
+
+使用量を含むマウントされたファイルシステムの例出力:
+
+[source,json]
+----
+{
+  "items": [
+    {
+      "diskName": "vda2",
+      "mountPoint": "/boot/efi",
+      "fileSystemType": "vfat",
+      "usedBytes": 21723136,
+      "totalBytes": 104607744
+    },
+    {
+      "diskName": "vda3",
+      "mountPoint": "/boot",
+      "fileSystemType": "ext4",
+      "usedBytes": 91316224,
+      "totalBytes": 1902895104
+    },
+    {
+      "diskName": "vda4",
+      "mountPoint": "/",
+      "fileSystemType": "btrfs",
+      "usedBytes": 687783936,
+      "totalBytes": 29525868544
+    }
+  ]
+}
+----
+
+[source,bash,role=execute]
+----
+# ログイン済みユーザーのリスト表示
+virtctl userlist fedora-app-vm -n myapp
+----
+
+=== ファイルの転送
+
+`virtctl scp` を使用して、VM から VM へのファイルのコピーを行います。これには、VM 内で SSH が実行中で、以下のいずれかの認証方法が必要です:
+
+* **SSH キー** (推奨): VM の `~/.ssh/authorized_keys` に公開キーが含まれている必要があります
+* **パスワード**: VM の SSH にパスワード認証が有効になっている必要があります
+
+[source,bash,role=execute]
+----
+# デフォルトの SSH キーを使用した VM へのコピー
+virtctl scp local-file.txt fedora@fedora-app-vm:/tmp/remote.txt -n myapp
+
+# VM からのコピー
+virtctl scp fedora@fedora-app-vm:/tmp/remote.txt ./local.txt -n myapp
+
+# 異なる SSH キーを指定
+virtctl scp -i ~/.ssh/my_key local-file.txt fedora@fedora-app-vm:/tmp/ -n myapp
+----
+
+ヒント: SSH が設定されていない場合は、まず `virtctl console` を使用して VM に接続し、SSH キーを設定します。
+
+VM を作成するときに SSH キーをインジェクションするには、cloud-init 設定に含めます:
+
+[source,yaml]
+----
+#cloud-config
+user: fedora
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC... your-key-here
+----
+
+詳細な SSH 設定オプションについては、xref:vm-configuration:remote-access-linux-vms.adoc[] を参照してください。
+
+== VM 操作の検証
+
+VM を開始または停止した後、操作を検証します:
+
+[source,bash,role=execute]
+----
+# VM の状態を確認
+oc get vm fedora-app-vm -n myapp
+----
+
+成功した開始後の例出力:
+
+[source,text]
+----
+NAME            AGE    STATUS    READY
+fedora-app-vm   7d3h   Running   True
+----
+
+[source,bash,role=execute]
+----
+# 実行中の VMI (インスタンス) を確認
+oc get vmi fedora-app-vm -n myapp
+----
+
+実行中の場合に VMI がリスト表示され、停止後にはリスト表示されないことを期待します。
+
+== 速記
+
+各アクセス方法の使用方法:
+
+* `virtctl console` - ネットワークなしでテキストのみのターミナルアクセス
+* `virtctl ssh` - キーが設定されている場合に便利な SSH アクセス
+* `virtctl vnc` - グラフィカルデスクトップアクセス (GUI ベースの VM)
+
+VM の情報を確認する方法:
+
+* `virtctl guestosinfo` - 更新前に OS バージョンを確認
+* `virtctl fslist` - インストール前にディスク容量を確認
+* `virtctl userlist` - 現在ログインしているユーザーを確認
+
+== 一般的な問題
+
+**問題: サーバーへの接続ができない**
+
+解決策: クラスターアクセスを確認します:
+
+[source,bash,role=execute]
+----
+oc whoami
+oc get nodes
+----
+
+**問題: ゲストエージェントコマンドがデータを返さない**
+
+解決策: VM に QEMU ゲストエージェントをインストールします。インストール方法については、xref:https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/managing-vms#virt-installing-qemu-guest-agent[インストール] を参照してください。
+
+**問題: SSH/SCP コマンドが失敗**
+
+解決策: VM 内で SSH が設定されていることを確認します。コンソールを使用して確認します:
+
+[source,bash,role=execute]
+----
+# まずコンソールを使用してアクセス
+virtctl console fedora-app-vm -n myapp
+
+# VM 内で SSH ステータスを確認
+systemctl status sshd
+----
+
+**問題: コンソールがハングしたり反応しなかった**
+
+解決策: `Ctrl+]` を押してセッションを終了し、VM の状態を確認します:
+
+[source,bash,role=execute]
+----
+oc get vmi fedora-app-vm -n myapp
+----
+
+== 最善の実践
+
+* **常に名前空間 (`-n`) を指定**して混乱を避けます
+* **初期設定のためにコンソールを使用し、SSH を定期的に使用**
+* **すべての VM に QEMU ゲストエージェントをインストール**して完全な機能を実現します
+* **VM の状態 (`oc`) を確認し、VM 操作 (`virtctl`) を実行**
+* **コンソールから適切に終了 (`Ctrl+]`)**してハングセッションを避けます
+* **外部アクセスを設定する前に `virtctl ssh` をテスト**
+
+== 追加リソース
+
+* link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/getting-started#virt-using-the-cli-tools[virtctl コマンドの参照,window=_blank]
+
+== 要約
+
+このチュートリアルで学んだこと:
+
+* OpenShift Web コンソールから virtctl CLI ツールをダウンロード、インストール、および構成する方法
+* 開始、停止、再起動などの VM ライフサイクル操作の管理方法
+* コンソール、SSH、VNC などの方法を使用して VM にアクセスする方法
+* QEMU ゲストエージェントを使用して、ゲスト OS の情報、ファイルシステムの詳細、ログインユーザーのリストを取得する方法
+* `virtctl scp` を使用して VM から VM へのファイルの転送方法
+
+== 参照
+
+* xref:vm-configuration:remote-access-linux-vms.adoc[] - すべての VM アクセス方法

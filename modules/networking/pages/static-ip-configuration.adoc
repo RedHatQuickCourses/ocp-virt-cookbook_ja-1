@@ -1,0 +1,596 @@
+= 静的IPアドレスの設定
+:navtitle: 静的IP構成
+
+== 概要
+
+このチュートリアルでは、OpenShift Virtualization で仮想マシンに静的IPアドレスを割り当てる方法について説明します。DHCPはデフォルトで最も簡単な方法ですが、多くのワークロードは外部システムとの統合、コンプライアンス、またはレガシーアプリケーションの要件により、予測可能で固定されたIPアドレスが必要です。
+
+以下の5つの方法を使用して、静的IPを構成します。
+
+* **Cloud-init `networkData`** -- 最初のブート時にネットワーク構成を行う (Linux VM)
+* **UDN 主ネットワークに永続的なIP** -- OVN-Kubernetes を使用したクラスター管理されたIP割り当て
+* **DHCP予約** -- 外部DHCPサーバー上のMACアドレスと固定IPをバインドする
+* **QEMUゲストエージェントと `nmcli`** -- ゲストエージェントを使用してブート後に静的IPを適用する
+* **Sysprep (Windows VM)** -- `unattend.xml` を使用したネットワーク構成の設定
+
+各方法には、自動化、柔軟性、および運用上のオーバーヘッドのトレードオフがあります。環境に最適な方法を選択してください。
+
+== 学習目標
+
+* OpenShift Virtualization で静的IPを割り当てることのトレードオフ
+* Cloud-init `networkData` を使用して最初のブート時に静的IPを構成する方法
+* UDN 主ネットワークに永続的なIPを使用したクラスター管理されたアドレス割り当て
+* DHCP予約と固定MACアドレスを使用する方法
+* QEMUゲストエージェントと `nmcli` を使用してブート後に静的IPを適用する方法
+* Windows VM における Sysprep の使用方法
+* 環境に適した方法を選択する方法
+
+== トレードオフと考慮事項
+
+静的IPを割り当てる前に、以下の点を理解してください。
+
+クラスター管理されたネットワークの損失::
+セカンダリーネットワークインターフェースに静的IPを割り当てると、OpenShift `サービス` と `ルート` にアクセスできなくなる可能性があります。これらはデフォルトのポッドネットワークに依存しています。主インターフェース (ポッドネットワークに接続されている) は、DHCPによって割り当てられたアドレスを保持してクラスター接続を維持する必要があります。
+
+クラスターが割り当てられたアドレスを認識しない::
+静的IPは OVN-Kubernetes IPAM をバイパスします。クラスターはこれらのアドレスを追跡しません。割り当てが外部で管理されない場合、IPの衝突が発生する可能性があります。割り当てられたアドレスのインベントリーを維持するか、外部の IPAM ソリューションを使用してください。
+
+メンテナンスのオーバーヘッド::
+静的IPの割り当ては、VMの作成、移動、または削除時に手動で追跡および更新する必要があります。予約を使用する DHCP はこの負担を軽減できます。
+
+静的IPが適切な場合::
+* 固定アドレスが必要なレガシーアプリケーション
+* 外部システム (ファイアウォール、ロードバランサー、モニタリング) に直接IPを参照する統合が必要
+* ターゲットネットワークに DHCP サーバーがない環境
+* アドレスの追跡が必要な規制またはコンプライアンスの要件
+
+DHCPまたはOVN-Kubernetes IPAMを好む場合::
+* 短期的なまたは頻繁に再生成される VM
+* 信頼できる DHCP インフラストラクチャーが備わった環境
+* Kubernetes サービスと DNS を経由して通信するワークロード
+
+== 前提条件
+
+* OpenShift 4.18+ に OpenShift Virtualization オペレーターがインストールされている
+* CLI ツール: `oc`, `virtctl`
+* 少なくとも1つの構成済みネットワーク (主ポッドネットワーク)
+* セカンダリーネットワークシナリオ: NetworkAttachmentDefinition (NAD) が構成されている (xref:networking:localnet-vlan.adoc[Localnet VLAN タイタル]を参照)
+* DHCP 予約シナリオ: ターゲットネットワークの外部 DHCP サーバーへの管理権限
+* ネットワーキングの基本的な理解 (IP アドレス、サブネット、ゲートウェイ、DNS)
+
+== メソッド 1: Cloud-init networkData
+
+Cloud-init は、VM ブート中に実行される業界標準の初期化ツールです。`cloudInitNoCloud` ボリュームの `networkData` フィールドは、netplan 互換バージョン 2 形式でネットワーク構成を専用に使用します。
+
+これは、OpenShift Virtualization で Linux VM によく使用される最も一般的な方法です。
+
+=== どのように機能するか
+
+* VM がブートし、cloud-init が NoCloud データソースから `networkData` を読み取ります。
+* cloud-init は、ユーザー空間サービスが開始される前にネットワーク構成を適用します。
+* 構成はリブート後も維持されます。
+
+=== 構成形式
+
+cloud-init ネットワーク構成は、バージョン 2 (netplan) 形式を使用します。バージョン 2 形式は、`ethernets`, `bonds`, `bridges`, `vlans` のデバイスタイプをサポートします。各デバイスには、`addresses`, `dhcp4`/`dhcp6`, `routes`, `nameservers` (アドレスと `search`), `mtu`, `match` (マクアドレス、名前、ドライバーによる) オプションが含まれます。
+
+基本的な形式は次のとおりです。
+
+[source,yaml]
+----
+networkData: |
+  version: 2
+  ethernets:
+    enp1s0:
+      dhcp4: true
+    enp2s0:
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - 192.168.100.50/24
+      nameservers:
+        addresses:
+          - 192.168.100.1
+----
+
+この例では、`enp1s0` (主ポッドネットワークインターフェース) は DHCP を使用し、`enp2s0` (2番目のインターフェース) は静的 IP を受け取ります。
+
+=== デフォルトゲートウェイ構成
+
+`gateway4` または `gateway6` フィールドを使用しないでください。これらは netplan 0.103 から cloud-init 23.1 からは非推奨になりました。代わりに、`routes` を使用してください。
+
+[source,yaml]
+----
+networkData: |
+  version: 2
+  ethernets:
+    enp2s0:
+      dhcp4: false
+      addresses:
+        - 192.168.100.50/24
+      routes:
+        - to: 192.168.100.0/24
+          via: 192.168.100.1
+      nameservers:
+        addresses:
+          - 192.168.100.1
+        search:
+          - example.com
+----
+
+この例では、DNS検索ドメインの追加方法 (`search` フィールド) と特定のルートの追加方法 (`routes` リスト) を示しています。セカンダリーインターフェース (`to: default`) のデフォルトゲートウェイルートのみ (`routes` リストに存在しない場合) を使用できます。
+
+=== 優先順位
+
+* `networkData` 構成 (最高優先順位)
+* データソースのネットワーク構成
+* DHCP (デフォルト) にフォールバック
+
+=== KubeVirt でのインターフェース命名
+
+KubeVirt は、ゲスト VM 内で予測可能なネットワークインターフェース命名を使用します。インターフェースは、PCI ソケットの順序に基づいてシーケンシャルに命名されます。
+
+* `enp1s0` -- 最初のインターフェース (通常はポッドネットワーク)
+* `enp2s0` -- 2番目のインターフェース (最初のセカンダリーネットワーク)
+* `enp3s0` -- 3番目のインターフェース (2番目のセカンダリーネットワーク)
+
+重要: `eth0` などのレガシー名を使用しないでください。ゲスト OS で定義されたインターフェースの順序に一致する予測可能な名前 (`enpXs0`) を使用してください。
+
+=== 重要なフォーマット規則
+
+`cloudInitNoCloud` ボリュームに `networkData` を提供する場合、以下の点に注意してください。
+
+`network:` キーでラップしないでください::
+KubeVirt の `networkData` フィールドは、バージョン 2 (`netplan`) 形式で構成を直接開始するように期待しています。トップレベルの `network:` ラッパーを追加しないでください。これはスタンドアロン構成ファイルで使用される形式ですが、NoCloud データソースの `networkData` フィールドでは使用されません。
+
+常に `userData` を含めてください::
+cloud-init は `networkData` を解析しないため、`userData` も設定されていない場合です。最小限の `userData` ヘッダー (`#cloud-config`) すなわちも十分です。このチュートリアル内のすべての例には `userData` が含まれています。
+
+インライン `networkData` を Secret 参照よりも好む::
+`networkDataSecretRef` が、一部の構成で cloud-init に適用されないという既知の問題があります。インライン `networkData` フィールドまたは `networkDataBase64` を使用して、信頼性の高い動作を確保してください。
+
+=== 静的IPが適用される場所
+
+静的 IP 構成は、**セカンダリーネットワークインターフェースのみ**に適用されます。主インターフェースは、ポッドネットワークにマスカレードを介して接続し、クラスターから自動的に IP が割り当てられます。これらのインターフェースに静的 IP を割り当てることは避けてください。マスカレードブリッジは内部サブネット (`10.0.2.0/24`) を使用し、NAT を介してポッド IP に翻訳されます。このサブネットを異なるサブネットでの静的アドレスの割り当てによって破損されることを避けるためです。
+
+このチュートリアル内のすべての例では、セカンダリーインターフェース (`enp2s0` 以上) に静的 IP を構成し、主インターフェース (`enp1s0`) に DHCP を維持します。
+
+=== シナリオ: 主 DHCP + セカンダリー静的 IP
+
+これは標準的なアプローチです。主インターフェースはポッドネットワークで DHCP を使用し、VLAN またはブリッジネットワークにあるセカンダリーインターフェースは静的 IP を受け取ります。
+
+前提条件: 2番目のネットワークが構成されていることを確認してください (例: localnet VLAN 100 NetworkAttachmentDefinition (NAD))。セットアップの手順については、xref:networking:localnet-vlan.adoc[Localnet VLAN タイタル]を参照してください。
+
+このチュートリアルのための名前空間を作成します。
+
+[source,bash,role=execute]
+----
+oc create namespace static-ip-demo
+----
+
+xref:attachment$static-ip-configuration/fedora-multi-network-vm.yaml[fedora-multi-network-vm.yaml をダウンロード]
+
+[source,yaml]
+----
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fedora-multi-vm
+  namespace: static-ip-demo
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        name: fedora-multi-vm-disk
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: fedora
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: fedora-multi-vm
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              name: default
+            - bridge: {}
+              name: vlan-network
+          rng: {}
+        machine:
+          type: pc-q35-rhel9.4.0
+        memory:
+          guest: 4Gi
+      networks:
+        - name: default
+          pod: {}
+        - name: vlan-network
+          multus:
+            networkName: localnet-vlan-100
+      volumes:
+        - dataVolume:
+            name: fedora-multi-vm-disk
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: fedora
+              password: fedora123
+              chpasswd: { expire: False }
+              ssh_pwauth: True
+            networkData: |-
+              version: 2
+              ethernets:
+                enp1s0:
+                  dhcp4: true
+                enp2s0:
+                  dhcp4: false
+                  dhcp6: false
+                  addresses:
+                    - 192.168.100.50/24
+                  nameservers:
+                    addresses:
+                      - 192.168.100.1
+          name: cloudinitdisk
+----
+
+デプロイおよび確認:
+
+[source,bash,role=execute]
+----
+oc apply -f fedora-multi-network-vm.yaml
+----
+
+VM コンソールにアクセスして、両方のインターフェースを確認します。
+
+[source,bash,role=execute]
+----
+virtctl console fedora-multi-vm -n static-ip-demo
+----
+
+VM 内で確認:
+
+[source,bash]
+----
+ip addr show
+----
+
+.期待出力
+----
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute
+       valid_lft forever preferred_lft forever
+2: enp1s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc fq_codel state UP group default qlen 1000
+    link/ether 02:7e:e2:23:d7:da brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.2/24 brd 10.0.2.255 scope global dynamic noprefixroute enp1s0
+       valid_lft 86313438sec preferred_lft 86313438sec
+    inet6 fe80::7e:e2ff:fe23:d7da/64 scope link noprefixroute
+       valid_lft forever preferred_lft forever
+3: enp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc fq_codel state UP group default qlen 1000
+    link/ether 02:7e:e2:23:d7:db brd ff:ff:ff:ff:ff:ff
+    inet 192.168.100.50/24 brd 192.168.100.255 scope global noprefixroute enp2s0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::7e:e2ff:fe23:d7db/64 scope link noprefixroute
+       valid_lft forever preferred_lft forever
+----
+
+[source,bash]
+----
+ip route show
+----
+
+.期待出力
+----
+default via 10.0.2.1 dev enp1s0 proto dhcp src 10.0.2.2 metric 100
+10.0.2.0/24 dev enp1s0 proto kernel scope link src 10.0.2.2 metric 100
+192.168.100.0/24 dev enp2s0 proto kernel scope link src 192.168.100.50 metric 101
+----
+
+注: 最初のインターフェース (`enp1s0`) は DHCP を使用して自動的に IP が割り当てられます。2番目のインターフェース (`enp2s0`) は静的 IP `192.168.100.50` を受け取ります。セカンダリーインターフェースにデフォルトルートを割り当てると、ルーティングの競合が発生する可能性があります。
+
+=== cloud-init の検証
+
+cloud-init を使用して VM をデプロイした後、外部から VM の IP 構成を検証できます。QEMU ゲストエージェントはインターフェースの詳細をクラスターに報告します。
+
+[source,bash,role=execute]
+----
+oc get vmi fedora-multi-vm -n static-ip-demo -o jsonpath='{.status.interfaces}' | python3 -m json.tool
+----
+
+.期待出力
+[source,json]
+----
+[
+    {
+        "infoSource": "domain, guest-agent",
+        "interfaceName": "enp1s0",
+        "ipAddress": "10.128.1.106",
+        "ipAddresses": [
+            "10.128.1.106"
+        ],
+        "mac": "02:7e:e2:23:d7:da",
+        "name": "default"
+    },
+    {
+        "infoSource": "domain, guest-agent, multus-status",
+        "interfaceName": "enp2s0",
+        "ipAddress": "192.168.100.50",
+        "ipAddresses": [
+            "192.168.100.50",
+            "fe80::7e:e2ff:fe23:d7db"
+        ],
+        "mac": "02:7e:e2:23:d7:db",
+        "name": "vlan-network"
+    }
+]
+----
+
+この出力は、`enp2s0` が `networkData` で構成されたように静的 IP `192.168.100.50` を持っていることを確認します。出力が空の場合は、ゲストエージェントがまだ開始されていない可能性があります。
+
+VM コンソールに接続して、インターフェースの IP が予期される値に一致することを確認します。
+
+[source,bash,role=execute]
+----
+virtctl console fedora-multi-vm -n static-ip-demo
+----
+
+VM 内で:
+
+[source,bash]
+----
+cloud-init status
+----
+
+.期待出力
+----
+status: done
+----
+
+[source,bash]
+----
+nmcli connection show
+----
+
+.期待出力
+----
+NAME               UUID                                  TYPE      DEVICE
+cloud-init enp1s0  a41601f3-3acc-5f60-ac5f-9d9011ab7c25  ethernet  enp1s0
+cloud-init enp2s0  90ff9077-4cf0-55d5-904d-6cdc4f01d148  ethernet  enp2s0
+lo                 29567487-41a5-4ac6-a312-f00ed799a660  loopback  lo
+----
+
+コンソールから退出 (`Ctrl+]`) します。
+
+cloud-init がエラーを報告する場合は、ログを確認してください。
+
+[source,bash]
+----
+sudo cat /var/log/cloud-init.log
+----
+
+詳細なトラブルシューティングについては、xref:cloud-init-troubleshooting.adoc[cloud-init トラブルシューティングガイド]を参照してください。
+
+== メソッド 2: UDN 主ネットワークに永続的な IP
+
+User Defined Networks (UDNs) は、レイヤー 2 トポロジーを提供するクラスター管理された代替手段として、安定した IP アドレスの割り当てを提供します。UDN が名前空間に `ipam.lifecycle: Persistent` ラベルを持ち、レイヤー 2 トポロジー、サブネット、および `ipam.lifecycle: Persistent` を持つ `UserDefinedNetwork` リソースとして定義される場合、OVN-Kubernetes は定義されたサブネットから IP を割り当て、VM の再起動、停止/起動サイクル、およびライブマイグレーション中に永続します。`IPAMClaim` カスタムリソースを使用します。
+
+このアプローチでは、手動の静的 IP 設定または外部の DHCP サーバーが必要ないため、クラスター管理された IP 割り当てが可能になります。各 VM は、同じ IP を保持するために、クラスターが割り当てられたアドレスを管理します。
+
+=== どのように機能するか
+
+* 名前空間に `k8s.ovn.org/primary-user-defined-network` ラベルを付けます。
+* Layer 2 トポロジー、サブネット、および `ipam.lifecycle: Persistent` を持つ `UserDefinedNetwork` リソースを定義します。
+* その名前空間にデプロイされた VM は、クラスターが自動的に永続的な IP を割り当てます。cloud-init `networkData` または DHCP 予約は必要ありません。
+
+=== この方法を使用する場合
+
+* クラスター管理された IP 割り当てが必要で、手動構成が必要ありません
+* VM が再起動およびライブマイグレーション中に同じ IP を保持する必要があります
+* 外部の DHCP サーバーまたはマニフェストに IP を埋め込むことを好みません
+* ネットワーク分離が必要な名前空間スコープのカスタムサブネットが必要です
+
+名前空間のセットアップ、UDN の作成、VM のデプロイ、および接続性の検証の完全なウォークスルーについては、xref:networking:udn-primary-networks.adoc[UDNs を使用したレイヤー 2 主ネットワークの構成]を参照してください。
+
+== メソッド 3: DHCP 予約
+
+DHCP 予約 (静的 DHCP または固定アドレス DHCP) は、DHCP の自動化と静的 IP 割り当ての予測可能性を組み合わせます。DHCP サーバーは、特定の MAC アドレスを固定 IP にマップし、VM は常に同じアドレスを受け取ります。
+
+=== どのように機能するか
+
+* VM のネットワークインターフェースに固定 MAC アドレスを VM 仮想マシン仕様に割り当てます。
+* 外部の DHCP サーバーで、その MAC を特定の IP にマップする予約を作成します。
+* VM がブートし、DHCP 要求を送信し、予約されたアドレスを受け取ります。
+
+=== この方法を使用する場合
+
+* 既存の DHCP インフラストラクチャーがあり、中央集権的な IP 管理が必要
+* VM 仮想マシン仕様にネットワーク構成を埋め込むことを好みしない
+* VM がポート可能 (IP は MAC に、マニフェストではなく続く)
+
+=== 固定 MAC アドレスの割り当て
+
+DHCP 予約を使用するには、VM インターフェースに固定 MAC アドレスを割り当てる必要があります。割り当てられていない場合、KubeVirt はブートごとにランダムな MAC を割り当て、予約を破壊します。
+
+xref:attachment$static-ip-configuration/fedora-dhcp-reserved-vm.yaml[fedora-dhcp-reserved-vm.yaml をダウンロード]
+
+[source,yaml]
+----
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fedora-dhcp-reserved-vm
+  namespace: static-ip-demo
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        name: fedora-dhcp-reserved-vm-disk
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: fedora
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: fedora-dhcp-reserved-vm
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              name: default
+            - bridge: {}
+              name: vlan-network
+              macAddress: "02:00:00:01:00:01"
+          rng: {}
+        machine:
+          type: pc-q35-rhel9.4.0
+        memory:
+          guest: 4Gi
+      networks:
+        - name: default
+          pod: {}
+        - name: vlan-network
+          multus:
+            networkName: localnet-vlan-100
+      volumes:
+        - dataVolume:
+            name: fedora-dhcp-reserved-vm-disk
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: fedora
+              password: fedora123
+              chpasswd: { expire: False }
+              ssh_pwauth: True
+          name: cloudinitdisk
+----
+
+クラウド-init メソッドとの主な違いは、セカンダリーインターフェースの `macAddress` フィールドです。DHCP サーバーが IP 割り当てを行うため、`networkData` は必要ありません。
+
+=== DHCP サーバーの構成
+
+外部の DHCP サーバーで、MAC アドレスに対する予約を作成します。DHCP サーバーのソフトウェアによっては異なります。
+
+ISC DHCP (`dhcpd.conf` の例):
+
+[source,text]
+----
+host fedora-dhcp-reserved-vm {
+  hardware ethernet 02:00:00:01:00:01;
+  fixed-address 192.168.100.60;
+}
+----
+
+dnsmasq の例:
+
+[source,text]
+----
+dhcp-host=02:00:00:01:00:01,192.168.100.60,fedora-dhcp-reserved-vm
+----
+
+予約が設定された後、VM をデプロイします。
+
+[source,bash,role=execute]
+----
+oc apply -f fedora-dhcp-reserved-vm.yaml
+----
+
+=== 検証
+
+VM にアクセスして、予約された IP が一致することを確認します。
+
+[source,bash,role=execute]
+----
+virtctl console fedora-dhcp-reserved-vm -n static-ip-demo
+----
+
+VM 内で:
+
+[source,bash]
+----
+ip addr show enp2s0
+----
+
+DHCP 予約が設定されている場合、予約された IP が固定 MAC に表示されます。
+
+.期待出力
+----
+3: enp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1400 qdisc fq_codel state UP group default qlen 1000
+    link/ether 02:00:00:01:00:01 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.100.60/24 brd 192.168.100.255 scope global dynamic enp2s0
+       valid_lft 3600sec preferred_lft 3600sec
+----
+
+DHCP サーバーが応答しない場合、インターフェースはリンクローカル IPv6 アドレスのみを持ちます。固定 MAC `02:00:00:01:00:01` は、`macAddress` フィールドが適切に適用されていることを確認します。
+
+注: `02:` で始まる MAC アドレスは、局所管理範囲であり、ハードウェアベンダー割り当てされた MAC と衝突しないでください。
+
+=== ライブマイグレーションの考慮事項
+
+VM に静的 IP が割り当てられている場合、VM が別のノードにライブマイグレーションされると、ネットワークタイプによって異なります。
+
+* **ブリッジベースのセカンダリーネットワーク (localnet、Linux ブリッジ)**: VM は、マクアドレスと IP をライブマイグレーション中に保持します。ネットワークファブリック (例: スイッチが MAC アドレステーブルを更新できる) は、マクアドレスの移動をサポートする必要があります。cloud-init、`nmcli`、または `nmcli` を使用して割り当てられた静的 IP は、ブリッジベースのセカンダリーネットワークでライブマイグレーション中に維持されます。
+* **SR-IOV ネットワーク**: SR-IOV でのライブマイグレーションには、追加の構成が必要で、同じネットワークパスを維持することができない場合があります。詳細については、link:https://docs.openshift.com/container-platform/latest/virt/live_migration/virt-about-live-migration.html[OpenShift Virtualization のライブマイグレーションドキュメント]を参照してください。
+
+主インターフェースは、マスカレードモードを使用する場合、ライブマイグレーション後に新しいポッド IP を受け取ります。これはゲスト OS にとっては透明です。
+
+== メソッド 4: QEMU ゲストエージェントと nmcli
+
+QEMU ゲストエージェントは、ホスト (KubeVirt) が実行中の VM と通信できるようにします。このチャネルを使用して、VM がブート後に標準的なツール (例: `nmcli`) を使用してネットワーク構成を変更できます。
+
+この方法は、既存の VM の実行時のネットワーク変更が必要な場合や、cloud-init が使用できない場合に役立ちます。
+
+=== どのように機能するか
+
+* VM が DHCP または無 IP でターゲットインターフェースでブートします。
+* VM 内で QEMU ゲストエージェントが開始します。
+* VM コンソール (または SSH) に接続し、`nmcli` を使用して静的 IP を適用します。
+* NetworkManager が保存したため、構成はリブート後も維持されます。
+
+=== 前提条件
+
+* VM イメージに `qemu-guest-agent` パッケージが含まれていること (大多数の Red Hat と Fedora イメージではデフォルトで含まれています)
+* VM 内でゲストエージェントが実行中であること
+
+=== 静的 IP の適用
+
+まず、セカンダリーインターフェースに DHCP を使用する VM をデプロイします (またはその

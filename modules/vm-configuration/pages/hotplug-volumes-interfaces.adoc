@@ -1,0 +1,373 @@
+= ボットプラグボリュームとネットワークインターフェースの追加
+:navtitle: ボットプラグボリュームとインターフェース
+
+== 概要
+
+このチュートリアルでは、実行中の仮想マシンにストレージボリュームを動的に追加および削除する方法を示します。ボットプラグは、ストレージのゼロダウンタイム拡張、柔軟なリソース割り当て、メンテナンスウィンドウの短縮を可能にします。
+
+`virtctl addvolume` を使用して、新しい PVC を実行中の VM にアタッチし、ゲスト内で新しいブロックデバイスとして表示されるかどうかを確認し、次に `virtctl removevolume` を使用して削除します。このチュートリアルでは、ボットプラグネットワークインターフェースの概念と要件もカバーします。
+
+== 前提条件
+
+* **OpenShift 4.18+** に OpenShift Virtualization オペレーターがインストールされている
+* **クラスター管理者権限** (`system:admin` または等価)
+* **`oc` CLI** と **`virtctl` CLI** がインストールされている
+* **デフォルトの StorageClass** が構成されている
+
+テスト済みバージョン:
+----
+OpenShift 4.20、4.21
+----
+
+== ステップ 1: ネームスペースとベース VM の作成
+
+実行中のボットプラグターゲットとして使用するネームスペースを作成し、VM をデプロイします。
+
+[source,bash,role=execute]
+----
+oc create namespace hotplug-demo
+----
+
+警告: この例の cloud-init パスワードはデモ目的のみです。実際の環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。
+
+xref:attachment$hotplug-volumes-interfaces/vm-hotplug.yaml[vm-hotplug.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: hotplug-vm
+  namespace: hotplug-demo
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: hotplug-vm
+    spec:
+      domain:
+        devices:
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+        resources:
+          requests:
+            memory: 1Gi
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: rootdisk
+        containerDisk:
+          image: quay.io/containerdisks/fedora:latest
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            password: redhat
+            chpasswd:
+              expire: false
+EOF
+----
+
+VM が開始されるまで待ちます:
+
+[source,bash,role=execute]
+----
+oc get vm -n hotplug-demo -w
+----
+
+`STATUS=Running` および `READY=True` のときに、続行します。`Ctrl+C` を押してウォッチを終了します。
+
+初期ディスクレイアウトを確認します:
+
+[source,bash,role=execute]
+----
+oc get vmi hotplug-vm -n hotplug-demo -o jsonpath='{range .status.volumeStatus[*]}{.name}: {.target}{"\n"}{end}'
+----
+
+期待される出力:
+----
+rootdisk: vda
+cloudinitdisk: vdb
+----
+
+== ステップ 2: ボットプラグ用の PVC の作成
+
+ボットプラグされるようにする PVC を作成します。
+
+xref:attachment$hotplug-volumes-interfaces/hotplug-pvc.yaml[hotplug-pvc.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hotplug-disk
+  namespace: hotplug-demo
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: lvms-vg1
+  volumeMode: Block
+EOF
+----
+
+重要: ボットプラグボリュームは `volumeMode: Block` を使用する必要があります。ファイルシステムモードの PVC は事前に作成された `disk.img` ファイルが必要で、直接の空白ボリュームへのボットプラグには適していません。
+
+PVC がプロビジョニングされるまで待ちます。`WaitForFirstConsumer` バインディングモードを使用する場合、割り当てられていない場合には `Pending` 状態に留まる可能性があります:
+
+[source,bash,role=execute]
+----
+oc get pvc hotplug-disk -n hotplug-demo
+----
+
+== ステップ 3: ボットプラグボリュームの追加
+
+`virtctl addvolume` を使用して、実行中の VM に PVC をアタッチします:
+
+[source,bash,role=execute]
+----
+virtctl addvolume hotplug-vm --volume-name=hotplug-disk --namespace=hotplug-demo --persist
+----
+
+期待される出力:
+----
+Successfully submitted addvolume request to VM hotplug-vm for volume hotplug-disk
+----
+
+`--persist` フラグは、ボリュームが VM 再起動後もアタッチされていることを保証します。このフラグを使用しない場合、次のブート時にボリュームが切断されます。
+
+== ステップ 4: ボットプラグボリュームの確認
+
+VM ボリュームのステータスを確認して、新しいディスクが表示されているかを確認します:
+
+[source,bash,role=execute]
+----
+oc get vmi hotplug-vm -n hotplug-demo -o jsonpath='{range .status.volumeStatus[*]}{.name}: {.target} (hotplugVolume: {.hotplugVolume}){"\n"}{end}'
+----
+
+期待される出力:
+----
+rootdisk: vda (hotplugVolume: )
+cloudinitdisk: vdb (hotplugVolume: )
+hotplug-disk: sda (hotplugVolume: {"attachPodName":"...","attachPodUID":"..."})
+----
+
+ボットプラグされたボリュームは SCSI デバイス (`sda`) で表示され、`Ready` 状態です。`hotplugVolume` フィールドにアタッチポッド情報があります。
+
+PVC がバインドされていることを確認します:
+
+[source,bash,role=execute]
+----
+oc get pvc hotplug-disk -n hotplug-demo
+----
+
+期待される出力:
+----
+NAME           STATUS   VOLUME       CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+hotplug-disk   Bound    pvc-xxxx     5Gi        RWO            lvms-vg1       1m
+----
+
+ゲスト内から確認します。VM コンソールにアクセスします:
+
+[source,bash,role=execute]
+----
+virtctl console hotplug-vm -n hotplug-demo
+----
+
+ユーザー名 `fedora` とパスワード `redhat` でログインし、ブロックデバイスをリスト表示します:
+
+[source,bash]
+----
+lsblk
+----
+
+新しいディスクデバイス (例: `sda`) が、PVC のサイズと一致するはずです。`Ctrl+]` を押して終了します。
+
+== ステップ 5: ボットプラグボリュームのフォーマットと使用 (ゲスト内)
+
+VM コンソール内で、新しいディスクをフォーマットします:
+
+[source,bash]
+----
+sudo mkfs.xfs /dev/sda
+----
+
+マウントポイントを作成し、ディスクをマウントします:
+
+[source,bash]
+----
+sudo mkdir -p /mnt/hotplug
+sudo mount /dev/sda /mnt/hotplug
+----
+
+テストファイルを書き込み、確認します:
+
+[source,bash]
+----
+echo "ボットプラグテスト" | sudo tee /mnt/hotplug/test.txt
+----
+
+[source,bash]
+----
+cat /mnt/hotplug/test.txt
+----
+
+期待される出力:
+----
+ボットプラグテスト
+----
+
+アンマウントする前に削除します:
+
+[source,bash]
+----
+sudo umount /mnt/hotplug
+----
+
+`Ctrl+]` を押してコンソールを終了します。
+
+== ステップ 6: ボットプラグボリュームの削除
+
+実行中の VM からボリュームを切断します:
+
+[source,bash,role=execute]
+----
+virtctl removevolume hotplug-vm --volume-name=hotplug-disk --namespace=hotplug-demo
+----
+
+期待される出力:
+----
+Successfully submitted removevolume request to VM hotplug-vm for volume hotplug-disk
+----
+
+重要: ボットプラグボリュームを削除する前に、ゲスト内のファイルシステムをアンマウントしてデータ損失を防ぐことが重要です。
+
+ボリュームが削除されたことを確認します:
+
+[source,bash,role=execute]
+----
+oc get vmi hotplug-vm -n hotplug-demo -o jsonpath='{range .status.volumeStatus[*]}{.name}: {.target}{"\n"}{end}'
+----
+
+期待される出力:
+----
+rootdisk: vda
+cloudinitdisk: vdb
+----
+
+hotplug-disk はさらにアタッチされていません。PVC はデータを保持します:
+
+[source,bash,role=execute]
+----
+oc get pvc hotplug-disk -n hotplug-demo
+----
+
+== ボットプラグボリュームの参照
+
+=== --persist フラグ
+
+[cols="1,1",options="header"]
+|===
+| フラグ
+| 動作
+
+| `--persist`
+| ボリュームが VM 仕様に追加され、再起動後もアタッチされます
+
+| (なし)
+| ボリュームは現在の VMI のみにアタッチされ、再起動時に失われます
+|===
+
+データディスクを永続的にアタッチする必要がある場合は `--persist` を使用します。一時的な操作 (データ移行や一度のインポートなど) には省略します。
+
+=== サポートされるボリュームタイプ
+
+ボットプラグは次のものをサポートします:
+
+* PersistentVolumeClaims (PVC)
+* DataVolumes
+
+ボットプラグは次のものをサポートしません:
+
+* containerDisk ボリューム
+* cloudInitNoCloud / cloudInitConfigDrive ボリューム
+* emptyDir ボリューム
+
+=== ディスクバスタイプ
+
+ボットプラグされたボリュームは SCSI バスを使用します ( `sda`、`sdb` など)、virtio ディスクは `vda`、`vdb` などとして表示されます。これは、virtio ディスクがブート後に PCI バスにホットプラグできないためです。SCSI はホットアドドの能力を提供します。
+
+== ネットワークインターフェースのボットプラグ (参照)
+
+OpenShift Virtualization は、ネットワークインターフェースのボットプラグもサポートしています。これは、すべてのクラスターで利用可能でない可能性のある追加のインフラストラクチャが必要です。
+
+=== 要件
+
+* **Multus CNI 厚いプラグイン**: 標準の Multus デプロイメントが、厚いプラグインとして実行されている必要があります。
+* **Multus 動的ネットワークコントローラー**: 変更を監視し、Multus を新しいアタッチメントを構成するために Multus にトリガーするデーモンです。
+* **マルチノードクラスター**: 単一ノードクラスターでは、ライブマイグレーションベースのボットプラグは使用できません。
+
+=== どのように機能するか
+
+ボットプラグボリューム ( `virtctl addvolume` を使用する) とは異なり、ネットワークインターフェースのボットプラグは VM 仕様を編集して行います:
+
+. 2 番目のネットワーク用の NetworkAttachmentDefinition (NAD) を作成します。
+. VM 仕様を編集して新しいインターフェースとネットワーク定義を追加します。
+. 厚い Multus が利用可能な場合は、実行中の VM にインターフェースがアタッチされます (またはライブマイグレーション後)。
+
+=== インターフェースの削除
+
+VM 仕様でインターフェースの `state: absent` を設定します:
+
+[source,yaml]
+----
+interfaces:
+- name: dyniface1
+  state: absent
+  bridge: {}
+----
+
+注: ブリッジバインディングインターフェースのみがホットアンプラグをサポートします。SR-IOV インターフェースはホットアンプラグできません。
+
+詳細なネットワークボットプラグ手順については、link:https://kubevirt.io/user-guide/network/hotplug_interfaces/[KubeVirt ネットワークインターフェースのボットプラグに関するユーザーガイドを参照してください。
+
+== クリーンアップ
+
+このチュートリアルで作成されたすべてのリソースを削除します:
+
+[source,bash,role=execute]
+----
+oc delete namespace hotplug-demo
+----
+
+== 要約
+
+このチュートリアルで学んだこと:
+
+* `virtctl addvolume` を使用して実行中の VM に PVC ボリュームをボットプラグ
+* `--persist` フラグを使用して、ボットプラグされたボリュームが再起動後もアタッチされるようにする
+* ボットプラグされたボリュームがゲスト内で新しいブロックデバイスとして表示されることを確認する
+* VM 内でボットプラグされたストレージをフォーマットしてマウントする
+* `virtctl removevolume` を使用してボットプラグされたボリュームを削除する
+* ネットワークインターフェースのボットプラグの要件と方法を理解する
+
+== 参照
+
+* link:https://kubevirt.io/user-guide/storage/hotplug_volumes/[Hotplug Volumes - KubeVirt User Guide,window=_blank]
+* link:https://kubevirt.io/user-guide/network/hotplug_interfaces/[Hotplug Network Interfaces - KubeVirt User Guide,window=_blank]
+* xref:vm-lifecycle:boot-order-boot-sources.adoc[ブート順序とブートソース]

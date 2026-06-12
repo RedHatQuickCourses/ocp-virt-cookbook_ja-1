@@ -1,0 +1,203 @@
+= ストレージクラスの作成と管理
+:navtitle: ストレージクラスの作成と管理
+
+== 概要
+
+このチュートリアルでは、OpenShift Container Platform (OCP) でのストレージクラスについて説明します。このガイドは、OCP 4.x (しばしば OCPv4 と略される) を中心に、Container Storage Interface (CSI) が標準的なストレージプロビジョニング方法であることに焦点を当てています。これらの概念は、OpenShift Virtualization (CNV) でも直接適用されます。ここでは、仮想マシンディスクのプロビジョニング方法を決定するストレージクラスが重要です。ストレージクラスについて詳しくは、以下の OpenShift ドキュメントを参照してください。
+
+- [ストレージクラス API](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage_apis/storageclass-storage-k8s-io-v1)
+- [Container Storage Interface](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/using-container-storage-interface-csi)
+
+== ストレージクラスの基本
+
+OpenShift で、ストレージクラス (SC) は、クラスターに使用可能なストレージの「クラス」を記述します。これにより、管理者は、ユーザーが底上げインフラストラクチャーの詳細を知らないで異なるストレージ層 (例: "fast-ssd", "cheap-hdd") を定義できます。
+
+ユーザーが PersistentVolumeClaim (PVC) を作成するときに、ストレージクラスを指定します。その後、動的プロビジョナーが自動的にバックインの PersistentVolume (PV) を作成します。
+
+== ストレージクラスオブジェクトの主要パラメーター
+
+* *プロビジョナー:* ボリュームを作成するプラグイン (例: AWS の場合 `ebs.csi.aws.com`, NFS の場合 `nfs.csi.k8s.io`).
+* *パラメーター:* 特定のプロビジョナーに渡されるキー値ペア (例: `type: gp3, encrypted: "true"`).
+* *リクレームポリシー:* PVC が削除されたときに、底上げストレージがどのようになるか。
+* *ボリュームバインディングモード:* PVC が使用されるタイミングを制御します。
+* *ボリューム拡張を許可する:* PVC を編集して拡張できるようになります。
+
+== ボリュームバインディングモード
+
+この設定は、特に多ゾーンクラスターまたはローカルストレージ (LVM/HostPath) を使用する場合に、パフォーマンスとスケジューリングにとって重要です。
+
+A. 即時
+* 動作: PVC が作成されたときに、ボリュームが作成されます。Pod が使用しているかどうかに関係なくです。
+* リスク: 多ゾーンクラスター (例: `AWS us-east-1a, 1b, 1c`) の場合、ボリュームがゾーン A に作成される可能性があります。その後、Pod がゾーン B のノードにスケジュールされると、ボリュームに接続できません。
+* 最適な使用方法: 単一ゾーンクラスターでの標準的なクラウドストレージ; トポロジーが関係ないシナリオ。
+
+B. WaitForFirstConsumer (推奨)
+* 動作: PVC を使用する Pod がスケジュールされるまで、ボリュームの作成が遅らせられます。
+* 利点: スケジューラーは、Pod が PVC を必要としていることを認識します。まず、Pod のノードを選択します (例: ゾーン B)。次に、ストレージプロビジョナーをトリガーして、ゾーン B にボリュームを作成します。
+* 必要な場合: ローカルストレージ (LVM)、HostPath、またはマルチゾーンクラウド環境。
+
+== リクレームポリシー
+
+PVC が削除されたときに、データの運び方を決定します。
+
+A. Delete (デフォルト)
+* 動作: PVC が削除されたときに、PV オブジェクトと実際のストレージインフラストラクチャー (例: AWS EBS ボリューム) が削除されます。
+* 使用例: エピメラルデータ、CI/CD ワークスペース、テスト。
+
+B. Retain
+* 動作: PVC が削除されたときに、PV オブジェクトはリリース状態に残ります。ストレージアレイ上の実際のデータは整理されています。
+* 回復: 管理者は、データを手動でクリーンアップするか、PV を削除してスペースを再利用する必要があります。
+* 使用例: データベース、重要な生産データで、意図的な削除を防ぐ必要がある場合。
+
+== デフォルトのストレージクラスの設定
+
+特定のストレージクラスをデフォルトにマークできます。ユーザーが storageClassName を指定せずに PVC を作成するときに、このクラスが使用されます。
+
+コマンド:
+[source,bash,role=execute]
+----
+oc patch storageclass <your-class-name> -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+----
+デフォルトの状態を削除する:
+[source,bash,role=execute]
+----
+oc patch storageclass <old-default-name> -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+----
+ヒント: デフォルトの SC を 1 つだけマークすることを確認して、混乱を避けてください。
+詳細については、[デフォルトのストレージクラス](https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/getting-started/default-storage-class.html) を参照してください。
+
+== ストレージクラスの例
+
+A. AWS EBS (高性能)
+
+この例では、CSI ドライバーを使用して gp3 ボリュームをプロビジョニングします。
+
+[source,yaml]
+----
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3-fast
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+parameters:
+  type: gp3
+  iops: "3000"
+  throughput: "125"
+  encrypted: "true"
+
+----
+OpenShift ドキュメント: https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/using-container-storage-interface-csi#persistent-storage-csi-ebs
+
+B. ローカルストレージ / LVM (パフォーマンス/データベース)
+
+Local Storage Operator または LVM Storage Operator がインストールされている必要があります。
+
+[source,yaml]
+----
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-lvm-storage
+provisioner: topolvm.io  # 使用するオペレーターの具体的なものに依存します
+volumeBindingMode: WaitForFirstConsumer # ローカルストレージの場合に重要です
+reclaimPolicy: Retain
+parameters:
+  "csi.storage.k8s.io/fstype": "xfs"
+
+----
+注: このストレージクラスは参照用の例です。LVMS オペレーターは自動で生成します。
+
+C. NFS (共有ストレージ / RWX)
+
+NFS CSI Driver Operator または外部 NFS プロビジョナーが必要です。
+
+[source,yaml]
+----
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-shared
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: nfs-server.example.com
+  share: /exports/data
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+mountOptions:
+  - nfsvers=4.1
+----
+
+OpenShift ドキュメント: https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/persistent-storage-using-local-storage
+
+== 確認とトラブルシューティングの検証コマンド
+
+ストレージクラスをリスト表示:
+
+[source,bash,role=execute]
+----
+oc get sc
+# 名前の (デフォルト) マーカーを探してください
+----
+
+クラスを説明:
+
+[source,bash,role=execute]
+----
+oc describe sc <name>
+----
+
+テストプロビジョニング: テスト PVCを作成:
+
+[source,yaml]
+----
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: test-pvc
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources: { requests: { storage: 1Gi } }
+  storageClassName: gp3-fast
+----
+
+OpenShift ドキュメント: https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/configuring-persistent-storage
+
+== 一般的なトラブルシューティングシナリオ
+
+* **問題 1:** PVC が保留状態に残る
+** 原因 A: volumeBindingMode が WaitForFirstConsumer であるが、まだ Pod が PVC を使用していません。
+   *** 解決策: この PVC を使用する Pod を作成します。
+** 原因 B: Pod をスケジュールするノードが十分なリソースがないため、ストレージが待機します。
+   *** 解決策: `oc get pods` を確認して、Pod が保留状態であるかどうかを確認します。
+
+* **問題 2:** Pod がボリュームに接続できない (トポロジー不一致)
+  ** エラー: ボリュームノードアフィニティー衝突
+  ** 原因: 多ゾーンクラスター (例: `AWS us-east-1a, 1b, 1c`) で、volumeBindingMode: Immediate を使用し、ボリュームがゾーン A に作成され、Pod がゾーン B にスケジュールされた場合です。
+  ** 解決策: PVC を削除して、WaitForFirstConsumer を使用するストレージクラスで再度作成します。
+
+* **問題 3:** "プロビジョナーが見つかりません"
+  ** 原因: provisioner に指定された CSI ドライバーがインストールされていないか、崩れています。
+  ** 解決策: 関連する名前空間 (例: openshift-cluster-csi-drivers) でストレージオペレーターのポッドを確認します。
+
+* **問題 4:** ボリューム拡張が失敗する
+  ** 原因: StorageClass で allowVolumeExpansion が false に設定されています。
+  ** 解決策: StorageClass を true に編集します。
+  NOTE: すべてのプロビジョナーがオンライン拡張をサポートしていないことに注意してください。
+
+== 要約
+
+このチュートリアルで学んだこと:
+
+* OpenShift でのストレージクラスの役割と、動的プロビジョニングのための異なるストレージ層の定義
+* ストレージクラスの主要パラメーター、プロビジョナー、リクレームポリシー、ボリュームバインディングモード、ボリューム拡張
+* `Immediate` と `WaitForFirstConsumer` ボリュームバインディングモードの違いと、それぞれの使用方法
+* AWS EBS、ローカル LVM、NFS ストレージバックエンド用のストレージクラス定義の作成方法
+* PVC が保留状態になる、トポロジー不一致、ボリューム拡張失敗などの一般的なトラブルシューティングシナリオ
+
+== 参照
+
+* [OpenShift - 永続ストレージの設定](https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/configuring-persistent-storage)
+* [OpenShift - Container Storage Interface](https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/using-container-storage-interface-csi)

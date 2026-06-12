@@ -1,0 +1,75 @@
+= ストレージ構成
+:navtitle:
+
+== 概要
+
+このモジュールでは、OpenShift Virtualization のストレージ構成をカバーします。これには、LVM Storage Operator、HostPath Provisioner、およびストレージ問題のトラブルシューティングが含まれます。
+
+VM のデプロイメントにおいて、プロパーなストレージ構成は必須です。VM は、ディスクとデータのために永続的なストレージが必要です。
+
+== 学習目標
+
+このセクションでは、以下のことを学習します。
+
+* LVM Storage Operator をインストールおよび構成して、ローカルディスクストレージを設定する方法
+* HostPath Provisioner を使用して、単純なローカルストレージを設定する方法
+* デフォルトのストレージクラスを設定して、自動プロビジョニングを行う方法
+* 一般的なストレージ問題をトラブルシューティングする方法
+* OpenShift Virtualization でのストレージ構成のベストプラクティス
+
+== OpenShift Virtualization のストレージオプション
+
+OpenShift Virtualization は、さまざまなストレージバックエンドをサポートしています。
+
+* **LVM Storage**: Logical Volume Manager を使用したローカルディスクストレージ (このモジュールでカバー)
+* **HostPath Provisioner**: 単純なローカルストレージプロビジョニング (このモジュールでカバー)
+* **Ceph/ODF**: 分散ブロックおよびファイルストレージ
+* **NFS**: ネットワークアタッチストレージ
+* **外部ストレージプロバイダー**: AWS EBS、Azure Disk など
+
+このモジュールでは、LVM Storage と HostPath Provisioner をローカルストレージシナリオに焦点を当て、Single Node OpenShift (SNO) およびベアメタルデプロイメントに適したものです。
+
+== 前提条件
+
+このセクションのチュートリアルを実行する前に、以下のことを確認してください。
+
+* OpenShift 4.18+ クラスター
+* クラスター管理者アクセス権
+* クラスターノードに少なくとも 1 つのスパレディスク
+* Linux ストレージ概念 (LVM、ブロックデバイス) の基本的な理解
+
+== セクション
+
+xref:lvm-operator.adoc[]::
+ローカルディスクに LVM Storage Operator をインストールおよび構成するためのステップバイステップのガイド。
+
+xref:lvm-troubleshooting.adoc[]::
+LVM ストレージ問題の診断および解決に使用するトラブルシューティングガイド。
+
+xref:hostpath-provisioner.adoc[]::
+開発、テスト、および単一ノードクラスターシナリオで HostPath Provisioner を使用してローカルストレージを設定する方法。
+xref:multi-disk-configuration.adoc[]::
+異なる StorageClasses を使用して、異なるストレージ層に VM を複数ディスクで構成する方法。
+
+== デフォルトのストレージクラスの重要性
+
+OpenShift Virtualization でデフォルトのストレージクラスを設定することは重要です。
+
+* **ブートソースイメージ**: DataSource OS イメージはデフォルトのストレージクラスが必要
+* **自動プロビジョニング**: VM を作成する際にストレージを指定する必要がなくなります
+* **テンプレートサポート**: VM テンプレートはボックスで動作します
+* **簡素化された操作**: クラスター全体で一貫したストレージプロビジョニング
+
+LVM operator ガイドの xref:lvm-operator.adoc#_step_5_set_default_storageclass[ステップ 5: デフォルトのストレージクラスを設定]を参照してください。
+
+== 次のステップ
+
+このモジュールを完了した後は、以下のことができます。
+
+* xref:networking:index.adoc[ネットワーキング] を構成して、VM に
+* 仮想マシンを作成および構成する
+
+== 参照
+
+* xref:getting-started:default-storage-class.adoc[デフォルトのストレージクラスを設定]
+* link:https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/persistent-storage-using-local-storage#persistent-storage-using-lvms[OpenShift LVM Storage ドキュメント,window=_blank]

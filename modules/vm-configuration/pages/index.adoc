@@ -1,0 +1,66 @@
+= 仮想マシン構成
+:navtitle:
+
+== 概要
+
+このセクションでは、OpenShift Virtualization での仮想マシンの構成とカスタマイズをカバーします。これには、DNS 解決、リモートアクセス方法、ノード配置制御、ホットプラグ、および VM テンプレートが含まれます。
+
+== 学習目標
+
+OpenShift Virtualization で仮想マシンを構成およびカスタマイズする方法を学びます。
+
+* VM-to-VM と Pod-to-VM の通信用の内部 DNS 解決
+* Linux と Windows VM に対するリモートアクセス方法
+* セレクター、アフィニティー、反アフィニティー規則を使用したノード配置
+* 専用ノードでのインフラストラクチャーコンポーネントの配置
+* 実行中の VM にストレージボリュームとネットワークインターフェースのホットプラグ
+* 再現可能なデプロイメントのためのカスタム VM テンプレートの作成
+
+== 前提条件
+
+VM 構成を開始する前に、以下のものを確保してください。
+
+* OpenShift 4.18+ で OpenShift Virtualization オペレーターがインストールされている
+* 仮想マシンとネットワーキングの基本的な理解
+* YAML 文法の理解
+* CLI ツールがインストールされている: `oc`, `virtctl`, `kubectl`
+
+== トピック
+
+xref:internal-dns-for-vms.adoc[]::
+Kubernetes サービスを使用して、クラスター内で VM-to-VM と Pod-to-VM の通信用の内部 DNS 解決を構成およびカスタマイズします。
+
+xref:remote-access-linux-vms.adoc[]::
+コンソール、VNC、virtctl を介した SSH、NodePort サービス、ポートフォワーディング、または直接ネットワークアクセスなど、Linux VM に対する複数のリモートアクセス方法。
+
+xref:remote-access-linux-troubleshooting.adoc[]::
+VM リモートアクセス方法のトラブルシューティングガイド、診断コマンド、および一般的な問題の解決策。
+
+xref:remote-access-windows-vms.adoc[]::
+外部の Remote Desktop Protocol (RDP) アクセスを Windows VM に設定するための LoadBalancer または NodePort サービス。
+
+xref:infrastructure-node-placement.adoc[]::
+HyperConverged カスタムリソースを使用して、専用インフラストラクチャーノードと高可用性を実現するために、OpenShift Virtualization インフラストラクチャー コンポーネント (virt-controller、virt-api、virt-handler、CDI) の配置を制御します。
+
+xref:node-placement-affinity.adoc[]::
+ノードセレクター、ノードアフィニティー、および Pod アフィニティー/反アフィニティー規則を使用して、パフォーマンス、可用性、ワークロード分離を実現するためにクラスターノード間で VM の配置を制御します。
+
+xref:hotplug-volumes-interfaces.adoc[]::
+virtctl を使用して、実行中の VM にストレージボリュームとネットワークインターフェースを動的に追加および削除し、ゼロダウンタイムで行います。
+
+xref:vm-templates.adoc[]::
+OpenShift Virtualization コンソールおよびコマンドラインから、再現可能なデプロイメントのためのカスタム VM テンプレートを作成します。
+
+== 関連トピック
+
+* xref:getting-started:index.adoc[入門] - 初期設定と前提条件
+* xref:storage:index.adoc[ストレージ構成] - VM 用の永続ストレージ
+* xref:networking:index.adoc[ネットワーク構成] - ネットワークインフラストラクチャーの設定
+* xref:performance:index.adoc[パフォーマンスチューニング] - CPU ピニング、NUMA、hugepages、リアルタイム VM
+* xref:vm-lifecycle:index.adoc[VM ライフサイクル] - ゴールデンイメージ、クローン、スナップショット、ブート構成
+
+== 追加リソース
+
+* link:https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/virtualization/about#about-virt[OpenShift Virtualization ドキュメント,window=_blank]
+* link:https://cloudinit.readthedocs.io/[クラウド-init 公式ドキュメント,window=_blank]
+* link:https://kubevirt.io/user-guide/[KubeVirt ユーザーガイド,window=_blank]

@@ -1,0 +1,380 @@
+= 複数ディスク VM の構成に異なるストレージクラスを使用する
+:navtitle: 複数ディスク VM
+
+== 概要
+
+このチュートリアルでは、各ディスクが異なるストレージクラスを使用する複数ディスクの仮想マシンを構成する方法を示します。ストレージティアリング (OS ブートディスク用に高速なストレージ、データボリューム用に低価格で遅いストレージ) を可能にします。このパターンは、データベースワークロード、アプリケーションサーバー、OS とアプリケーションデータを分離する任意の VM によく使用されます。
+
+2つのディスクを作成します: ブートディスク (デフォルトのストレージクラス) とデータディスク (2番目のストレージクラス)。両方のディスクがゲストOS でアクセス可能であることを確認します。
+
+== 前提条件
+
+* **OpenShift 4.18+** に OpenShift Virtualization オペレーターがインストールされている
+* **クラスター管理者権限** (`system:admin` または等価)
+* **`oc` CLI** と **`virtctl` CLI** がインストールされている
+* **デフォルトのストレージクラス** (例: `lvms-vg1`) が構成されている
+
+テスト済みバージョン:
+----
+OpenShift 4.20、4.21
+----
+
+== ステップ 1: ディスクとボリュームマッピングを理解する
+
+KubeVirt VM 仕様では、ディスクとボリュームが協力します:
+
+* **`spec.template.spec.domain.devices.disks`** は、ゲストOS にどのようにディスクを表示するか (バスタイプ、ディスクの順序) を定義します。
+* **`spec.template.spec.volumes`** は、各ディスクの背後にあるストレージ (PVC、DataVolume、containerDisk、cloudInitNoCloud) を定義します。
+* 各ディスクの `name` は、対応するボリュームの `name` に一致する必要があります。
+
+ディスクは、定義された順序で `/dev/vda`、`/dev/vdb` などとしてゲスト内で表示されます。
+
+== ステップ 2: ネームスペースの作成
+
+[source,bash,role=execute]
+----
+oc create namespace multi-disk-demo
+----
+
+== ステップ 3: 2番目のストレージクラスの作成 (オプション)
+
+クラスターに 1 つのストレージクラスしかない場合は、両方のディスクに同じストレージクラスを指定してもこのチュートリアルを使用できます。しかし、ストレージティアリングを示すために、2番目のストレージクラスを作成できます。
+
+LVM Storage を使用するクラスターでは、既にデフォルトの `lvms-vg1` ストレージクラスがあります。このチュートリアルでは、異なるストレージティアリングをシミュレートするために、 `Retain` 再利用ポリシーを持つ 2番目のストレージクラスを作成します:
+
+xref:attachment$multi-disk-configuration/sc-data-retain.yaml[sc-data-retain.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: lvms-vg1-retain
+provisioner: topolvm.io
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+EOF
+----
+
+両方のストレージクラスを確認します:
+
+[source,bash,role=execute]
+----
+oc get storageclass
+----
+
+期待される出力:
+----
+NAME                 PROVISIONER   RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+lvms-vg1 (default)   topolvm.io    Delete          WaitForFirstConsumer   true                   30d
+lvms-vg1-retain      topolvm.io    Retain          WaitForFirstConsumer   true                   5s
+----
+
+== ステップ 4: 複数ディスクの VM のデプロイ
+
+3つのディスクを使用した VMを作成します:
+
+* **rootdisk**: ブートディスク (30Gi、デフォルトのストレージクラス)、Fedora ブートソースからクローン
+* **datadisk**: データディスク (10Gi、2番目のストレージクラス)、空のボリューム
+* **cloudinitdisk**: Cloud-init 設定ディスク
+
+警告: この例の cloud-init パスワードはデモのためのものです。実際の生産環境では、強力で一意のパスワードまたは SSH キー認証を使用してください。
+
+xref:attachment$multi-disk-configuration/vm-multi-disk.yaml[vm-multi-disk.yaml をダウンロード]
+
+[source,bash,role=execute]
+----
+oc apply -f - <<EOF
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: multi-disk-vm
+  namespace: multi-disk-demo
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: multi-disk-vm
+    spec:
+      domain:
+        devices:
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+            bootOrder: 1
+          - name: datadisk
+            disk:
+              bus: virtio
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+        resources:
+          requests:
+            memory: 1Gi
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - name: rootdisk
+        dataVolume:
+          name: multi-disk-rootdisk
+      - name: datadisk
+        dataVolume:
+          name: multi-disk-datadisk
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            password: redhat
+            chpasswd:
+              expire: false
+  dataVolumeTemplates:
+  - metadata:
+      name: multi-disk-rootdisk
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 30Gi
+        storageClassName: lvms-vg1
+      source:
+        registry:
+          pullMethod: node
+          url: docker://quay.io/containerdisks/fedora:latest
+  - metadata:
+      name: multi-disk-datadisk
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: lvms-vg1-retain
+      source:
+        blank: {}
+EOF
+----
+
+=== 重要な構成詳細
+
+* **`bootOrder: 1`** は、rootdisk で VM が OS ディスクからブートされるようにします。
+* **`source.registry`** は、rootdisk で Fedora コンテナーディスクイメージをプルします。
+* **`source.blank: {}`** は、datadisk で空の未形式化ボリュームを作成します。
+* `dataVolumeTemplates` の各エントリーは、異なる `storageClassName` を指定できます。
+* `devices.disks` のディスク名は、`volumes` のボリューム名に一致し、これらは `dataVolumeTemplates` メタデータ名に一致する必要があります。
+
+== ステップ 5: VM とディスクの検証
+
+両方の DataVolume が完了し、VM が起動するのを待ちます:
+
+[source,bash,role=execute]
+----
+oc get dv -n multi-disk-demo -w
+----
+
+両方が `Succeeded` になったら、VM を確認します:
+
+[source,bash,role=execute]
+----
+oc get vm -n multi-disk-demo
+----
+
+期待される出力:
+----
+NAME            AGE   STATUS    READY
+multi-disk-vm   3m    Running   True
+----
+
+PVC がそれぞれのストレージクラスに関連付けられていることを確認します:
+
+[source,bash,role=execute]
+----
+oc get pvc -n multi-disk-demo
+----
+
+期待される出力:
+----
+NAME                   STATUS   VOLUME       CAPACITY   ACCESS MODES   STORAGECLASS      AGE
+multi-disk-rootdisk    Bound    pvc-xxxx     30Gi       RWO            lvms-vg1          3m
+multi-disk-datadisk    Bound    pvc-yyyy     10Gi       RWO            lvms-vg1-retain   3m
+----
+
+== ステップ 6: VM 内でデータディスクのフォーマットとマウント
+
+VM コンソールにアクセスします:
+
+[source,bash,role=execute]
+----
+virtctl console multi-disk-vm -n multi-disk-demo
+----
+
+ユーザー名 `fedora` とパスワード `redhat` でログインします。
+
+ゲスト内のすべてのブロックデバイスをリスト表示します:
+
+[source,bash]
+----
+lsblk
+----
+
+期待される出力:
+----
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+vda    252:0    0   30G  0 disk
+|-vda1 252:1    0    1M  0 part
+|-vda2 252:2    0  1.9G  0 part [SWAP]
+|-vda3 252:3    0    1G  0 part /boot
+`-vda4 252:4    0 27.1G  0 part /
+vdb    252:16   0   10G  0 disk
+vdc    252:32   0    1M  0 disk
+----
+
+データディスクは `vdb` (10G、未形式化) で表示されます。XFS でフォーマットします:
+
+[source,bash]
+----
+sudo mkfs.xfs /dev/vdb
+----
+
+マウントポイントを作成し、ディスクをマウントします:
+
+[source,bash]
+----
+sudo mkdir -p /mnt/data
+sudo mount /dev/vdb /mnt/data
+----
+
+マウントを確認します:
+
+[source,bash]
+----
+df -h /mnt/data
+----
+
+期待される出力:
+----
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vdb         10G   105M  9.9G   2% /mnt/data
+----
+
+テストファイルを書き込みます:
+
+[source,bash]
+----
+sudo sh -c "echo 'Multi-disk test data' > /mnt/data/test.txt"
+----
+
+確認します:
+
+[source,bash]
+----
+cat /mnt/data/test.txt
+----
+
+永続的なマウントをリブート後に作成するために、`/etc/fstab` に追加します:
+
+[source,bash]
+----
+sudo sh -c "echo '/dev/vdb /mnt/data xfs defaults 0 0' >> /etc/fstab"
+----
+
+`Ctrl+]` を押してコンソールから退出します。
+
+== ステップ 7: ストレージの分離を検証する
+
+各 PVC が異なるストレージクラスと PersistentVolume を使用していることを確認します:
+
+[source,bash,role=execute]
+----
+oc get pvc multi-disk-rootdisk -n multi-disk-demo -o jsonpath='StorageClass: {.spec.storageClassName}, Volume: {.spec.volumeName}, Capacity: {.status.capacity.storage}'
+----
+
+[source,bash,role=execute]
+----
+oc get pvc multi-disk-datadisk -n multi-disk-demo -o jsonpath='StorageClass: {.spec.storageClassName}, Volume: {.spec.volumeName}, Capacity: {.status.capacity.storage}'
+----
+
+これにより、各ディスクが独立してプロビジョニングされ、個別に管理できること (例: 異なるバックアップポリシー、展開スケジュール、または再利用行動) が確認されます。
+
+== 複数ディスク VM の使用例
+
+[cols="1,1,1",options="header"]
+|===
+| 使用例
+| ブートディスク
+| データディスク
+
+| データベースサーバー
+| 高速 SSD (OS + バイナリ)
+| 大容量 HDD (データファイル、ログ)
+
+| アプリケーションサーバー
+| 標準ストレージ (OS)
+| 高速 SSD (アプリケーション状態)
+
+| 開発 VM
+| 共有ストレージ (OS テンプレート)
+| ローカルストレージ (スクラッチ空間)
+
+| ロギング/モニタリング
+| 標準ストレージ (OS)
+| 大容量ストレージ (ログ保持)
+|===
+
+== クリーンアップ
+
+ネームスペースを削除して、VM、PVC、および DataVolumes を削除します:
+
+[source,bash,role=execute]
+----
+oc delete namespace multi-disk-demo
+----
+
+2番目のストレージクラスを削除します:
+
+[source,bash,role=execute]
+----
+oc delete storageclass lvms-vg1-retain
+----
+
+`lvms-vg1-retain` ストレージクラスが `reclaimPolicy: Retain` を使用しているため、PVC が削除されたときに PersistentVolume が自動的に削除されないことに注意してください。リリースされた PV を確認します:
+
+[source,bash,role=execute]
+----
+oc get pv | grep Released
+----
+
+リリースされた PV が見つかった場合は、手動で削除してストレージを再利用します:
+
+[source,bash,role=execute]
+----
+oc delete pv <pv-name>
+----
+
+== 要約
+
+このチュートリアルで学んだこと:
+
+* 異なるストレージクラスを使用した複数ディスクの VM の構成
+* `dataVolumeTemplates` を使用して、各ディスクのストレージを独立に定義する
+* ブート順序を設定して、VM がどのディスクからブートするかを制御する
+* 追加のストレージのための空のボリュームの作成
+* ゲスト OS 内で追加のディスクのフォーマットとマウント
+* VM のストレージティアリングパターンの理解
+
+== 参照
+
+* link:https://kubevirt.io/user-guide/storage/disks_and_volumes/[ディスクとボリューム - KubeVirt ユーザーガイド,window=_blank]
+* link:https://docs.redhat.com/ja/documentation/openshift_container_platform/4.18/html/virtualization/storage#virt-configuring-storage-profile[ストレージプロファイルの構成 - OpenShift ドキュメント,window=_blank]
+* xref:vm-lifecycle:boot-order-boot-sources.adoc[ブート順序とブートソース]
+* xref:lvm-operator.adoc[LVM Storage Operator]

@@ -1,0 +1,55 @@
+= 開始
+:navtitle:
+
+== 概要
+
+このモジュールでは、OpenShift Virtualization に必要な基本的なツールと設定をカバーします。OpenShift Virtualization に新しい方や既存の方でも、迅速に作業を開始できるように、これらのガイドが役立ちます。
+
+== 学習目標
+
+このセクションでは、以下のことを学びます。
+
+* OpenShift Virtualization での作業に必要な前提条件と必要なツール
+* 仮想マシンの管理に使用する virtctl コマンドラインツールの基本的な使用法
+* 仮想マシンデプロイメントのデフォルトストレージの構成方法
+* Cloud-init の基礎と VM 初期化パターン
+
+== 前提条件
+
+このセクションのチュートリアルを進める前に、以下のものを確保してください。
+
+* OpenShift 4.18+ クラスターに OpenShift Virtualization オペレーターがインストールされている
+* クラスター管理者アクセスまたは適切な RBAC 権限
+* CLI ツールがインストールされている: `oc`, `kubectl`, `virtctl`
+* Kubernetes/OpenShift の概念についての基本的な理解
+
+== セクション
+
+xref:prerequisites.adoc[]::
+OpenShift Virtualization での作業に必要な詳細な要件とセットアップ手順。
+
+xref:install-openshift-virtualization.adoc[]::
+クラスターに OpenShift Virtualization オペレーターをインストールおよび構成する。
+
+xref:virtctl-basics.adoc[]::
+仮想マシンの管理に使用する virtctl コマンドの基本的なコマンドを学ぶ。
+
+xref:default-storage-class.adoc[]::
+仮想マシンデプロイメントのためのデフォルトストレージクラスの構成。
+
+xref:create-vm-web-console.adoc[]::
+テンプレートを使用した OpenShift Web コンソールから仮想マシンを作成する。
+
+xref:vm-lifecycle-states.adoc[]::
+仮想マシンのライフサイクル状態と基本的な操作を理解する。
+
+xref:cloud-init-fundamentals.adoc[]::
+Cloud-init の基礎、実行段階、一般的なモジュール、VirtualMachine マニフェストに cloud-init 設定を埋め込む方法を学ぶ。
+
+== 次のステップ
+
+このモジュールを完了した後、以下のことに進むことができます。
+
+* xref:storage:index.adoc[ストレージ構成] - ストレージオプションの詳細な探求
+* xref:networking:index.adoc[ネットワーク構成] - VM のネットワーク設定
+* xref:networking:cloud-init-troubleshooting.adoc[Cloud-init トラブルシューティング] - cloud-init 問題の診断手順
