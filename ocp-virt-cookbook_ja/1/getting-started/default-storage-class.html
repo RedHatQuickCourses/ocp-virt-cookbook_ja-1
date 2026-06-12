@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>デフォルトストレージクラスの設定 :: OpenShift Virtualization cookbook</title>
+    <title>Untitled :: OpenShift Virtualization cookbook</title>
     <link rel="prev" href="install-openshift-virtualization.html">
     <link rel="next" href="create-vm-web-console.html">
     <meta name="generator" content="Antora 3.2.0-alpha.12">
@@ -44,7 +44,7 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../index.html">Introduction</a>
+    <a class="nav-link" href="../index.html">index.adoc</a>
   </li>
 </ul>
   </li>
@@ -52,28 +52,28 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="index.html">はじめに</a>
+    <a class="nav-link" href="index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="prerequisites.html">前提条件</a>
+    <a class="nav-link" href="prerequisites.html">prerequisites.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="install-openshift-virtualization.html">OpenShift Virtualization をインストール</a>
+    <a class="nav-link" href="install-openshift-virtualization.html">install-openshift-virtualization.adoc</a>
   </li>
   <li class="nav-item is-current-page" data-depth="2">
-    <a class="nav-link" href="default-storage-class.html">ストレージセットアップ</a>
+    <a class="nav-link" href="default-storage-class.html">default-storage-class.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="create-vm-web-console.html">ウェブコンソールからのVM作成</a>
+    <a class="nav-link" href="create-vm-web-console.html">create-vm-web-console.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="vm-lifecycle-states.html">VMライフサイクルステート</a>
+    <a class="nav-link" href="vm-lifecycle-states.html">vm-lifecycle-states.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="virtctl-basics.html">virtctlの基本</a>
+    <a class="nav-link" href="virtctl-basics.html">virtctl の基本</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="cloud-init-fundamentals.html">Cloud-initの基本</a>
+    <a class="nav-link" href="cloud-init-fundamentals.html">cloud-init-fundamentals.adoc</a>
   </li>
 </ul>
   </li>
@@ -89,7 +89,7 @@
     <a class="nav-link" href="../storage/lvm-operator.html">lvm-operator.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/lvm-troubleshooting.html">lvm-troubleshooting.adoc</a>
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../storage/hostpath-provisioner.html">hostpath-provisioner.adoc</a>
@@ -138,7 +138,7 @@
     <a class="nav-link" href="../networking/sriov-secondary.html">sriov-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM Ingress とルート</a>
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">vm-ingress-routes.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ovs-bridge-troubleshooting.adoc</a>
@@ -290,8 +290,8 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
-    <li><a href="index.html">はじめに</a></li>
-    <li><a href="default-storage-class.html">ストレージセットアップ</a></li>
+    <li><a href="index.html">index.adoc</a></li>
+    <li><a href="default-storage-class.html">default-storage-class.adoc</a></li>
   </ul>
 </nav>
 </div>
@@ -300,453 +300,12 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">デフォルトストレージクラスの設定</h1>
-<div class="sect1">
-<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>このチュートリアルでは、OpenShift Virtualization のデフォルトストレージクラスを設定する方法を説明します。デフォルトストレージクラスは、組み込みの DataSource イメージ (Fedora、RHEL、CentOS Stream、Windows) からブートソースを自動的にプロビジョニングするために必要です。これがないと、これらの DataSource は保留状態のままであり、VM を作成できません。デフォルトを設定することで、明示的にストレージが定義されていない場合に、仮想マシンとデータボリュームが指定されたストレージを自動的に使用するようになり、デプロイメントと管理が簡素化されます。</p>
-</div>
-<div class="paragraph">
-<p>テスト済みバージョン:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>OpenShift 4.19, 4.20</pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>開始するには、次のものが必要です。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>OpenShift クラスター</strong>: OpenShift Virtualization がインストールされている OpenShift クラスター</p>
-</li>
-<li>
-<p><strong>クラスター管理者アクセス</strong>: クラスター管理者権限を持つクラスターへのアクセス</p>
-</li>
-<li>
-<p><strong>ストレージクラス</strong>: クラスターに少なくとも1つの StorageClass が設定されていること</p>
-</li>
-<li>
-<p><strong>ストレージプロビジョナー</strong>: 動的プロビジョニングをサポートするストレージプロビジョナー</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_ステップ_1_利用可能なストレージクラスの確認"><a class="anchor" href="#_ステップ_1_利用可能なストレージクラスの確認"></a>ステップ 1: 利用可能なストレージクラスの確認</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>まず、クラスターで利用可能なストレージクラスを確認し、すでにデフォルトストレージクラスが設定されているかどうかを特定します。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get sc</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>このコマンドは、すべてのストレージクラスを名前とプロビジョナーとともに一覧表示します。名前の横に <code>(default)</code> と表示されているストレージクラスを探してください。これは、現在デフォルトとして設定されていることを示します。</p>
-</div>
-<div class="paragraph">
-<p>デフォルトストレージクラスがない場合の出力例:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>NAME                    PROVISIONER                             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
-ceph-rbd-sc             rbd.csi.ceph.com                        Delete          Immediate              true                   2d
-hostpath-provisioner    kubevirt.io/hostpath-provisioner        Delete          WaitForFirstConsumer   false                  1d
-local-storage           kubernetes.io/no-provisioner            Delete          WaitForFirstConsumer   false                  1d</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>既存のデフォルトストレージクラスがある場合の出力例:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>NAME                    PROVISIONER                             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
-ceph-rbd-sc (default)   rbd.csi.ceph.com                        Delete          Immediate              true                   2d
-hostpath-provisioner    kubevirt.io/hostpath-provisioner        Delete          WaitForFirstConsumer   false                  1d
-local-storage           kubernetes.io/no-provisioner            Delete          WaitForFirstConsumer   false                  1d</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>次の点に注意してください。</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>デフォルトとして設定したいストレージクラスの名前</p>
-</li>
-<li>
-<p>すでにデフォルトストレージクラスが設定されているかどうか</p>
-</li>
-</ol>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_ステップ_2_既存のデフォルトの削除_必要な場合"><a class="anchor" href="#_ステップ_2_既存のデフォルトの削除_必要な場合"></a>ステップ 2: 既存のデフォルトの削除 (必要な場合)</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>別のストレージクラスがすでにデフォルトとして設定されている場合、新しいデフォルトを設定する前に、そのアノテーションを最初に削除する必要があります。クラスターには1つのデフォルトストレージクラスしか設定できません。</p>
-</div>
-<div class="paragraph">
-<p>ストレージクラスからデフォルトのアノテーションを削除するには:</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc annotate sc &lt;the-old-default-storage-class-name&gt; storageclass.kubernetes.io/is-default-class-</code></pre>
-</div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-アノテーションキーの末尾のハイフンは、アノテーションを削除するものです。
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_ステップ_3_ストレージクラスへのアノテーション追加"><a class="anchor" href="#_ステップ_3_ストレージクラスへのアノテーション追加"></a>ステップ 3: ストレージクラスへのアノテーション追加</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>選択したストレージクラスにアノテーションを追加します。このアノテーションは、OpenShift に対して、この特定のストレージクラスがデフォルトであるべきであることを伝えます。</p>
-</div>
-<div class="paragraph">
-<p>アノテーションは次のとおりです: <code>storageclass.kubernetes.io/is-default-class: "true"</code></p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc annotate sc &lt;your-storage-class-name&gt; storageclass.kubernetes.io/is-default-class="true"</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>たとえば、ストレージクラスの名前が <code>ceph-rbd-sc</code> の場合:</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc annotate sc ceph-rbd-sc storageclass.kubernetes.io/is-default-class="true"</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_ステップ_4_デフォルトストレージクラスの確認"><a class="anchor" href="#_ステップ_4_デフォルトストレージクラスの確認"></a>ステップ 4: デフォルトストレージクラスの確認</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>アノテーションを適用した後、変更が有効になっていることを確認します。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get sc</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>デフォルト設定後の出力例:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>NAME                    PROVISIONER                             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
-ceph-rbd-sc (default)   rbd.csi.ceph.com                        Delete          Immediate              true                   2d
-hostpath-provisioner    kubevirt.io/hostpath-provisioner        Delete          WaitForFirstConsumer   false                  1d
-local-storage           kubernetes.io/no-provisioner            Delete          WaitForFirstConsumer   false                  1d</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>選択したストレージクラス名の横に <code>(default)</code> と表示されるはずです。</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_ステップ_5_デフォルトストレージクラスのテスト"><a class="anchor" href="#_ステップ_5_デフォルトストレージクラスのテスト"></a>ステップ 5: デフォルトストレージクラスのテスト</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>デフォルトストレージクラスが正しく機能していることを確認するための簡単なテストを作成します。ストレージクラスを指定せずに PVC を作成します。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: test-default-storage
-  namespace: default
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-EOF</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>次に、PVC が正しいストレージクラスで作成されたことを確認します。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pvc test-default-storage -n default</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>出力例:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>NAME                   STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-test-default-storage   Pending                                      lvms-vg1       0s</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>PVC は <code>Pending</code> ステータスですが、デフォルトストレージクラス (この例では <code>lvms-vg1</code>) に自動的に割り当てられました。</p>
-</div>
-<div class="sect2">
-<h3 id="_ボリュームバインディングモードの理解"><a class="anchor" href="#_ボリュームバインディングモードの理解"></a>ボリュームバインディングモードの理解</h3>
-<div class="paragraph">
-<p>ほとんどのストレージクラスは <code>WaitForFirstConsumer</code> ボリュームバインディングモードを使用するため、PVC は <code>Pending</code> ステータスのままになります。これは期待される動作です。</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 40%;">
-<col style="width: 40%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Binding Mode</th>
-<th class="tableblock halign-left valign-top">動作</th>
-<th class="tableblock halign-left valign-top">ユースケース</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>WaitForFirstConsumer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PVC を使用する Pod がスケジュールされたときにのみ PV がプロビジョニングされます</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Pod と同じノードにストレージが作成されることを保証します。トポロジーを認識するストレージ (LVM、ローカルストレージ) に適しています</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Immediate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PVC が作成されるとすぐに PV がプロビジョニングされます</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">任意のノードからアクセス可能なネットワークアタッチストレージ (NFS、Ceph、クラウドストレージ) に適しています</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>ストレージクラスのバインディングモードを確認するには:</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get sc &lt;storage-class-name&gt; -o jsonpath='{.volumeBindingMode}'</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_ステップ_6_デフォルトストレージを使用した_vm_のデプロイ"><a class="anchor" href="#_ステップ_6_デフォルトストレージを使用した_vm_のデプロイ"></a>ステップ 6: デフォルトストレージを使用した VM のデプロイ</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>これで、データボリュームにデフォルトストレージクラスを自動的に使用する仮想マシンをデプロイできます。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f - &lt;&lt;EOF
-apiVersion: kubevirt.io/v1
-kind: VirtualMachine
-metadata:
-  name: test-vm-default-storage
-  namespace: default
-spec:
-  runStrategy: Always
-  dataVolumeTemplates:
-  - metadata:
-      name: test-vm-disk
-    spec:
-      pvc:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 10Gi
-      sourceRef:
-        kind: DataSource
-        name: fedora
-        namespace: openshift-virtualization-os-images
-  template:
-    metadata:
-      labels:
-        kubevirt.io/vm: test-vm-default-storage
-    spec:
-      domain:
-        devices:
-          disks:
-          - name: datavolumedisk
-            disk:
-              bus: virtio
-        resources:
-          requests:
-            memory: 1Gi
-            cpu: 1
-      networks:
-      - name: default
-        pod: {}
-      volumes:
-      - name: datavolumedisk
-        dataVolume:
-          name: test-vm-disk
-EOF</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_トラブルシューティング"><a class="anchor" href="#_トラブルシューティング"></a>トラブルシューティング</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_よくある問題"><a class="anchor" href="#_よくある問題"></a>よくある問題</h3>
-<div class="sect3">
-<h4 id="_複数のデフォルトストレージクラス"><a class="anchor" href="#_複数のデフォルトストレージクラス"></a>複数のデフォルトストレージクラス</h4>
-<div class="paragraph">
-<p>複数のストレージクラスがデフォルトとしてマークされている場合は、1つを除くすべてのアノテーションを削除します。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get sc -o custom-columns=NAME:.metadata.name,DEFAULT:.metadata.annotations.storageclass\.kubernetes\.io/is-default-class</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_ストレージクラスが見つからない"><a class="anchor" href="#_ストレージクラスが見つからない"></a>ストレージクラスが見つからない</h4>
-<div class="paragraph">
-<p>アノテーションを適用する前に、ストレージクラスが存在することを確認してください。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get sc &lt;storage-class-name&gt;</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_権限拒否"><a class="anchor" href="#_権限拒否"></a>権限拒否</h4>
-<div class="paragraph">
-<p>クラスター管理者権限があることを確認してください。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc auth can-i create storageclass --all-namespaces</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_確認コマンド"><a class="anchor" href="#_確認コマンド"></a>確認コマンド</h3>
-<div class="paragraph">
-<p>すべてのストレージクラスとそのデフォルトステータスを確認します。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get sc -o wide</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>特定のストレージクラスに関する詳細情報を表示します。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc describe sc &lt;storage-class-name&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>PVC とそのストレージクラスを一覧表示します。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pvc --all-namespaces -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,STORAGECLASS:.spec.storageClassName</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_ベストプラクティス"><a class="anchor" href="#_ベストプラクティス"></a>ベストプラクティス</h2>
-<div class="sectionbody">
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p><strong>適切なストレージの選択</strong>: VM に必要なパフォーマンスと機能 (例: 高速 I/O、スナップショット、暗号化) を提供するストレージクラスを選択します。</p>
-</li>
-<li>
-<p><strong>ワークロード要件の考慮</strong>: 異なるワークロードでは、異なるストレージ特性が必要になる場合があります。デフォルトに依存するのではなく、重要なワークロードには特定のストレージクラスを使用することを検討してください。</p>
-</li>
-<li>
-<p><strong>ストレージ使用状況の監視</strong>: デフォルトストレージクラスがニーズを満たしていることを確認するために、ストレージの使用状況とパフォーマンスを定期的に監視します。</p>
-</li>
-<li>
-<p><strong>選択内容の文書化</strong>: 将来の参照とトラブルシューティングのために、特定のストレージクラスをデフォルトとして選択した理由を文書化します。</p>
-</li>
-</ol>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_まとめ"><a class="anchor" href="#_まとめ"></a>まとめ</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>このチュートリアルでは、次のことを学びました。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>利用可能なストレージクラスを表示し、既存のデフォルトを特定する方法</p>
-</li>
-<li>
-<p>既存のデフォルトストレージクラスアノテーションを削除する方法</p>
-</li>
-<li>
-<p><code>storageclass.kubernetes.io/is-default-class</code> を使用してストレージクラスをデフォルトとしてアノテーションを付ける方法</p>
-</li>
-<li>
-<p>テスト PVC を作成し、VM をデプロイしてデフォルトストレージクラスを確認する方法</p>
-</li>
-<li>
-<p>OpenShift Virtualization でデフォルトストレージクラスを選択および管理するためのベストプラクティス</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_関連項目"><a class="anchor" href="#_関連項目"></a>関連項目</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/understanding-persistent-storage#persistent-storage-overview_storage-classes" target="_blank" rel="noopener">OpenShift - 永続ストレージ</a></p>
-</li>
-<li>
-<p><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/storage" target="_blank" rel="noopener">OpenShift Virtualization - ストレージ</a></p>
-</li>
-</ul>
-</div>
-</div>
+<p>Error: Unable to get response from Gemini model after multiple attempts.</p>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="install-openshift-virtualization.html">OpenShift Virtualization をインストール</a></span>
-  <span class="next"><a href="create-vm-web-console.html">ウェブコンソールからのVM作成</a></span>
+  <span class="prev"><a href="install-openshift-virtualization.html">install-openshift-virtualization.adoc</a></span>
+  <span class="next"><a href="create-vm-web-console.html">create-vm-web-console.adoc</a></span>
 </nav>
 </article>
   </div>

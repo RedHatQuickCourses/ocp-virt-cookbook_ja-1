@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>用語集 :: OpenShift Virtualization cookbook</title>
+    <title>Untitled :: OpenShift Virtualization cookbook</title>
     <link rel="prev" href="../api/api-component-overview.html">
     <meta name="generator" content="Antora 3.2.0-alpha.12">
     <link rel="stylesheet" href="../../../_/css/site.css">
@@ -43,7 +43,7 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../index.html">Introduction</a>
+    <a class="nav-link" href="../index.html">index.adoc</a>
   </li>
 </ul>
   </li>
@@ -51,28 +51,28 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../getting-started/index.html">はじめに</a>
+    <a class="nav-link" href="../getting-started/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+    <a class="nav-link" href="../getting-started/prerequisites.html">prerequisites.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift Virtualization をインストール</a>
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">install-openshift-virtualization.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージセットアップ</a>
+    <a class="nav-link" href="../getting-started/default-storage-class.html">default-storage-class.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/create-vm-web-console.html">ウェブコンソールからのVM作成</a>
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">create-vm-web-console.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VMライフサイクルステート</a>
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">vm-lifecycle-states.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctlの基本</a>
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">Cloud-initの基本</a>
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">cloud-init-fundamentals.adoc</a>
   </li>
 </ul>
   </li>
@@ -88,7 +88,7 @@
     <a class="nav-link" href="../storage/lvm-operator.html">lvm-operator.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/lvm-troubleshooting.html">lvm-troubleshooting.adoc</a>
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../storage/hostpath-provisioner.html">hostpath-provisioner.adoc</a>
@@ -137,7 +137,7 @@
     <a class="nav-link" href="../networking/sriov-secondary.html">sriov-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM Ingress とルート</a>
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">vm-ingress-routes.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ovs-bridge-troubleshooting.adoc</a>
@@ -298,90 +298,8 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">用語集</h1>
-<div class="sect1">
-<h2 id="_openshift_virtualization_用語"><a class="anchor" href="#_openshift_virtualization_用語"></a>OpenShift Virtualization 用語</h2>
-<div class="sectionbody">
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><strong>CNV</strong></dt>
-<dd>
-<p>Container Native Virtualization, Red Hat の OpenShift Virtualization の名称</p>
-</dd>
-<dt class="hdlist1"><strong>NAD</strong></dt>
-<dd>
-<p>NetworkAttachmentDefinition, Pod/VM の追加ネットワークを定義します</p>
-</dd>
-<dt class="hdlist1"><strong>NNCP</strong></dt>
-<dd>
-<p>NodeNetworkConfigurationPolicy, ノードのネットワーク設定を行う NMState CR</p>
-</dd>
-<dt class="hdlist1"><strong>UDN</strong></dt>
-<dd>
-<p>User Defined Network, Layer 2 または Layer 3 接続を持つカスタムネットワーク</p>
-</dd>
-<dt class="hdlist1"><strong>VLAN</strong></dt>
-<dd>
-<p>Virtual LAN, VLAN タグ付けを使用したネットワークセグメンテーション</p>
-</dd>
-<dt class="hdlist1"><strong>OVS</strong></dt>
-<dd>
-<p>Open vSwitch, ソフトウェアベースのネットワークスイッチ</p>
-</dd>
-<dt class="hdlist1"><strong>IPAM</strong></dt>
-<dd>
-<p>IP Address Management, 自動 IP 割り当て</p>
-</dd>
-<dt class="hdlist1"><strong>PVC</strong></dt>
-<dd>
-<p>PersistentVolumeClaim, ストレージ要求</p>
-</dd>
-<dt class="hdlist1"><strong>DataVolume</strong></dt>
-<dd>
-<p>VM のストレージをプロビジョニングするための CDI CR</p>
-</dd>
-<dt class="hdlist1"><strong>VMI</strong></dt>
-<dd>
-<p>VirtualMachineInstance, 実行中の VM インスタンス</p>
-</dd>
-<dt class="hdlist1"><strong>SCC</strong></dt>
-<dd>
-<p>SecurityContextConstraint, OpenShift の Pod セキュリティポリシー</p>
-</dd>
-<dt class="hdlist1"><strong>RBAC</strong></dt>
-<dd>
-<p>Role-Based Access Control, Kubernetes 認証</p>
-</dd>
-<dt class="hdlist1"><strong>Localnet</strong></dt>
-<dd>
-<p>物理ネットワークへの直接アクセスを提供するネットワークトポロジー</p>
-</dd>
-<dt class="hdlist1"><strong>Cloud-init</strong></dt>
-<dd>
-<p>設定用の VM 初期化ツール</p>
-</dd>
-<dt class="hdlist1"><strong>Virtctl</strong></dt>
-<dd>
-<p>VM 管理用の CLI ツール</p>
-</dd>
-</dl>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_参照"><a class="anchor" href="#_参照"></a>参照</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="../getting-started/index.html" class="xref page">はじめに</a> - OpenShift Virtualization の利用を開始する</p>
-</li>
-<li>
-<p><a href="../index.html" class="xref page">OpenShift Virtualization クックブック</a> - クックブックのホームページに戻る</p>
-</li>
-</ul>
-</div>
-</div>
+<div class="paragraph">
+<p>Error: Unable to get response from Gemini model after multiple attempts.</p>
 </div>
 <nav class="pagination">
   <span class="prev"><a href="../api/api-component-overview.html">api-component-overview.adoc</a></span>

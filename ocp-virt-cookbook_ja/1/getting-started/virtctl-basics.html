@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>VM管理のためのvirtctlの使用 :: OpenShift Virtualization cookbook</title>
+    <title>virtctl を使用した VM 管理 :: OpenShift Virtualization cookbook</title>
     <link rel="prev" href="vm-lifecycle-states.html">
     <link rel="next" href="cloud-init-fundamentals.html">
     <meta name="generator" content="Antora 3.2.0-alpha.12">
@@ -44,7 +44,7 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../index.html">Introduction</a>
+    <a class="nav-link" href="../index.html">index.adoc</a>
   </li>
 </ul>
   </li>
@@ -52,28 +52,28 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="index.html">はじめに</a>
+    <a class="nav-link" href="index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="prerequisites.html">前提条件</a>
+    <a class="nav-link" href="prerequisites.html">prerequisites.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="install-openshift-virtualization.html">OpenShift Virtualization をインストール</a>
+    <a class="nav-link" href="install-openshift-virtualization.html">install-openshift-virtualization.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="default-storage-class.html">ストレージセットアップ</a>
+    <a class="nav-link" href="default-storage-class.html">default-storage-class.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="create-vm-web-console.html">ウェブコンソールからのVM作成</a>
+    <a class="nav-link" href="create-vm-web-console.html">create-vm-web-console.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="vm-lifecycle-states.html">VMライフサイクルステート</a>
+    <a class="nav-link" href="vm-lifecycle-states.html">vm-lifecycle-states.adoc</a>
   </li>
   <li class="nav-item is-current-page" data-depth="2">
-    <a class="nav-link" href="virtctl-basics.html">virtctlの基本</a>
+    <a class="nav-link" href="virtctl-basics.html">virtctl の基本</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="cloud-init-fundamentals.html">Cloud-initの基本</a>
+    <a class="nav-link" href="cloud-init-fundamentals.html">cloud-init-fundamentals.adoc</a>
   </li>
 </ul>
   </li>
@@ -89,7 +89,7 @@
     <a class="nav-link" href="../storage/lvm-operator.html">lvm-operator.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/lvm-troubleshooting.html">lvm-troubleshooting.adoc</a>
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../storage/hostpath-provisioner.html">hostpath-provisioner.adoc</a>
@@ -138,7 +138,7 @@
     <a class="nav-link" href="../networking/sriov-secondary.html">sriov-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM Ingress とルート</a>
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">vm-ingress-routes.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ovs-bridge-troubleshooting.adoc</a>
@@ -290,8 +290,8 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
-    <li><a href="index.html">はじめに</a></li>
-    <li><a href="virtctl-basics.html">virtctlの基本</a></li>
+    <li><a href="index.html">index.adoc</a></li>
+    <li><a href="virtctl-basics.html">virtctl の基本</a></li>
   </ul>
 </nav>
 </div>
@@ -300,15 +300,15 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">VM管理のためのvirtctlの使用</h1>
+<h1 class="page">virtctl を使用した VM 管理</h1>
 <div class="sect1">
 <h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>virtctl</code> CLIツールは、OpenShift Virtualizationで仮想マシンを管理するためのコマンドを提供します。このガイドでは、基本的なVM操作について説明します。</p>
+<p>virtctl CLI ツールは、OpenShift Virtualization で仮想マシンを管理するためのコマンドを提供します。このガイドでは、VM の主要な操作について説明します。</p>
 </div>
 <div class="paragraph">
-<p>テスト済みのバージョン：</p>
+<p>テスト済みのバージョン:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -323,52 +323,52 @@
 <div class="ulist">
 <ul>
 <li>
-<p>OpenShift VirtualizationがインストールされたOpenShift 4.18以降</p>
+<p>OpenShift Virtualization がインストールされた OpenShift 4.18 以降</p>
 </li>
 <li>
-<p><code>virtctl</code> CLIツールがインストールされていること</p>
+<p>virtctl CLI ツールがインストールされていること</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_virtctlのダウンロードとインストール"><a class="anchor" href="#_virtctlのダウンロードとインストール"></a>virtctlのダウンロードとインストール</h2>
+<h2 id="_virtctl_のダウンロードとインストール"><a class="anchor" href="#_virtctl_のダウンロードとインストール"></a>virtctl のダウンロードとインストール</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>virtctl</code> CLIツールは、OpenShiftウェブコンソールから直接ダウンロードできます。</p>
+<p><code>virtctl</code> CLI ツールは、OpenShift Web コンソールから直接ダウンロードできます。</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>OpenShiftウェブコンソールで、左側のサイドバーから <strong>仮想化</strong> → <strong>概要</strong> に移動します。</p>
+<p>OpenShift Web コンソールで、左側のサイドバーから <strong>Virtualization</strong> → <strong>Overview</strong> に移動します。</p>
 <div class="imageblock">
 <div class="content">
-<img src="_images/virtualization-overview.png" alt="Virtualization Overview menu">
+<img src="_images/virtualization-overview.png" alt="Virtualization Overview メニュー">
 </div>
-<div class="title">Figure 1. OpenShiftコンソールにおける仮想化の概要</div>
+<div class="title">Figure 1. OpenShift コンソールの Virtualization Overview</div>
 </div>
 </li>
 <li>
-<p>概要ページの右上にある <strong>virtctlコマンドラインユーティリティをダウンロード</strong> のリンクをクリックします。</p>
+<p>Overview ページの右上にある <strong>Download the virtctl command-line utility</strong> リンクをクリックします。</p>
 <div class="imageblock">
 <div class="content">
-<img src="_images/virtctl-download.png" alt="Download virtctl link in the upper right corner">
+<img src="_images/virtctl-download.png" alt="右上の virtctl ダウンロードリンク">
 </div>
-<div class="title">Figure 2. virtctlダウンロードリンク</div>
+<div class="title">Figure 2. virtctl ダウンロードリンク</div>
 </div>
 </li>
 <li>
-<p>ダウンロードページで、お使いのオペレーティングシステムとアーキテクチャに適した <code>virtctl</code> バイナリを選択します。</p>
+<p>ダウンロードページで、ご使用のオペレーティングシステムとアーキテクチャーに適した <code>virtctl</code> バイナリーを選択します。</p>
 <div class="imageblock">
 <div class="content">
-<img src="_images/virtctl-versions.png" alt="List of virtctl binaries for different platforms">
+<img src="_images/virtctl-versions.png" alt="さまざまなプラットフォーム向けの virtctl バイナリーのリスト">
 </div>
-<div class="title">Figure 3. 利用可能なvirtctlバイナリ</div>
+<div class="title">Figure 3. 利用可能な virtctl バイナリー</div>
 </div>
 </li>
 <li>
-<p>ダウンロード後、バイナリを実行可能にし、`PATH`に移動します。</p>
+<p>ダウンロード後、バイナリーを実行可能にし、PATH に移動します。</p>
 <div class="listingblock execute">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Linux/Mac
@@ -380,7 +380,7 @@ virtctl version</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Windowsの場合、実行可能ファイルを解凍し、その場所をシステムの`PATH`に追加します。</p>
+<p>Windows の場合は、実行ファイルを抽出し、その場所をシステムの PATH に追加します。</p>
 </div>
 </li>
 </ol>
@@ -388,12 +388,12 @@ virtctl version</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_必須コマンド"><a class="anchor" href="#_必須コマンド"></a>必須コマンド</h2>
+<h2 id="_主要なコマンド"><a class="anchor" href="#_主要なコマンド"></a>主要なコマンド</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_vmのリスト表示"><a class="anchor" href="#_vmのリスト表示"></a>VMのリスト表示</h3>
+<h3 id="_vm_の一覧表示"><a class="anchor" href="#_vm_の一覧表示"></a>VM の一覧表示</h3>
 <div class="paragraph">
-<p>VMを管理する前に、`oc`コマンドを使用してクラスター内で利用可能なVMをリスト表示します。</p>
+<p>VM を管理する前に、<code>oc</code> コマンドを使用してクラスターで利用可能な VM を一覧表示します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -405,7 +405,7 @@ oc get vm -A</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>出力例：</p>
+<p>出力例:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -414,7 +414,7 @@ myapp       fedora-app-vm   13d   Running   True</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>IPアドレスやノード配置などの詳細情報とともに、実行中のVMインスタンス（VMI）を表示するには：</p>
+<p>実行中の VM インスタンス (VMI) を、IP アドレスやノード配置などの追加の詳細とともに表示するには、以下を実行します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -422,7 +422,7 @@ myapp       fedora-app-vm   13d   Running   True</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>出力例：</p>
+<p>出力例:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -437,16 +437,16 @@ myapp       fedora-app-vm   13d   Running   10.128.1.225   ocplab01   True</code
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-VMのリスト表示とクエリには <code>oc</code> を使用します。起動、停止、コンソールアクセスなどのVM操作には <code>virtctl</code> を使用します。
+VM の一覧表示とクエリーには <code>oc</code> を使用します。起動、停止、コンソールアクセスなどの VM 操作には <code>virtctl</code> を使用します。
 </td>
 </tr>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_vmライフサイクル"><a class="anchor" href="#_vmライフサイクル"></a>VMライフサイクル</h3>
+<h3 id="_vm_ライフサイクル"><a class="anchor" href="#_vm_ライフサイクル"></a>VM ライフサイクル</h3>
 <div class="paragraph">
-<p>VMの起動、停止、再起動：</p>
+<p>VM の起動、停止、再起動を行います。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -462,9 +462,9 @@ virtctl restart fedora-app-vm -n myapp</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_vmへのアクセス"><a class="anchor" href="#_vmへのアクセス"></a>VMへのアクセス</h3>
+<h3 id="_vm_へのアクセス"><a class="anchor" href="#_vm_へのアクセス"></a>VM へのアクセス</h3>
 <div class="paragraph">
-<p>VMに接続します。</p>
+<p>VM に接続します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -480,9 +480,9 @@ virtctl vnc fedora-app-vm -n myapp</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_vm情報"><a class="anchor" href="#_vm情報"></a>VM情報</h3>
+<h3 id="_vm_情報"><a class="anchor" href="#_vm_情報"></a>VM 情報</h3>
 <div class="paragraph">
-<p>VMの詳細情報を取得します（VMにQEMUゲストエージェントがインストールされている必要があります）：</p>
+<p>VM の詳細を取得します (VM に QEMU ゲストエージェントがインストールされている必要があります)。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -491,7 +491,7 @@ virtctl guestosinfo fedora-app-vm -n myapp</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>出力例：</p>
+<p>出力例:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -518,7 +518,7 @@ virtctl fslist fedora-app-vm -n myapp</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>出力例は、マウントされたファイルシステムのディスク使用状況を示しています。</p>
+<p>出力例は、使用状況とともにマウントされたファイルシステムを示しています。</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -559,15 +559,15 @@ virtctl userlist fedora-app-vm -n myapp</code></pre>
 <div class="sect2">
 <h3 id="_ファイル転送"><a class="anchor" href="#_ファイル転送"></a>ファイル転送</h3>
 <div class="paragraph">
-<p><code>virtctl scp</code> を使用して、VMとの間でファイルをコピーします。これには、VMでSSHが実行されており、以下の認証方法のいずれかが必要です。</p>
+<p>virtctl scp を使用して、VM との間でファイルをコピーします。これには、VM で SSH が実行されていること、および次のいずれかの認証方法が必要です。</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>SSHキー</strong> (推奨): 公開キーはVMの <code>~/.ssh/authorized_keys</code> に存在する必要があります。</p>
+<p><strong>SSH キー</strong> (推奨): 公開キーは VM の <code>~/.ssh/authorized_keys</code> に存在する必要があります</p>
 </li>
 <li>
-<p><strong>パスワード</strong>: VMでSSHのパスワード認証が有効になっている必要があります。</p>
+<p><strong>パスワード</strong>: VM で SSH のパスワード認証が有効になっている必要があります</p>
 </li>
 </ul>
 </div>
@@ -590,13 +590,13 @@ virtctl scp -i ~/.ssh/my_key local-file.txt fedora@fedora-app-vm:/tmp/ -n myapp<
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-SSHが設定されていない場合、最初に <code>virtctl console</code> を使用してVMにアクセスし、SSHキーを設定します。
+SSH が設定されていない場合は、まず <code>virtctl console</code> を使用して VM にアクセスし、SSH キーを設定します。
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>VM作成時にSSHキーを挿入するには、cloud-init設定に含めます。</p>
+<p>VM の作成時に SSH キーを挿入するには、cloud-init 設定に含めます。</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -607,16 +607,16 @@ ssh_authorized_keys:
 </div>
 </div>
 <div class="paragraph">
-<p>詳細なSSH設定オプションについては、<a href="../vm-configuration/remote-access-linux-vms.html" class="xref page">vm-configuration:remote-access-linux-vms.adoc</a> を参照してください。</p>
+<p>SSH 設定オプションの詳細については、<a href="../vm-configuration/remote-access-linux-vms.html" class="xref page">vm-configuration:remote-access-linux-vms.adoc</a> を参照してください。</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_vm操作の検証"><a class="anchor" href="#_vm操作の検証"></a>VM操作の検証</h2>
+<h2 id="_vm_操作の検証"><a class="anchor" href="#_vm_操作の検証"></a>VM 操作の検証</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>VMの起動または停止後、操作を検証します。</p>
+<p>VM を起動または停止した後、操作を検証します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -625,7 +625,7 @@ oc get vm fedora-app-vm -n myapp</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>正常に起動した後の出力例：</p>
+<p>正常に起動した後の出力例:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -640,7 +640,7 @@ oc get vmi fedora-app-vm -n myapp</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>予想: 実行中はVMIがリスト表示され、停止後はVMIが表示されません。</p>
+<p>期待される結果: 実行中の場合は VMI がリストされ、停止後は VMI はリストされません。</p>
 </div>
 </div>
 </div>
@@ -648,47 +648,47 @@ oc get vmi fedora-app-vm -n myapp</code></pre>
 <h2 id="_クイックリファレンス"><a class="anchor" href="#_クイックリファレンス"></a>クイックリファレンス</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><strong>各アクセス方法の使用時期：</strong></p>
+<p><strong>各アクセス方法を使用するタイミング:</strong></p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><code>virtctl console</code> - テキスト専用のターミナルアクセス。ネットワークなしで動作します。</p>
+<p><code>virtctl console</code> - テキストのみのターミナルアクセス。ネットワークなしで動作します。</p>
 </li>
 <li>
-<p><code>virtctl ssh</code> - キーが設定されている場合に便利なSSHアクセス。</p>
+<p><code>virtctl ssh</code> - キーが設定されている場合に便利な SSH</p>
 </li>
 <li>
-<p><code>virtctl vnc</code> - GUIベースのVM向けのグラフィカルデスクトップアクセス。</p>
+<p><code>virtctl vnc</code> - GUI ベースの VM 用のグラフィカルデスクトップアクセス</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>VM情報の確認時期：</strong></p>
+<p><strong>VM 情報を確認するタイミング:</strong></p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><code>virtctl guestosinfo</code> - 更新前にOSのバージョンを確認します。</p>
+<p><code>virtctl guestosinfo</code> - 更新前に OS バージョンを確認</p>
 </li>
 <li>
-<p><code>virtctl fslist</code> - ソフトウェアをインストールする前にディスク容量を確認します。</p>
+<p><code>virtctl fslist</code> - ソフトウェアをインストールする前にディスク容量を確認</p>
 </li>
 <li>
-<p><code>virtctl userlist</code> - 現在ログインしているユーザーを確認します。</p>
+<p><code>virtctl userlist</code> - 現在ログインしているユーザーを確認</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_よくある問題"><a class="anchor" href="#_よくある問題"></a>よくある問題</h2>
+<h2 id="_一般的な問題"><a class="anchor" href="#_一般的な問題"></a>一般的な問題</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><strong>問題: サーバーに接続できない</strong></p>
 </div>
 <div class="paragraph">
-<p>解決策: クラスターへのアクセスを確認します。</p>
+<p>解決策: クラスターアクセスを確認します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -700,13 +700,13 @@ oc get nodes</code></pre>
 <p><strong>問題: ゲストエージェントコマンドがデータを返さない</strong></p>
 </div>
 <div class="paragraph">
-<p>解決策: VMにQEMUゲストエージェントをインストールします。インストール手順については、<a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/managing-vms#virt-installing-qemu-guest-agent" target="_blank" rel="noopener">QEMUゲストエージェントのインストール</a> を参照してください。</p>
+<p>解決策: VM に QEMU ゲストエージェントをインストールします。インストール手順については、<a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/managing-vms#virt-installing-qemu-guest-agent" target="_blank" rel="noopener">QEMU ゲストエージェントのインストール</a> を参照してください。</p>
 </div>
 <div class="paragraph">
-<p><strong>問題: SSH/SCPコマンドが失敗する</strong></p>
+<p><strong>問題: SSH/SCP コマンドが失敗する</strong></p>
 </div>
 <div class="paragraph">
-<p>解決策: VMでSSHが設定されていることを確認します。コンソールを使用して確認します。</p>
+<p>解決策: VM で SSH が設定されていることを確認します。コンソールを使用して確認します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -718,10 +718,10 @@ systemctl status sshd</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p><strong>問題: コンソールがハングしたり、応答しない</strong></p>
+<p><strong>問題: コンソールがハングする、または応答しない</strong></p>
 </div>
 <div class="paragraph">
-<p>解決策: <code>Ctrl+]</code> で終了し、VMのステータスを確認します。</p>
+<p>解決策: <code>Ctrl+]</code> で終了し、VM ステータスを確認します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -736,22 +736,22 @@ systemctl status sshd</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p>混乱を避けるために、<code>-n</code> を使用して<strong>常に名前空間を指定</strong>します。</p>
+<p>混乱を避けるために、<code>-n</code> で<strong>必ず namespace を指定します</strong>。</p>
 </li>
 <li>
-<p><strong>初期設定にはコンソールを使用</strong>し、その後は通常のアクセスにはSSHを使用します。</p>
+<p><strong>初期設定にはコンソールを使用し</strong>、その後は通常のアクセスには SSH を使用します。</p>
 </li>
 <li>
-<p>完全な機能のために、すべてのVMに<strong>ゲストエージェントをインストール</strong>します。</p>
+<p>すべての VM に<strong>ゲストエージェントをインストールして</strong>、すべての機能を利用できるようにします。</p>
 </li>
 <li>
-<p><strong>VMのステータス確認には <code>oc</code> を使用</strong>し、VM操作には <code>virtctl</code> を使用します。</p>
+<p>VM のステータスには <code>oc</code> を、VM の操作には <code>virtctl</code> を<strong>使用します</strong>。</p>
 </li>
 <li>
-<p>セッションがハングするのを避けるため、<code>Ctrl+]</code> で<strong>コンソールを適切に終了</strong>します。</p>
+<p>セッションがハングするのを防ぐために、<code>Ctrl+]</code> で<strong>コンソールを適切に終了します</strong>。</p>
 </li>
 <li>
-<p>外部アクセスを設定する前に、<strong><code>virtctl ssh</code> でテスト</strong>します。</p>
+<p>外部アクセスを設定する前に、<code>virtctl ssh</code> で<strong>テストします</strong>。</p>
 </li>
 </ul>
 </div>
@@ -763,7 +763,7 @@ systemctl status sshd</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/getting-started#virt-using-the-cli-tools" target="_blank" rel="noopener">virtctlコマンドリファレンス</a></p>
+<p><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/getting-started#virt-using-the-cli-tools" target="_blank" rel="noopener">virtctl コマンドリファレンス</a></p>
 </li>
 </ul>
 </div>
@@ -773,44 +773,44 @@ systemctl status sshd</code></pre>
 <h2 id="_まとめ"><a class="anchor" href="#_まとめ"></a>まとめ</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>このチュートリアルでは、以下の内容を学習しました。</p>
+<p>このチュートリアルでは、以下のことを学びました。</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>OpenShiftウェブコンソールから <code>virtctl</code> CLIツールをダウンロード、インストール、および設定する方法</p>
+<p>OpenShift Web コンソールから <code>virtctl</code> CLI ツールをダウンロード、インストール、設定する方法</p>
 </li>
 <li>
-<p>起動、停止、再起動を含むVMライフサイクル操作を管理する方法</p>
+<p>起動、停止、再起動を含む VM ライフサイクル操作を管理する方法</p>
 </li>
 <li>
-<p>コンソール、SSH、およびVNCメソッドを使用してVMにアクセスする方法</p>
+<p>コンソール、SSH、および VNC の方法を使用して VM にアクセスする方法</p>
 </li>
 <li>
-<p>QEMUゲストエージェントを介して、ゲストOS情報、ファイルシステムの詳細、およびユーザーリストを取得する方法</p>
+<p>QEMU ゲストエージェントを介して、ゲスト OS 情報、ファイルシステムの詳細、およびユーザーリストを取得する方法</p>
 </li>
 <li>
-<p><code>virtctl scp</code> を使用してVMとの間でファイルを転送する方法</p>
+<p>virtctl scp を使用して、VM との間でファイルを転送する方法</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_関連項目"><a class="anchor" href="#_関連項目"></a>関連項目</h2>
+<h2 id="_参照"><a class="anchor" href="#_参照"></a>参照</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p><a href="../vm-configuration/remote-access-linux-vms.html" class="xref page">vm-configuration:remote-access-linux-vms.adoc</a> - すべてのVMアクセス方法</p>
+<p><a href="../vm-configuration/remote-access-linux-vms.html" class="xref page">vm-configuration:remote-access-linux-vms.adoc</a> - すべての VM アクセス方法</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="vm-lifecycle-states.html">VMライフサイクルステート</a></span>
-  <span class="next"><a href="cloud-init-fundamentals.html">Cloud-initの基本</a></span>
+  <span class="prev"><a href="vm-lifecycle-states.html">vm-lifecycle-states.adoc</a></span>
+  <span class="next"><a href="cloud-init-fundamentals.html">cloud-init-fundamentals.adoc</a></span>
 </nav>
 </article>
   </div>

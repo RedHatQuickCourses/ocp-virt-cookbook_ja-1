@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>OpenShift Virtualization クックブック :: OpenShift Virtualization cookbook</title>
+    <title>Untitled :: OpenShift Virtualization cookbook</title>
     <link rel="next" href="getting-started/index.html">
     <meta name="generator" content="Antora 3.2.0-alpha.12">
     <link rel="stylesheet" href="../../_/css/site.css">
@@ -43,7 +43,7 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item is-current-page" data-depth="1">
-    <a class="nav-link" href="index.html">Introduction</a>
+    <a class="nav-link" href="index.html">index.adoc</a>
   </li>
 </ul>
   </li>
@@ -51,28 +51,28 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="getting-started/index.html">はじめに</a>
+    <a class="nav-link" href="getting-started/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="getting-started/prerequisites.html">前提条件</a>
+    <a class="nav-link" href="getting-started/prerequisites.html">prerequisites.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="getting-started/install-openshift-virtualization.html">OpenShift Virtualization をインストール</a>
+    <a class="nav-link" href="getting-started/install-openshift-virtualization.html">install-openshift-virtualization.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="getting-started/default-storage-class.html">ストレージセットアップ</a>
+    <a class="nav-link" href="getting-started/default-storage-class.html">default-storage-class.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="getting-started/create-vm-web-console.html">ウェブコンソールからのVM作成</a>
+    <a class="nav-link" href="getting-started/create-vm-web-console.html">create-vm-web-console.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="getting-started/vm-lifecycle-states.html">VMライフサイクルステート</a>
+    <a class="nav-link" href="getting-started/vm-lifecycle-states.html">vm-lifecycle-states.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="getting-started/virtctl-basics.html">virtctlの基本</a>
+    <a class="nav-link" href="getting-started/virtctl-basics.html">virtctl の基本</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="getting-started/cloud-init-fundamentals.html">Cloud-initの基本</a>
+    <a class="nav-link" href="getting-started/cloud-init-fundamentals.html">cloud-init-fundamentals.adoc</a>
   </li>
 </ul>
   </li>
@@ -88,7 +88,7 @@
     <a class="nav-link" href="storage/lvm-operator.html">lvm-operator.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="storage/lvm-troubleshooting.html">lvm-troubleshooting.adoc</a>
+    <a class="nav-link" href="storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="storage/hostpath-provisioner.html">hostpath-provisioner.adoc</a>
@@ -137,7 +137,7 @@
     <a class="nav-link" href="networking/sriov-secondary.html">sriov-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="networking/vm-ingress-routes.html">VM Ingress とルート</a>
+    <a class="nav-link" href="networking/vm-ingress-routes.html">vm-ingress-routes.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="networking/ovs-bridge-troubleshooting.html">ovs-bridge-troubleshooting.adoc</a>
@@ -289,7 +289,7 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">OpenShift Virtualization cookbook</a></li>
-    <li><a href="index.html">Introduction</a></li>
+    <li><a href="index.html">index.adoc</a></li>
   </ul>
 </nav>
 </div>
@@ -298,163 +298,11 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">OpenShift Virtualization クックブック</h1>
-<div class="sect1">
-<h2 id="_はじめに"><a class="anchor" href="#_はじめに"></a>はじめに</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>OpenShift Virtualization でワークロードを開始およびデプロイするための実用的なフィールドガイドです。</p>
-</div>
-<div class="paragraph">
-<p>このクックブックは、OpenShift を使い始めたばかりのユーザー向けに、一口サイズのレシピ、マニフェストの例、およびトラブルシューティングのメモを提供します。これは、<a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html-single/virtualization/index" target="_blank" rel="noopener">公式ドキュメント</a>と<a href="https://www.redhat.com/en/services/training/do316-managing-virtual-machines-red-hat-openshift-virtualization" target="_blank" rel="noopener">トレーニングコース</a>を実践的に<em>補完</em>するものとして設計されており、理論的な学習に代わるものではなく、実際の導入を促進します。</p>
-</div>
-<div class="paragraph">
-<p>(<em>最終更新日: {build-date}</em>)</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>このクックブックを効果的に使用するには、以下が必要です。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>クラスター</strong>: OpenShift Virtualization オペレーターがインストールされた OpenShift 4.18+。</p>
-</li>
-<li>
-<p><strong>ツール</strong>: <code>oc</code>、<code>kubectl</code>、および <code>virtctl</code>。(オプション: <code>kustomize</code>、<code>helm</code>、<code>ansible</code>)。</p>
-</li>
-<li>
-<p><strong>知識</strong>: YAML と CLI ワークフローに精通していること (必須ではありませんが、強く推奨します)。Kubernetes/OpenShift の概念に関する基本的な理解。</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>特にテクノロジーを初めて使用する場合は、<strong><a href="getting-started/index.html" class="xref page">はじめに</a></strong> のすべてのモジュールを参照して、環境を準備または検証してください。</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_クックブックモジュール"><a class="anchor" href="#_クックブックモジュール"></a>クックブックモジュール</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>開始するには、左メニューからモジュールを 1 つ選択してください。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong><a href="getting-started/index.html" class="xref page">はじめに</a></strong> - 必須ツールのセットアップと環境検証。</p>
-</li>
-<li>
-<p><strong><a href="storage/index.html" class="xref page">storage:index.adoc</a></strong> - 仮想マシン用のストレージセットアップ。</p>
-</li>
-<li>
-<p><strong><a href="networking/index.html" class="xref page">networking:index.adoc</a></strong> - ネットワークおよび IP 設定ガイド。</p>
-</li>
-<li>
-<p><strong><a href="vm-configuration/index.html" class="xref page">vm-configuration:index.adoc</a></strong> - VM アクセス、DNS、ノード配置、およびテンプレート。</p>
-</li>
-<li>
-<p><strong><a href="performance/index.html" class="xref page">performance:index.adoc</a></strong> - CPU ピニング、NUMA、ヒュージページ、およびリアルタイム VM。</p>
-</li>
-<li>
-<p><strong><a href="vm-lifecycle/index.html" class="xref page">vm-lifecycle:index.adoc</a></strong> - ゴールデンイメージ、クローン作成、スナップショット、およびブート設定。</p>
-</li>
-<li>
-<p><strong><a href="manifests/index.html" class="xref page">YAML マニフェストライブラリ</a></strong> - デプロイ準備が整ったマニフェスト例のライブラリ。</p>
-</li>
-<li>
-<p><strong><a href="api/index.html" class="xref page">API統合</a></strong> - クローン作成、エクスポート、マシン拓​​ポロジーなどの API コンポーネントのアーキテクチャーと機能。</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_追加リソース"><a class="anchor" href="#_追加リソース"></a>追加リソース</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>OpenShift Virtualization</p>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/virtualization/about" target="_blank" rel="noopener">公式ドキュメント</a></p>
-</li>
-<li>
-<p><a href="https://www.redhat.com/en/technologies/cloud-computing/openshift/virtualization/learn" target="_blank" rel="noopener">ラーニングハブ</a></p>
-</li>
-<li>
-<p><a href="https://access.redhat.com/sites/default/files/attachments/openshift_virtualization_reference_implementation_guide.pdf" target="_blank" rel="noopener">リファレンス実装ガイド (pdf)</a></p>
-</li>
-<li>
-<p><a href="https://access.redhat.com/articles/7119411" target="_blank" rel="noopener">アーキテクチャーガイド</a></p>
-</li>
-<li>
-<p><a href="https://access.redhat.com/articles/7067871" target="_blank" rel="noopener">アーキテクチャー例</a></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><a href="https://kubevirt.io/" target="_blank" rel="noopener">KubeVirt プロジェクト</a></p>
-</li>
-<li>
-<p><a href="https://cloudinit.readthedocs.io/" target="_blank" rel="noopener">Cloud-init ドキュメント</a></p>
-</li>
-<li>
-<p><a href="appendix/glossary.html" class="xref page">用語集</a> - 主要な用語と定義</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_貢献"><a class="anchor" href="#_貢献"></a>貢献</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>ご質問、問題、または貢献については、<a href="https://github.com/RedHatQuickCourses/ocp-virt-cookbook/issues/new/choose" target="_blank" rel="noopener">プロジェクトリポジトリ</a>でイシューを開くか、<a href="mailto:ocp-virt-cookbook@redhat.com">ocp-virt-cookbook@redhat.com</a> のチームにご連絡ください。</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_謝辞"><a class="anchor" href="#_謝辞"></a>謝辞</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>このクックブックは、元の <a href="https://github.com/acmenezes/ocp-virt-onboarding-kit" target="_blank" rel="noopener">OpenShift Virtualization Onboarding Kit</a>の素晴らしい成果に基づいて構築されています。Alexandre Menezes、Andrea Perotti、Daphne Hoover、Josh Manning、Melvin Hillsman、Roshan Warrier、Yash Devan Oza、およびコミュニティの貢献に深く感謝します。</p>
-</div>
-<div class="paragraph">
-<p>コンテンツ作成、テスト、フィードバックを通じてこのリソースの形成にご協力いただいたすべての貢献者に深く感謝いたします。</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_ライセンス"><a class="anchor" href="#_ライセンス"></a>ライセンス</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>このプロジェクトは <a href="https://github.com/RedHatQuickCourses/ocp-virt-cookbook/blob/main/LICENSE" target="_blank" rel="noopener">MIT ライセンス</a>の下でライセンスされています。</p>
-</div>
-<hr>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-このクックブックは、コンテンツ開発を加速し、ドキュメントの品質を向上させるために AI ツールの支援を受けて作成されました。ただし、すべてのコンテンツは、技術的な正確性と実世界への適用性を確保するために、経験豊富な人間のエンジニアによって構築、編集、テスト、およびレビューされています。私たちは、あらゆる段階で人間の専門知識と監視を維持しながら、ツールの透明性を信じています。
-</td>
-</tr>
-</table>
-</div>
-</div>
+<p>Error: Unable to get response from Gemini model after multiple attempts.</p>
 </div>
 <nav class="pagination">
-  <span class="next"><a href="getting-started/index.html">はじめに</a></span>
+  <span class="next"><a href="getting-started/index.html">index.adoc</a></span>
 </nav>
 </article>
   </div>

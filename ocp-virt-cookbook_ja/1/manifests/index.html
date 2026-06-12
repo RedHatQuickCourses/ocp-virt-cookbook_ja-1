@@ -44,7 +44,7 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../index.html">Introduction</a>
+    <a class="nav-link" href="../index.html">index.adoc</a>
   </li>
 </ul>
   </li>
@@ -52,28 +52,28 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../getting-started/index.html">はじめに</a>
+    <a class="nav-link" href="../getting-started/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+    <a class="nav-link" href="../getting-started/prerequisites.html">prerequisites.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift Virtualization をインストール</a>
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">install-openshift-virtualization.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージセットアップ</a>
+    <a class="nav-link" href="../getting-started/default-storage-class.html">default-storage-class.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/create-vm-web-console.html">ウェブコンソールからのVM作成</a>
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">create-vm-web-console.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VMライフサイクルステート</a>
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">vm-lifecycle-states.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctlの基本</a>
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">Cloud-initの基本</a>
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">cloud-init-fundamentals.adoc</a>
   </li>
 </ul>
   </li>
@@ -89,7 +89,7 @@
     <a class="nav-link" href="../storage/lvm-operator.html">lvm-operator.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/lvm-troubleshooting.html">lvm-troubleshooting.adoc</a>
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../storage/hostpath-provisioner.html">hostpath-provisioner.adoc</a>
@@ -138,7 +138,7 @@
     <a class="nav-link" href="../networking/sriov-secondary.html">sriov-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM Ingress とルート</a>
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">vm-ingress-routes.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ovs-bridge-troubleshooting.adoc</a>
@@ -303,7 +303,7 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>クックブックチュートリアルで使用されるYAMLマニフェストのクイックリファレンスライブラリをカテゴリ別に整理しています。</p>
+<p>クックブックのチュートリアルで使用されるYAMLマニフェストのクイックリファレンスライブラリで、カテゴリ別に整理されています。</p>
 </div>
 </div>
 </div>
@@ -337,7 +337,7 @@
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#Virtual Machines">[Virtual Machines]</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">14</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">様々なチュートリアルからのVMの例</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">さまざまなチュートリアルからのVM例</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#Services">[Services]</a></p></td>
@@ -365,7 +365,7 @@
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">名前</th>
-<th class="tableblock halign-left valign-top">Kind</th>
+<th class="tableblock halign-left valign-top">種類</th>
 <th class="tableblock halign-left valign-top">目的</th>
 <th class="tableblock halign-left valign-top">チュートリアル</th>
 <th class="tableblock halign-left valign-top">ダウンロード</th>
@@ -375,35 +375,35 @@
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">lvm-namespace</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Namespace</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">openshift-lvm-storage namespaceを作成します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">`openshift-lvm-storage`名前空間を作成する</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../storage/lvm-operator.html" class="xref page">storage:lvm-operator.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../storage/_attachments/lvm-operator/lvm-namespace.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">lvm-operatorgroup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">OperatorGroup</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">LVMオペレーターのNamespaceスコープを定義します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">LVMオペレーターの名前空間スコープを定義する</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../storage/lvm-operator.html" class="xref page">storage:lvm-operator.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../storage/_attachments/lvm-operator/lvm-operatorgroup.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">lvm-subscription</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Subscription</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">OperatorHubからLVM Storage Operatorをインストールします</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OperatorHubからLVM Storage Operatorをインストールする</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../storage/lvm-operator.html" class="xref page">storage:lvm-operator.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../storage/_attachments/lvm-operator/lvm-subscription.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">lvmcluster-with-wipe</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">LVMCluster</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">既存データのあるディスクに対してforceWipeを使用してLVMストレージを設定します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">既存データのあるディスクに対してforceWipeを使用してLVMストレージを設定する</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../storage/lvm-operator.html" class="xref page">storage:lvm-operator.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../storage/_attachments/lvm-operator/lvmcluster-with-wipe.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">lvmcluster-clean-disk</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">LVMCluster</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">クリーン/新規ディスク用にLVMストレージを設定します</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クリーン/新規ディスクに対してLVMストレージを設定する</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../storage/lvm-operator.html" class="xref page">storage:lvm-operator.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../storage/_attachments/lvm-operator/lvmcluster-clean-disk.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
@@ -429,7 +429,7 @@
 <h2 id="_ネットワーク"><a class="anchor" href="#_ネットワーク"></a>ネットワーク</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>localnet、UDN、およびブリッジマッピングのネットワーク設定。</p>
+<p>Localnet、UDN、およびブリッジマッピングのネットワーク構成。</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -442,7 +442,7 @@
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">名前</th>
-<th class="tableblock halign-left valign-top">Kind</th>
+<th class="tableblock halign-left valign-top">種類</th>
 <th class="tableblock halign-left valign-top">目的</th>
 <th class="tableblock halign-left valign-top">チュートリアル</th>
 <th class="tableblock halign-left valign-top">ダウンロード</th>
@@ -452,14 +452,14 @@
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">localnet-secondary-namespace</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Namespace</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">localnetセカンダリネットワークVM用のNamespace</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">localnetセカンダリネットワークVM用の名前空間</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/localnet-secondary.html" class="xref page">networking:localnet-secondary.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/_attachments/localnet-secondary/localnet-secondary-namespace.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">localnet-bridge-mapping-nncp</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">NNCP</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">localnetトポロジのためにlocalnet1をbr-exブリッジにマッピングします</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">localnetトポロジーのためにlocalnet1をbr-exブリッジにマッピングする</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/localnet-secondary.html" class="xref page">networking:localnet-secondary.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/_attachments/localnet-secondary/localnet-bridge-mapping-nncp.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
@@ -473,14 +473,14 @@
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">localnet-vlan-namespace</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Namespace</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VLAN localnet VM用のNamespace</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VLAN localnet VM用の名前空間</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/localnet-vlan.html" class="xref page">networking:localnet-vlan.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/_attachments/localnet-vlan/localnet-vlan-namespace.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">localnet-vlan-bridge-mapping-nncp</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">NNCP</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VLANトラフィックのためにlocalnet-vlanをbr-exブリッジにマッピングします</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VLANトラフィックのためにlocalnet-vlanをbr-exブリッジにマッピングする</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/localnet-vlan.html" class="xref page">networking:localnet-vlan.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/_attachments/localnet-vlan/localnet-vlan-bridge-mapping-nncp.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
@@ -494,14 +494,14 @@
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">udn-primary-namespace</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Namespace</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">UDNプライマリネットワークラベルを持つNamespace</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UDNプライマリネットワークラベルを持つ名前空間</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/udn-primary-networks.html" class="xref page">networking:udn-primary-networks.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/_attachments/udn-primary-networks/udn-primary-namespace.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">udn-primary</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">UDN</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMプライマリネットワーク用のLayer 2 UserDefinedNetwork</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMプライマリネットワーク用のレイヤー2 UserDefinedNetwork</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/udn-primary-networks.html" class="xref page">networking:udn-primary-networks.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/_attachments/udn-primary-networks/udn-primary.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
@@ -513,7 +513,7 @@
 <h2 id="_仮想マシン"><a class="anchor" href="#_仮想マシン"></a>仮想マシン</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>様々なチュートリアルからのVMマニフェストで、異なる構成を示します。</p>
+<p>さまざまな構成を示すチュートリアルからのVMマニフェスト。</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -526,7 +526,7 @@
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">名前</th>
-<th class="tableblock halign-left valign-top">Kind</th>
+<th class="tableblock halign-left valign-top">種類</th>
 <th class="tableblock halign-left valign-top">目的</th>
 <th class="tableblock halign-left valign-top">チュートリアル</th>
 <th class="tableblock halign-left valign-top">ダウンロード</th>
@@ -557,7 +557,7 @@
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fedora-dhcp-vm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">VirtualMachine</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">DHCPネットワークを備えた基本的なFedora VM</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DHCPネットワーキングを持つ基本的なFedora VM</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/static-ip-configuration.html" class="xref page">networking:static-ip-configuration.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/_attachments/cloud-init-ip-configuration/fedora-dhcp-vm.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
@@ -578,7 +578,7 @@
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">golden-image-base-vm</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">VirtualMachine</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ゴールデンイメージ作成用のベースVM</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ゴールデンイメージを作成するためのベースVM</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../vm-lifecycle/custom-golden-images.html" class="xref page">vm-lifecycle:custom-golden-images.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../vm-lifecycle/_attachments/custom-golden-images/golden-image-base-vm.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
@@ -645,7 +645,7 @@
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">名前</th>
-<th class="tableblock halign-left valign-top">Kind</th>
+<th class="tableblock halign-left valign-top">種類</th>
 <th class="tableblock halign-left valign-top">目的</th>
 <th class="tableblock halign-left valign-top">チュートリアル</th>
 <th class="tableblock halign-left valign-top">ダウンロード</th>
@@ -655,7 +655,7 @@
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fedora-vm-web-service</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Service</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VM Webサーバーを公開するLoadBalancerサービス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMウェブサーバーを公開するLoadBalancerサービス</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/udn-primary-networks.html" class="xref page">networking:udn-primary-networks.adoc</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../networking/_attachments/udn-primary-networks/fedora-vm-web-service.yaml" class="xref attachment">YAML</a></p></td>
 </tr>
@@ -678,7 +678,7 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="_使用方法"><a class="anchor" href="#_使用方法"></a>使用方法</h2>
+<h2 id="_使用法"><a class="anchor" href="#_使用法"></a>使用法</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_ダウンロードと適用"><a class="anchor" href="#_ダウンロードと適用"></a>ダウンロードと適用</h3>
@@ -691,7 +691,7 @@
 <p>環境に合わせて値をカスタマイズします</p>
 </li>
 <li>
-<p><code>oc apply -f &lt;filename&gt;.yaml</code> で適用します</p>
+<p>`oc apply -f &lt;filename&gt;.yaml`で適用します</p>
 </li>
 </ol>
 </div>
@@ -707,12 +707,12 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="_関連項目"><a class="anchor" href="#_関連項目"></a>関連項目</h2>
+<h2 id="_参照"><a class="anchor" href="#_参照"></a>参照</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p><a href="../getting-started/index.html" class="xref page">はじめに</a></p>
+<p><a href="../getting-started/index.html" class="xref page">getting-started:index.adoc</a></p>
 </li>
 <li>
 <p><a href="../storage/index.html" class="xref page">storage:index.adoc</a></p>

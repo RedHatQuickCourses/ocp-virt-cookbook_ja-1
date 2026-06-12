@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>前提条件とセットアップ :: OpenShift Virtualization cookbook</title>
+    <title>Untitled :: OpenShift Virtualization cookbook</title>
     <link rel="prev" href="index.html">
     <link rel="next" href="install-openshift-virtualization.html">
     <meta name="generator" content="Antora 3.2.0-alpha.12">
@@ -44,7 +44,7 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../index.html">Introduction</a>
+    <a class="nav-link" href="../index.html">index.adoc</a>
   </li>
 </ul>
   </li>
@@ -52,28 +52,28 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="index.html">はじめに</a>
+    <a class="nav-link" href="index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item is-current-page" data-depth="2">
-    <a class="nav-link" href="prerequisites.html">前提条件</a>
+    <a class="nav-link" href="prerequisites.html">prerequisites.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="install-openshift-virtualization.html">OpenShift Virtualization をインストール</a>
+    <a class="nav-link" href="install-openshift-virtualization.html">install-openshift-virtualization.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="default-storage-class.html">ストレージセットアップ</a>
+    <a class="nav-link" href="default-storage-class.html">default-storage-class.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="create-vm-web-console.html">ウェブコンソールからのVM作成</a>
+    <a class="nav-link" href="create-vm-web-console.html">create-vm-web-console.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="vm-lifecycle-states.html">VMライフサイクルステート</a>
+    <a class="nav-link" href="vm-lifecycle-states.html">vm-lifecycle-states.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="virtctl-basics.html">virtctlの基本</a>
+    <a class="nav-link" href="virtctl-basics.html">virtctl の基本</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="cloud-init-fundamentals.html">Cloud-initの基本</a>
+    <a class="nav-link" href="cloud-init-fundamentals.html">cloud-init-fundamentals.adoc</a>
   </li>
 </ul>
   </li>
@@ -89,7 +89,7 @@
     <a class="nav-link" href="../storage/lvm-operator.html">lvm-operator.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/lvm-troubleshooting.html">lvm-troubleshooting.adoc</a>
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../storage/hostpath-provisioner.html">hostpath-provisioner.adoc</a>
@@ -138,7 +138,7 @@
     <a class="nav-link" href="../networking/sriov-secondary.html">sriov-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM Ingress とルート</a>
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">vm-ingress-routes.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ovs-bridge-troubleshooting.adoc</a>
@@ -290,8 +290,8 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
-    <li><a href="index.html">はじめに</a></li>
-    <li><a href="prerequisites.html">前提条件</a></li>
+    <li><a href="index.html">index.adoc</a></li>
+    <li><a href="prerequisites.html">prerequisites.adoc</a></li>
   </ul>
 </nav>
 </div>
@@ -300,236 +300,12 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">前提条件とセットアップ</h1>
-<div class="sect1">
-<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>このページでは、本書に記載されている OpenShift Virtualization を使用するための前提条件と要件を概説します。</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_クラスター要件"><a class="anchor" href="#_クラスター要件"></a>クラスター要件</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_openshift_のバージョン"><a class="anchor" href="#_openshift_のバージョン"></a>OpenShift のバージョン</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>OpenShift 4.18+ 以降</p>
-</li>
-<li>
-<p>OpenShift Virtualization オペレーターがインストールされ、実行中であること</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_クラスターアクセス"><a class="anchor" href="#_クラスターアクセス"></a>クラスターアクセス</h3>
-<div class="paragraph">
-<p>実行したいタスクに応じて、適切なアクセスレベルが必要です。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Cluster Admin</strong>: オペレーターのインストール、ストレージ構成、ネットワーク構成に必要です</p>
-</li>
-<li>
-<p><strong>Namespace Admin</strong>: 特定のネームスペース内で VM を管理するのに十分です</p>
-</li>
-<li>
-<p><strong>Developer</strong>: 適切な RBAC 権限があれば、VM の作成と管理が可能です</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_必須の_cli_ツール"><a class="anchor" href="#_必須の_cli_ツール"></a>必須の CLI ツール</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_openshift_cli_oc"><a class="anchor" href="#_openshift_cli_oc"></a>OpenShift CLI (oc)</h3>
-<div class="paragraph">
-<p>OpenShift コマンドラインインターフェースは、クラスター操作に不可欠です。</p>
-</div>
-<div class="paragraph">
-<p>インストール元: <a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/cli_tools/openshift-cli-oc#cli-getting-started" target="_blank" rel="noopener">OpenShift CLI ドキュメント</a></p>
-</div>
-<div class="paragraph">
-<p>インストールの確認:</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc version</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_kubernetes_cli_kubectl"><a class="anchor" href="#_kubernetes_cli_kubectl"></a>Kubernetes CLI (kubectl)</h3>
-<div class="paragraph">
-<p><code>oc</code> が推奨されますが、<code>kubectl</code> も多くの操作に使用できます。</p>
-</div>
-<div class="paragraph">
-<p>インストール元: <a href="https://kubernetes.io/docs/tasks/tools/" target="_blank" rel="noopener">Kubernetes ドキュメント</a></p>
-</div>
-<div class="paragraph">
-<p>インストールの確認:</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl version</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_virtctl"><a class="anchor" href="#_virtctl"></a>Virtctl</h3>
-<div class="paragraph">
-<p><code>virtctl</code> ツールは、KubeVirt/OpenShift Virtualization リソースを管理するために特別に設計されています。</p>
-</div>
-<div class="paragraph">
-<p>インストール元: <a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/getting-started#virt-using-the-cli-tools" target="_blank" rel="noopener">OpenShift Virtualization ドキュメント</a></p>
-</div>
-<div class="paragraph">
-<p>インストールの確認:</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">virtctl version</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_オプションのツール"><a class="anchor" href="#_オプションのツール"></a>オプションのツール</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>ワークフローによっては、以下のツールも必要となる場合があります。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>kustomize</strong>: Kubernetes 構成を管理するため</p>
-</li>
-<li>
-<p><strong>helm</strong>: パッケージ化されたアプリケーションをデプロイするため</p>
-</li>
-<li>
-<p><strong>ansible</strong>: 自動化とオーケストレーションのため</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_クラスター構成"><a class="anchor" href="#_クラスター構成"></a>クラスター構成</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_ストレージ"><a class="anchor" href="#_ストレージ"></a>ストレージ</h3>
-<div class="paragraph">
-<p>クラスターに以下のものがあることを確認してください。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>少なくとも 1 つの StorageClass が構成されている</p>
-</li>
-<li>
-<p>VM ディスクに十分なストレージ容量がある</p>
-</li>
-<li>
-<p>動的プロビジョニングをサポートするストレージプロビジョナーがある</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>利用可能なストレージクラスを確認する:</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get storageclass</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_ネットワーク"><a class="anchor" href="#_ネットワーク"></a>ネットワーク</h3>
-<div class="paragraph">
-<p>ネットワーク接続を確認する:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>クラスターネットワークが機能している</p>
-</li>
-<li>
-<p>Pod ネットワークにアクセスできる</p>
-</li>
-<li>
-<p>VM に外部ネットワークアクセスが必要な場合は、それが可能である</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_確認"><a class="anchor" href="#_確認"></a>確認</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>チュートリアルに進む前に、セットアップを確認してください。</p>
-</div>
-<div class="listingblock execute">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Check cluster status
-oc get nodes
-
-# Verify OpenShift Virtualization operator
-oc get csv -n openshift-cnv
-
-# Check available VM templates
-oc get datasources -n openshift-virtualization-os-images</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_次のステップ"><a class="anchor" href="#_次のステップ"></a>次のステップ</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>前提条件が整ったら、次へ進みます。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="virtctl-basics.html" class="xref page">virtctl の基本を学ぶ</a></p>
-</li>
-<li>
-<p><a href="default-storage-class.html" class="xref page">デフォルトストレージを構成する</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_関連項目"><a class="anchor" href="#_関連項目"></a>関連項目</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html" target="_blank" rel="noopener">OpenShift Virtualization ドキュメント</a></p>
-</li>
-<li>
-<p><a href="https://kubevirt.io/" target="_blank" rel="noopener">KubeVirt プロジェクト</a></p>
-</li>
-</ul>
-</div>
-</div>
+<p>Error: Unable to get response from Gemini model after multiple attempts.</p>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="index.html">はじめに</a></span>
-  <span class="next"><a href="install-openshift-virtualization.html">OpenShift Virtualization をインストール</a></span>
+  <span class="prev"><a href="index.html">index.adoc</a></span>
+  <span class="next"><a href="install-openshift-virtualization.html">install-openshift-virtualization.adoc</a></span>
 </nav>
 </article>
   </div>

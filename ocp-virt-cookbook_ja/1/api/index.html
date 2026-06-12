@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>API統合 :: OpenShift Virtualization cookbook</title>
+    <title>APIの統合 :: OpenShift Virtualization cookbook</title>
     <link rel="prev" href="../manifests/index.html">
     <link rel="next" href="api-component-overview.html">
     <meta name="generator" content="Antora 3.2.0-alpha.12">
@@ -44,7 +44,7 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../index.html">Introduction</a>
+    <a class="nav-link" href="../index.html">index.adoc</a>
   </li>
 </ul>
   </li>
@@ -52,28 +52,28 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../getting-started/index.html">はじめに</a>
+    <a class="nav-link" href="../getting-started/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
+    <a class="nav-link" href="../getting-started/prerequisites.html">prerequisites.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift Virtualization をインストール</a>
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">install-openshift-virtualization.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージセットアップ</a>
+    <a class="nav-link" href="../getting-started/default-storage-class.html">default-storage-class.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/create-vm-web-console.html">ウェブコンソールからのVM作成</a>
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">create-vm-web-console.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VMライフサイクルステート</a>
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">vm-lifecycle-states.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctlの基本</a>
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">Cloud-initの基本</a>
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">cloud-init-fundamentals.adoc</a>
   </li>
 </ul>
   </li>
@@ -89,7 +89,7 @@
     <a class="nav-link" href="../storage/lvm-operator.html">lvm-operator.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/lvm-troubleshooting.html">lvm-troubleshooting.adoc</a>
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../storage/hostpath-provisioner.html">hostpath-provisioner.adoc</a>
@@ -138,7 +138,7 @@
     <a class="nav-link" href="../networking/sriov-secondary.html">sriov-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM Ingress とルート</a>
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">vm-ingress-routes.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ovs-bridge-troubleshooting.adoc</a>
@@ -299,15 +299,15 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">API統合</h1>
+<h1 class="page">APIの統合</h1>
 <div class="sect1">
 <h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>このモジュールでは、OpenShift VirtualizationのAPIについて、コンポーネントAPIオブジェクトの概要と各オブジェクト内の主要フィールドを含めて説明します。</p>
+<p>このモジュールでは、OpenShift Virtualization のAPIについて説明します。これには、コンポーネントのAPIオブジェクトの概要と、各オブジェクト内の主要フィールドが含まれます。</p>
 </div>
 <div class="paragraph">
-<p>APIは強力な機能であり、OpenShift Virtualizationと基盤となるOpenShift Container Platformの両方とのより緊密な製品統合に活用できます。</p>
+<p>APIは強力な機能であり、OpenShift Virtualization および基盤となるOpenShift Container Platform の両方との製品統合を強化するために活用できます。</p>
 </div>
 </div>
 </div>
@@ -315,7 +315,7 @@
 <h2 id="_内容"><a class="anchor" href="#_内容"></a>内容</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>このセクションで扱うトピックは次のとおりです。</p>
+<p>このセクションで扱うトピックは以下の通りです。</p>
 </div>
 <div class="ulist">
 <ul>
@@ -326,19 +326,19 @@
 <p>各APIオブジェクトの役割</p>
 </li>
 <li>
-<p>APIオブジェクト間の関係（一部は他のオブジェクトのより高レベルな抽象化です）</p>
+<p>APIオブジェクトが互いにどのように関連しているか（一部は他のオブジェクトのより上位の抽象化である）</p>
 </li>
 <li>
-<p>各APIオブジェクトの必須フィールド（および各フィールドの役割と許容値）</p>
+<p>各APIオブジェクトにおける必須フィールド（および各フィールドの役割と許容値）</p>
 </li>
 <li>
-<p>より高レベルなAPI機能（スナップショット、リストア、クローニング）</p>
+<p>より高レベルのAPI機能（スナップショット、リストア、クローン作成）</p>
 </li>
 <li>
-<p>オブジェクトの状態（VM、スナップショット、クローニング）を監視および管理する方法</p>
+<p>オブジェクトの状態（VM、スナップショット、クローン作成）を監視および管理する方法</p>
 </li>
 <li>
-<p>他のクラスターにインポートするためにVMとボリュームをエクスポートする方法</p>
+<p>他のクラスターへのインポートのためにVMとボリュームをエクスポートする方法</p>
 </li>
 </ul>
 </div>
@@ -356,10 +356,10 @@
 <p>OpenShift VirtualizationがインストールされたOpenShift v4.18+クラスター</p>
 </li>
 <li>
-<p>クラスターレベルの管理者アクセス（またはテスト用またはシングルテナントクラスター用の`kubeadmin`アカウント資格情報）</p>
+<p>クラスターレベルの管理者アクセス権（またはテスト用またはシングルテナントクラスター用の <code>kubeadmin</code> アカウント認証情報）</p>
 </li>
 <li>
-<p>REST APIと関連するHTTP CRUD操作（GET、PUT、POST、PATCH、DELETE）、トークンベース認証、jsonなどの理解</p>
+<p>REST APIと関連するHTTP CRUD操作（GET、PUT、POST、PATCH、DELETE）、トークンベース認証、jsonなどに関する理解</p>
 </li>
 <li>
 <p>REST API開発ツール（Postman、cURLなど）</p>
@@ -375,7 +375,7 @@
 <dl>
 <dt class="hdlist1"><a href="api-component-overview.html" class="xref page">APIコンポーネントの概要</a></dt>
 <dd>
-<p>OpenShift VirtualizationのAPIコンポーネントの概要です。</p>
+<p>OpenShift Virtualization のAPIコンポーネントの概要です。</p>
 </dd>
 </dl>
 </div>
@@ -385,8 +385,8 @@
 <h2 id="_次のステップ"><a class="anchor" href="#_次のステップ"></a>次のステップ</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>このモジュールを完了すると、OpenShift Virtualizationと独自の製品を統合し始めるのに十分な理解が得られるはずです（願わくば）。
-このガイドでは、将来の（そして現在の）パートナーの市場投入までの時間を短縮するために、他のベンダーとの統合で遭遇した注意点や問題点を挙げるように努めました。</p>
+<p>このモジュールを完了すると、OpenShift Virtualization とご自身の製品の統合を開始するのに十分な理解が得られるはずです（願わくば）。
+本ガイドでは、これまでのベンダー統合で遭遇した注意点や問題点を挙げるよう努めました。これにより、将来（および現在の）パートナー様の市場投入までの時間を短縮できるでしょう。</p>
 </div>
 </div>
 </div>
