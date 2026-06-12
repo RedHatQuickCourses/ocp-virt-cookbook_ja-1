@@ -1,5 +1,5 @@
 site:
-  title: FIXME Course Title
+  title: OpenShift Virtualization cookbook
   start_page: ocp-virt-cookbook_ja::index.adoc
 
 content:
