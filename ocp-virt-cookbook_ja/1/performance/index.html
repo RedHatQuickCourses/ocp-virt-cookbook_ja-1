@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>VM パフォーマンスチューニング :: OpenShift Virtualization cookbook</title>
-    <link rel="prev" href="#仮想マシンテンプレート.adoc">
-    <link rel="next" href="#リソース制限とQoS.adoc">
+    <title>Untitled :: OpenShift Virtualization cookbook</title>
+    <link rel="prev" href="../vm-configuration/vm-templates.html">
+    <link rel="next" href="resource-limits-qos.html">
     <meta name="generator" content="Antora 3.2.0-alpha.12">
     <link rel="stylesheet" href="../../../_/css/site.css">
     <link rel="stylesheet" href="../../../_/css/vendor/tabs.css">
@@ -44,7 +44,7 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../index.html">紹介</a>
+    <a class="nav-link" href="../index.html">Introduction</a>
   </li>
 </ul>
   </li>
@@ -52,28 +52,28 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../getting-started/index.html">開始</a>
+    <a class="nav-link" href="../getting-started/index.html">はじめに</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="../getting-started/prerequisites.html">前提条件</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+    <a class="nav-link" href="../getting-started/install-openshift-virtualization.html">OpenShift Virtualization をインストール</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージ設定</a>
+    <a class="nav-link" href="../getting-started/default-storage-class.html">ストレージセットアップ</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/create-vm-web-console.html">WebコンソールからのVMの作成</a>
+    <a class="nav-link" href="../getting-started/create-vm-web-console.html">ウェブコンソールからのVM作成</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VM ライフサイクル状態</a>
+    <a class="nav-link" href="../getting-started/vm-lifecycle-states.html">VMライフサイクルステート</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctl の基本</a>
+    <a class="nav-link" href="../getting-started/virtctl-basics.html">virtctlの基本</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+    <a class="nav-link" href="../getting-started/cloud-init-fundamentals.html">Cloud-initの基本</a>
   </li>
 </ul>
   </li>
@@ -83,22 +83,22 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../storage/index.html">ストレージ構成</a>
+    <a class="nav-link" href="../storage/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/lvm-operator.html">LVM Operator のインストール</a>
+    <a class="nav-link" href="../storage/lvm-operator.html">lvm-operator.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">lvm-troubleshooting.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/hostpath-provisioner.html">HostPath Provisioner</a>
+    <a class="nav-link" href="../storage/hostpath-provisioner.html">hostpath-provisioner.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+    <a class="nav-link" href="../storage/creating-managing-storage-class.html">creating-managing-storage-class.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/multi-disk-configuration.html">複数ディスク VM</a>
+    <a class="nav-link" href="../storage/multi-disk-configuration.html">multi-disk-configuration.adoc</a>
   </li>
 </ul>
   </li>
@@ -108,40 +108,40 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+    <a class="nav-link" href="../networking/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#静的IP構成.adoc">静的IP構成.adoc</a>
+    <a class="nav-link" href="../networking/static-ip-configuration.html">static-ip-configuration.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#クラウドイニシャルトラブルシューティング.adoc">クラウドイニシャルトラブルシューティング.adoc</a>
+    <a class="nav-link" href="../networking/cloud-init-troubleshooting.html">cloud-init-troubleshooting.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#UDN主ネットワーク.adoc">UDN主ネットワーク.adoc</a>
+    <a class="nav-link" href="../networking/udn-primary-networks.html">udn-primary-networks.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#ローカルネットセカンダリ.adoc">ローカルネットセカンダリ.adoc</a>
+    <a class="nav-link" href="../networking/localnet-secondary.html">localnet-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#ローカルネットVLAN.adoc">ローカルネットVLAN.adoc</a>
+    <a class="nav-link" href="../networking/localnet-vlan.html">localnet-vlan.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#CUDNローカルネットVLAN.adoc">CUDNローカルネットVLAN.adoc</a>
+    <a class="nav-link" href="../networking/cudn-localnet-vlan.html">cudn-localnet-vlan.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#レイヤ2セカンダリ.adoc">レイヤ2セカンダリ.adoc</a>
+    <a class="nav-link" href="../networking/layer2-secondary.html">layer2-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#Linuxブリッジ.adoc">Linuxブリッジ.adoc</a>
+    <a class="nav-link" href="../networking/linux-bridges.html">linux-bridges.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#SIRIUSセカンダリ.adoc">SIRIUSセカンダリ.adoc</a>
+    <a class="nav-link" href="../networking/sriov-secondary.html">sriov-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#VM入口ルート.adoc">VM入口ルート.adoc</a>
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM Ingress とルート</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#OVSブリッジトラブルシューティング.adoc">OVSブリッジトラブルシューティング.adoc</a>
+    <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ovs-bridge-troubleshooting.adoc</a>
   </li>
 </ul>
   </li>
@@ -151,34 +151,34 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../vm-configuration/index.html">仮想マシン構成</a>
+    <a class="nav-link" href="../vm-configuration/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#内部DNSの仮想マシン.adoc">内部DNSの仮想マシン.adoc</a>
+    <a class="nav-link" href="../vm-configuration/internal-dns-for-vms.html">internal-dns-for-vms.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシン.adoc">リモートアクセスを用いたLinux仮想マシン.adoc</a>
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-vms.html">remote-access-linux-vms.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc">リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc</a>
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-troubleshooting.html">remote-access-linux-troubleshooting.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#リモートアクセスを用いたWindows仮想マシン.adoc">リモートアクセスを用いたWindows仮想マシン.adoc</a>
+    <a class="nav-link" href="../vm-configuration/remote-access-windows-vms.html">remote-access-windows-vms.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#Windows仮想マシンのVirtioドライバー.adoc">Windows仮想マシンのVirtioドライバー.adoc</a>
+    <a class="nav-link" href="../vm-configuration/windows-vm-virtio-drivers.html">windows-vm-virtio-drivers.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#インフラストラクチャーノードの配置.adoc">インフラストラクチャーノードの配置.adoc</a>
+    <a class="nav-link" href="../vm-configuration/infrastructure-node-placement.html">infrastructure-node-placement.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#ノードのアフィニティー.adoc">ノードのアフィニティー.adoc</a>
+    <a class="nav-link" href="../vm-configuration/node-placement-affinity.html">node-placement-affinity.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#ホットプラグ可能なボリュームとインターフェース.adoc">ホットプラグ可能なボリュームとインターフェース.adoc</a>
+    <a class="nav-link" href="../vm-configuration/hotplug-volumes-interfaces.html">hotplug-volumes-interfaces.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#仮想マシンテンプレート.adoc">仮想マシンテンプレート.adoc</a>
+    <a class="nav-link" href="../vm-configuration/vm-templates.html">vm-templates.adoc</a>
   </li>
 </ul>
   </li>
@@ -188,19 +188,19 @@
 <ul class="nav-list">
   <li class="nav-item is-current-page" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="index.html">VM パフォーマンスチューニング</a>
+    <a class="nav-link" href="index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#リソース制限とQoS.adoc">リソース制限とQoS.adoc</a>
+    <a class="nav-link" href="resource-limits-qos.html">resource-limits-qos.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#CPUピニング.adoc">CPUピニング.adoc</a>
+    <a class="nav-link" href="cpu-pinning.html">cpu-pinning.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#NUMA大ページ.adoc">NUMA大ページ.adoc</a>
+    <a class="nav-link" href="numa-hugepages.html">numa-hugepages.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#リアルタイム仮想マシン.adoc">リアルタイム仮想マシン.adoc</a>
+    <a class="nav-link" href="realtime-vms.html">realtime-vms.adoc</a>
   </li>
 </ul>
   </li>
@@ -210,25 +210,25 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+    <a class="nav-link" href="../vm-lifecycle/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">import-qcow2-boot-volume.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">custom-golden-images.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">golden-images-troubleshooting.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">cloning-vms.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">vm-snapshots.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">boot-order-boot-sources.adoc</a>
   </li>
 </ul>
   </li>
@@ -245,10 +245,10 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../api/index.html">API ガイド</a>
+    <a class="nav-link" href="../api/index.html">APIガイド</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+    <a class="nav-link" href="../api/api-component-overview.html">api-component-overview.adoc</a>
   </li>
 </ul>
   </li>
@@ -257,7 +257,7 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../appendix/glossary.html">glossary</a>
+    <a class="nav-link" href="../appendix/glossary.html">Glossary</a>
   </li>
 </ul>
   </li>
@@ -290,7 +290,7 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
-    <li><a href="index.html">VM パフォーマンスチューニング</a></li>
+    <li><a href="index.html">index.adoc</a></li>
   </ul>
 </nav>
 </div>
@@ -299,142 +299,12 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">VM パフォーマンスチューニング</h1>
-<div class="sect1">
-<h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>このモジュールでは、OpenShift Virtualization で仮想マシンのパフォーマンスチューニングについて説明します。チュートリアルは、リソース管理の基礎から始まり、CPU ピニング、NUMA トポロジー、リアルタイムワークロードに進みます。</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_学習目標"><a class="anchor" href="#_学習目標"></a>学習目標</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>仮想マシンの CPU とメモリーの要求、制限、QoS クラスを設定する方法</p>
-</li>
-<li>
-<p>低遅延ワークロード向けに VM vCPUs を専用の物理 CPU にピニングする方法</p>
-</li>
-<li>
-<p>VM に大ページバックされたメモリーと NUMA トポロジー通過を設定する方法</p>
-</li>
-<li>
-<p>制限されたワーストケースレイテンシーでリアルタイム仮想マシンを実行する方法</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>VM パフォーマンスチューニングを開始する前に、以下の点を確認してください。</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>OpenShift 4.18+ に OpenShift Virtualization オペレーターがインストールされている</p>
-</li>
-<li>
-<p>Kubernetes リソース管理概念の理解</p>
-</li>
-<li>
-<p>CLI ツールがインストールされている: <code>oc</code>, <code>virtctl</code>, <code>kubectl</code></p>
-</li>
-<li>
-<p>ノードレベルの構成 (CPU マネージャー、hugepages) にクラスター管理者アクセス権</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_トピック"><a class="anchor" href="#_トピック"></a>トピック</h2>
-<div class="sectionbody">
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><a href="resource-limits-qos.html" class="xref page">仮想マシンリソース制限とQoSの構成</a></dt>
-<dd>
-<p>仮想マシンの CPU とメモリーの要求、制限、QoS クラスを設定する方法、リソースクォータと LimitRanges を使用した名前空間レベルのガバナンス。</p>
-</dd>
-<dt class="hdlist1"><a href="cpu-pinning.html" class="xref page">仮想マシン用専用CPU配置</a></dt>
-<dd>
-<p>Kubernetes CPU マネージャーの静的ポリシーを使用して、仮想マシンの vCPUs を専用の物理 CPU にピニングし、低遅延およびパフォーマンス駆動型ワークロードから CPU スティールを排除する方法。</p>
-</dd>
-<dt class="hdlist1"><a href="numa-hugepages.html" class="xref page">NUMA トポロジーとヒュージページ用の仮想マシン</a></dt>
-<dd>
-<p>仮想マシンに大ページバックされたメモリーと NUMA トポロジー通過を設定する方法、TLB オーバーヘッドを減らし、NUMA 認識のゲストスケジューリングを可能にする方法。</p>
-</dd>
-<dt class="hdlist1"><a href="realtime-vms.html" class="xref page">リアルタイム仮想マシン</a></dt>
-<dd>
-<p>専用 CPU、NUMA パススルー、hugepages、RT カーネル、SCHED_FIFO スケジューリングを使用して、制限されたワーストケースレイテンシーでリアルタイム仮想マシンを設定する方法。</p>
-</dd>
-</dl>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_推奨読解順序"><a class="anchor" href="#_推奨読解順序"></a>推奨読解順序</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>パフォーマンスチュートリアルは、順序的に構築されます。</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p><strong>リソース制限と QoS</strong>&#8201;&#8212;&#8201;専用 CPU を有効にする前に、ガーランテッド QoS の要件を理解する</p>
-</li>
-<li>
-<p><strong>CPU ピニング</strong>&#8201;&#8212;&#8201;CPU マネージャーの静的ポリシーを有効にし、vCPUs を専用にする</p>
-</li>
-<li>
-<p><strong>NUMA と大ページ</strong>&#8201;&#8212;&#8201;大ページメモリーと NUMA トポロジー認識を追加する</p>
-</li>
-<li>
-<p><strong>リアルタイム仮想マシン</strong>&#8201;&#8212;&#8201;上記のすべてのものを組み合わせて、RT カーネルと SCHED_FIFO スケジューリングを使用する</p>
-</li>
-</ol>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_関連トピック"><a class="anchor" href="#_関連トピック"></a>関連トピック</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="../vm-configuration/index.html" class="xref page">仮想マシン構成</a> - 一般的な仮想マシンのセットアップとアクセス</p>
-</li>
-<li>
-<p><a href="../storage/index.html" class="xref page">ストレージ構成</a> - 仮想マシン用の永続ストレージ</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_追加リソース"><a class="anchor" href="#_追加リソース"></a>追加リソース</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/about#about-virt" target="_blank" rel="noopener">OpenShift Virtualization ドキュメント</a></p>
-</li>
-<li>
-<p><a href="https://kubevirt.io/user-guide/" target="_blank" rel="noopener">KubeVirt ユーザーガイド</a></p>
-</li>
-</ul>
-</div>
-</div>
+<p>Error: Unable to get response from Gemini model after multiple attempts.</p>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="#仮想マシンテンプレート.adoc">仮想マシンテンプレート.adoc</a></span>
-  <span class="next"><a href="#リソース制限とQoS.adoc">リソース制限とQoS.adoc</a></span>
+  <span class="prev"><a href="../vm-configuration/vm-templates.html">vm-templates.adoc</a></span>
+  <span class="next"><a href="resource-limits-qos.html">resource-limits-qos.adoc</a></span>
 </nav>
 </article>
   </div>

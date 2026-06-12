@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>デフォルトストレージクラスの構成 :: OpenShift Virtualization cookbook</title>
+    <title>デフォルトストレージクラスの設定 :: OpenShift Virtualization cookbook</title>
     <link rel="prev" href="install-openshift-virtualization.html">
     <link rel="next" href="create-vm-web-console.html">
     <meta name="generator" content="Antora 3.2.0-alpha.12">
@@ -44,7 +44,7 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../index.html">紹介</a>
+    <a class="nav-link" href="../index.html">Introduction</a>
   </li>
 </ul>
   </li>
@@ -52,28 +52,28 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="index.html">開始</a>
+    <a class="nav-link" href="index.html">はじめに</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="prerequisites.html">前提条件</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="install-openshift-virtualization.html">OpenShift仮想化のインストール</a>
+    <a class="nav-link" href="install-openshift-virtualization.html">OpenShift Virtualization をインストール</a>
   </li>
   <li class="nav-item is-current-page" data-depth="2">
-    <a class="nav-link" href="default-storage-class.html">ストレージ設定</a>
+    <a class="nav-link" href="default-storage-class.html">ストレージセットアップ</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="create-vm-web-console.html">WebコンソールからのVMの作成</a>
+    <a class="nav-link" href="create-vm-web-console.html">ウェブコンソールからのVM作成</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="vm-lifecycle-states.html">VM ライフサイクル状態</a>
+    <a class="nav-link" href="vm-lifecycle-states.html">VMライフサイクルステート</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="virtctl-basics.html">virtctl の基本</a>
+    <a class="nav-link" href="virtctl-basics.html">virtctlの基本</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="cloud-init-fundamentals.html">クラウドインイニシャライゼーションの基礎</a>
+    <a class="nav-link" href="cloud-init-fundamentals.html">Cloud-initの基本</a>
   </li>
 </ul>
   </li>
@@ -83,22 +83,22 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../storage/index.html">ストレージ構成</a>
+    <a class="nav-link" href="../storage/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/lvm-operator.html">LVM Operator のインストール</a>
+    <a class="nav-link" href="../storage/lvm-operator.html">lvm-operator.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/lvm-troubleshooting.html">LVMトラブルシューティング</a>
+    <a class="nav-link" href="../storage/lvm-troubleshooting.html">lvm-troubleshooting.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/hostpath-provisioner.html">HostPath Provisioner</a>
+    <a class="nav-link" href="../storage/hostpath-provisioner.html">hostpath-provisioner.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/creating-managing-storage-class.html">ストレージクラスの作成と管理</a>
+    <a class="nav-link" href="../storage/creating-managing-storage-class.html">creating-managing-storage-class.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../storage/multi-disk-configuration.html">複数ディスク VM</a>
+    <a class="nav-link" href="../storage/multi-disk-configuration.html">multi-disk-configuration.adoc</a>
   </li>
 </ul>
   </li>
@@ -108,40 +108,40 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../networking/index.html">ネットワーク構成</a>
+    <a class="nav-link" href="../networking/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#静的IP構成.adoc">静的IP構成.adoc</a>
+    <a class="nav-link" href="../networking/static-ip-configuration.html">static-ip-configuration.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#クラウドイニシャルトラブルシューティング.adoc">クラウドイニシャルトラブルシューティング.adoc</a>
+    <a class="nav-link" href="../networking/cloud-init-troubleshooting.html">cloud-init-troubleshooting.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#UDN主ネットワーク.adoc">UDN主ネットワーク.adoc</a>
+    <a class="nav-link" href="../networking/udn-primary-networks.html">udn-primary-networks.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#ローカルネットセカンダリ.adoc">ローカルネットセカンダリ.adoc</a>
+    <a class="nav-link" href="../networking/localnet-secondary.html">localnet-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#ローカルネットVLAN.adoc">ローカルネットVLAN.adoc</a>
+    <a class="nav-link" href="../networking/localnet-vlan.html">localnet-vlan.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#CUDNローカルネットVLAN.adoc">CUDNローカルネットVLAN.adoc</a>
+    <a class="nav-link" href="../networking/cudn-localnet-vlan.html">cudn-localnet-vlan.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#レイヤ2セカンダリ.adoc">レイヤ2セカンダリ.adoc</a>
+    <a class="nav-link" href="../networking/layer2-secondary.html">layer2-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#Linuxブリッジ.adoc">Linuxブリッジ.adoc</a>
+    <a class="nav-link" href="../networking/linux-bridges.html">linux-bridges.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#SIRIUSセカンダリ.adoc">SIRIUSセカンダリ.adoc</a>
+    <a class="nav-link" href="../networking/sriov-secondary.html">sriov-secondary.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#VM入口ルート.adoc">VM入口ルート.adoc</a>
+    <a class="nav-link" href="../networking/vm-ingress-routes.html">VM Ingress とルート</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#OVSブリッジトラブルシューティング.adoc">OVSブリッジトラブルシューティング.adoc</a>
+    <a class="nav-link" href="../networking/ovs-bridge-troubleshooting.html">ovs-bridge-troubleshooting.adoc</a>
   </li>
 </ul>
   </li>
@@ -151,34 +151,34 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../vm-configuration/index.html">仮想マシン構成</a>
+    <a class="nav-link" href="../vm-configuration/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#内部DNSの仮想マシン.adoc">内部DNSの仮想マシン.adoc</a>
+    <a class="nav-link" href="../vm-configuration/internal-dns-for-vms.html">internal-dns-for-vms.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシン.adoc">リモートアクセスを用いたLinux仮想マシン.adoc</a>
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-vms.html">remote-access-linux-vms.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc">リモートアクセスを用いたLinux仮想マシンのトラブルシューティング.adoc</a>
+    <a class="nav-link" href="../vm-configuration/remote-access-linux-troubleshooting.html">remote-access-linux-troubleshooting.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#リモートアクセスを用いたWindows仮想マシン.adoc">リモートアクセスを用いたWindows仮想マシン.adoc</a>
+    <a class="nav-link" href="../vm-configuration/remote-access-windows-vms.html">remote-access-windows-vms.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#Windows仮想マシンのVirtioドライバー.adoc">Windows仮想マシンのVirtioドライバー.adoc</a>
+    <a class="nav-link" href="../vm-configuration/windows-vm-virtio-drivers.html">windows-vm-virtio-drivers.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#インフラストラクチャーノードの配置.adoc">インフラストラクチャーノードの配置.adoc</a>
+    <a class="nav-link" href="../vm-configuration/infrastructure-node-placement.html">infrastructure-node-placement.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#ノードのアフィニティー.adoc">ノードのアフィニティー.adoc</a>
+    <a class="nav-link" href="../vm-configuration/node-placement-affinity.html">node-placement-affinity.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#ホットプラグ可能なボリュームとインターフェース.adoc">ホットプラグ可能なボリュームとインターフェース.adoc</a>
+    <a class="nav-link" href="../vm-configuration/hotplug-volumes-interfaces.html">hotplug-volumes-interfaces.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#仮想マシンテンプレート.adoc">仮想マシンテンプレート.adoc</a>
+    <a class="nav-link" href="../vm-configuration/vm-templates.html">vm-templates.adoc</a>
   </li>
 </ul>
   </li>
@@ -188,19 +188,19 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../performance/index.html">VM パフォーマンスチューニング</a>
+    <a class="nav-link" href="../performance/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#リソース制限とQoS.adoc">リソース制限とQoS.adoc</a>
+    <a class="nav-link" href="../performance/resource-limits-qos.html">resource-limits-qos.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#CPUピニング.adoc">CPUピニング.adoc</a>
+    <a class="nav-link" href="../performance/cpu-pinning.html">cpu-pinning.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#NUMA大ページ.adoc">NUMA大ページ.adoc</a>
+    <a class="nav-link" href="../performance/numa-hugepages.html">numa-hugepages.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#リアルタイム仮想マシン.adoc">リアルタイム仮想マシン.adoc</a>
+    <a class="nav-link" href="../performance/realtime-vms.html">realtime-vms.adoc</a>
   </li>
 </ul>
   </li>
@@ -210,25 +210,25 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../vm-lifecycle/index.html">VM ライフサイクル管理</a>
+    <a class="nav-link" href="../vm-lifecycle/index.html">index.adoc</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">qcow2 ブートボリュームのインポート</a>
+    <a class="nav-link" href="../vm-lifecycle/import-qcow2-boot-volume.html">import-qcow2-boot-volume.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">ゴールデンイメージ</a>
+    <a class="nav-link" href="../vm-lifecycle/custom-golden-images.html">custom-golden-images.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">ゴールデンイメージのトラブルシューティング</a>
+    <a class="nav-link" href="../vm-lifecycle/golden-images-troubleshooting.html">golden-images-troubleshooting.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">仮想マシンのクローン作成</a>
+    <a class="nav-link" href="../vm-lifecycle/cloning-vms.html">cloning-vms.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">VM スナップショット</a>
+    <a class="nav-link" href="../vm-lifecycle/vm-snapshots.html">vm-snapshots.adoc</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">VM ブート順序とブートソース</a>
+    <a class="nav-link" href="../vm-lifecycle/boot-order-boot-sources.html">boot-order-boot-sources.adoc</a>
   </li>
 </ul>
   </li>
@@ -245,10 +245,10 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../api/index.html">API ガイド</a>
+    <a class="nav-link" href="../api/index.html">APIガイド</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="../api/api-component-overview.html">API コンポーネントの概要</a>
+    <a class="nav-link" href="../api/api-component-overview.html">api-component-overview.adoc</a>
   </li>
 </ul>
   </li>
@@ -257,7 +257,7 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../appendix/glossary.html">glossary</a>
+    <a class="nav-link" href="../appendix/glossary.html">Glossary</a>
   </li>
 </ul>
   </li>
@@ -290,8 +290,8 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">OpenShift Virtualization cookbook</a></li>
-    <li><a href="index.html">開始</a></li>
-    <li><a href="default-storage-class.html">ストレージ設定</a></li>
+    <li><a href="index.html">はじめに</a></li>
+    <li><a href="default-storage-class.html">ストレージセットアップ</a></li>
   </ul>
 </nav>
 </div>
@@ -300,19 +300,19 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">デフォルトストレージクラスの構成</h1>
+<h1 class="page">デフォルトストレージクラスの設定</h1>
 <div class="sect1">
 <h2 id="_概要"><a class="anchor" href="#_概要"></a>概要</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>このチュートリアルでは、OpenShift Virtualization にデフォルトのストレージクラスを設定する方法をご案内します。デフォルトのストレージクラスは、ビルトインのDataSourceイメージ（Fedora、RHEL、CentOS Stream、Windows）からブートソースを自動的にプロビジョニングするために必要です。デフォルトのストレージクラスが設定されていない場合、これらのDataSourceは保留中になり、仮想マシンの作成ができません。デフォルトを設定することで、ストレージが明示的に定義されていない場合にも、仮想マシンとデータボリュームが指定されたストレージを使用するように自動的に設定されるため、デプロイと管理が簡素化されます。</p>
+<p>このチュートリアルでは、OpenShift Virtualization のデフォルトストレージクラスを設定する方法を説明します。デフォルトストレージクラスは、組み込みの DataSource イメージ (Fedora、RHEL、CentOS Stream、Windows) からブートソースを自動的にプロビジョニングするために必要です。これがないと、これらの DataSource は保留状態のままであり、VM を作成できません。デフォルトを設定することで、明示的にストレージが定義されていない場合に、仮想マシンとデータボリュームが指定されたストレージを自動的に使用するようになり、デプロイメントと管理が簡素化されます。</p>
 </div>
 <div class="paragraph">
-<p>テスト済みバージョン：</p>
+<p>テスト済みバージョン:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>OpenShift 4.19、4.20</pre>
+<pre>OpenShift 4.19, 4.20</pre>
 </div>
 </div>
 </div>
@@ -321,31 +321,31 @@
 <h2 id="_前提条件"><a class="anchor" href="#_前提条件"></a>前提条件</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>始めるには、以下のものが必要です。</p>
+<p>開始するには、次のものが必要です。</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>OpenShift クラスター</strong>：OpenShift Virtualization がインストールされた OpenShift クラスター</p>
+<p><strong>OpenShift クラスター</strong>: OpenShift Virtualization がインストールされている OpenShift クラスター</p>
 </li>
 <li>
-<p><strong>クラスター管理者アクセス</strong>：クラスター管理者権限を持ったクラスターへのアクセス</p>
+<p><strong>クラスター管理者アクセス</strong>: クラスター管理者権限を持つクラスターへのアクセス</p>
 </li>
 <li>
-<p><strong>ストレージクラス</strong>：クラスター内に少なくとも 1 つのストレージクラスが構成されている</p>
+<p><strong>ストレージクラス</strong>: クラスターに少なくとも1つの StorageClass が設定されていること</p>
 </li>
 <li>
-<p><strong>ストレージプロビジョナー</strong>：動的プロビジョニングをサポートするストレージプロビジョナー</p>
+<p><strong>ストレージプロビジョナー</strong>: 動的プロビジョニングをサポートするストレージプロビジョナー</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_ステップ_1利用可能なストレージクラスの表示"><a class="anchor" href="#_ステップ_1利用可能なストレージクラスの表示"></a>ステップ 1：利用可能なストレージクラスの表示</h2>
+<h2 id="_ステップ_1_利用可能なストレージクラスの確認"><a class="anchor" href="#_ステップ_1_利用可能なストレージクラスの確認"></a>ステップ 1: 利用可能なストレージクラスの確認</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>まず、クラスター内で既に利用可能なストレージクラスを確認し、既にデフォルトのストレージクラスが設定されているかどうかを確認します。</p>
+<p>まず、クラスターで利用可能なストレージクラスを確認し、すでにデフォルトストレージクラスが設定されているかどうかを特定します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -353,10 +353,10 @@
 </div>
 </div>
 <div class="paragraph">
-<p>このコマンドは、名前とプロビジョナーを表示するすべてのストレージクラスをリスト表示します。名前に <code>(default)</code> が付いているストレージクラスは、現在デフォルトとして設定されています。</p>
+<p>このコマンドは、すべてのストレージクラスを名前とプロビジョナーとともに一覧表示します。名前の横に <code>(default)</code> と表示されているストレージクラスを探してください。これは、現在デフォルトとして設定されていることを示します。</p>
 </div>
 <div class="paragraph">
-<p>既にデフォルトのストレージクラスが設定されていない例の出力：</p>
+<p>デフォルトストレージクラスがない場合の出力例:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -367,7 +367,7 @@ local-storage           kubernetes.io/no-provisioner            Delete          
 </div>
 </div>
 <div class="paragraph">
-<p>既にデフォルトのストレージクラスが設定されている例の出力：</p>
+<p>既存のデフォルトストレージクラスがある場合の出力例:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -378,47 +378,56 @@ local-storage           kubernetes.io/no-provisioner            Delete          
 </div>
 </div>
 <div class="paragraph">
-<p>以下の点に注意してください。</p>
+<p>次の点に注意してください。</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>デフォルトとして設定するストレージクラスの名前</p>
+<p>デフォルトとして設定したいストレージクラスの名前</p>
 </li>
 <li>
-<p>既にデフォルトのストレージクラスが設定されているかどうか</p>
+<p>すでにデフォルトストレージクラスが設定されているかどうか</p>
 </li>
 </ol>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_ステップ_2既存のデフォルトのストレージクラスの削除必要に応じて"><a class="anchor" href="#_ステップ_2既存のデフォルトのストレージクラスの削除必要に応じて"></a>ステップ 2：既存のデフォルトのストレージクラスの削除（必要に応じて）</h2>
+<h2 id="_ステップ_2_既存のデフォルトの削除_必要な場合"><a class="anchor" href="#_ステップ_2_既存のデフォルトの削除_必要な場合"></a>ステップ 2: 既存のデフォルトの削除 (必要な場合)</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>既にデフォルトのストレージクラスが設定されている場合は、まずそのアノテーションを削除する必要があります。クラスターは 1 つのデフォルトのストレージクラスのみを持つことができます。</p>
+<p>別のストレージクラスがすでにデフォルトとして設定されている場合、新しいデフォルトを設定する前に、そのアノテーションを最初に削除する必要があります。クラスターには1つのデフォルトストレージクラスしか設定できません。</p>
 </div>
 <div class="paragraph">
-<p>ストレージクラスからデフォルトのアノテーションを削除するには：</p>
+<p>ストレージクラスからデフォルトのアノテーションを削除するには:</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc annotate sc &lt;the-old-default-storage-class-name&gt; storageclass.kubernetes.io/is-default-class-</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>注：アノテーションキーの末尾にあるハイフンがアノテーションを削除します。</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+アノテーションキーの末尾のハイフンは、アノテーションを削除するものです。
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_ステップ_3ストレージクラスのアノテーション"><a class="anchor" href="#_ステップ_3ストレージクラスのアノテーション"></a>ステップ 3：ストレージクラスのアノテーション</h2>
+<h2 id="_ステップ_3_ストレージクラスへのアノテーション追加"><a class="anchor" href="#_ステップ_3_ストレージクラスへのアノテーション追加"></a>ステップ 3: ストレージクラスへのアノテーション追加</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>選択したストレージクラスにアノテーションを追加します。このアノテーションは、この特定のストレージクラスがデフォルトであることを OpenShift に通知します。</p>
+<p>選択したストレージクラスにアノテーションを追加します。このアノテーションは、OpenShift に対して、この特定のストレージクラスがデフォルトであるべきであることを伝えます。</p>
 </div>
 <div class="paragraph">
-<p>アノテーションは、<code>storageclass.kubernetes.io/is-default-class: "true"</code> です。</p>
+<p>アノテーションは次のとおりです: <code>storageclass.kubernetes.io/is-default-class: "true"</code></p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -426,7 +435,7 @@ local-storage           kubernetes.io/no-provisioner            Delete          
 </div>
 </div>
 <div class="paragraph">
-<p>例えば、ストレージクラスが <code>ceph-rbd-sc</code> である場合：</p>
+<p>たとえば、ストレージクラスの名前が <code>ceph-rbd-sc</code> の場合:</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -436,10 +445,10 @@ local-storage           kubernetes.io/no-provisioner            Delete          
 </div>
 </div>
 <div class="sect1">
-<h2 id="_ステップ_4デフォルトのストレージクラスの確認"><a class="anchor" href="#_ステップ_4デフォルトのストレージクラスの確認"></a>ステップ 4：デフォルトのストレージクラスの確認</h2>
+<h2 id="_ステップ_4_デフォルトストレージクラスの確認"><a class="anchor" href="#_ステップ_4_デフォルトストレージクラスの確認"></a>ステップ 4: デフォルトストレージクラスの確認</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>アノテーションを適用した後、変更が有効になったことを確認します：</p>
+<p>アノテーションを適用した後、変更が有効になっていることを確認します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -447,7 +456,7 @@ local-storage           kubernetes.io/no-provisioner            Delete          
 </div>
 </div>
 <div class="paragraph">
-<p>デフォルトを設定した後の例の出力：</p>
+<p>デフォルト設定後の出力例:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -458,15 +467,15 @@ local-storage           kubernetes.io/no-provisioner            Delete          
 </div>
 </div>
 <div class="paragraph">
-<p>選択したストレージクラスの名前の隣に <code>(default)</code> が表示されていることを確認してください。</p>
+<p>選択したストレージクラス名の横に <code>(default)</code> と表示されるはずです。</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_ステップ_5デフォルトのストレージクラスのテスト"><a class="anchor" href="#_ステップ_5デフォルトのストレージクラスのテスト"></a>ステップ 5：デフォルトのストレージクラスのテスト</h2>
+<h2 id="_ステップ_5_デフォルトストレージクラスのテスト"><a class="anchor" href="#_ステップ_5_デフォルトストレージクラスのテスト"></a>ステップ 5: デフォルトストレージクラスのテスト</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>デフォルトのストレージクラスが正しく機能していることを確認するための簡単なテストを作成します。ストレージクラスを指定せずに PVCを作成します：</p>
+<p>デフォルトストレージクラスが正しく機能していることを確認するための簡単なテストを作成します。ストレージクラスを指定せずに PVC を作成します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -486,7 +495,7 @@ EOF</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>次に、PVC が正しいストレージクラスに作成されたかどうかを確認します：</p>
+<p>次に、PVC が正しいストレージクラスで作成されたことを確認します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -494,7 +503,7 @@ EOF</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>例の出力：</p>
+<p>出力例:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -503,12 +512,12 @@ test-default-storage   Pending                                      lvms-vg1    
 </div>
 </div>
 <div class="paragraph">
-<p>PVC は <code>Pending</code> 状態にあるが、デフォルトのストレージクラス (<code>lvms-vg1</code> など) に自動的に割り当てられています。</p>
+<p>PVC は <code>Pending</code> ステータスですが、デフォルトストレージクラス (この例では <code>lvms-vg1</code>) に自動的に割り当てられました。</p>
 </div>
 <div class="sect2">
 <h3 id="_ボリュームバインディングモードの理解"><a class="anchor" href="#_ボリュームバインディングモードの理解"></a>ボリュームバインディングモードの理解</h3>
 <div class="paragraph">
-<p>PVC が <code>Pending</code> 状態にあるのは、大多数のストレージクラスが <code>WaitForFirstConsumer</code> ボリュームバインディングモードを使用するためです。これは予期される動作です。</p>
+<p>ほとんどのストレージクラスは <code>WaitForFirstConsumer</code> ボリュームバインディングモードを使用するため、PVC は <code>Pending</code> ステータスのままになります。これは期待される動作です。</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -518,26 +527,26 @@ test-default-storage   Pending                                      lvms-vg1    
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">ボリュームバインディングモード</th>
+<th class="tableblock halign-left valign-top">Binding Mode</th>
 <th class="tableblock halign-left valign-top">動作</th>
-<th class="tableblock halign-left valign-top">使用ケース</th>
+<th class="tableblock halign-left valign-top">ユースケース</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>WaitForFirstConsumer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Pod が PVC をスケジュールされたときに PV がプロビジョニングされる</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Pod と同じノードにストレージが作成されることを保証し、トポロジー認識ストレージ（LVM、ローカルストレージ）に適しています</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PVC を使用する Pod がスケジュールされたときにのみ PV がプロビジョニングされます</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pod と同じノードにストレージが作成されることを保証します。トポロジーを認識するストレージ (LVM、ローカルストレージ) に適しています</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Immediate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PVC が作成されたときに PV がプロビジョニングされる</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ネットワークアタッチストレージ（NFS、Ceph、クラウドストレージ）から任意のノードにアクセスできるため、適しています</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PVC が作成されるとすぐに PV がプロビジョニングされます</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">任意のノードからアクセス可能なネットワークアタッチストレージ (NFS、Ceph、クラウドストレージ) に適しています</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>ストレージクラスのバインディングモードを確認するには：</p>
+<p>ストレージクラスのバインディングモードを確認するには:</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -548,10 +557,10 @@ test-default-storage   Pending                                      lvms-vg1    
 </div>
 </div>
 <div class="sect1">
-<h2 id="_ステップ_6デフォルトのストレージクラスを使用した_vm_のデプロイ"><a class="anchor" href="#_ステップ_6デフォルトのストレージクラスを使用した_vm_のデプロイ"></a>ステップ 6：デフォルトのストレージクラスを使用した VM のデプロイ</h2>
+<h2 id="_ステップ_6_デフォルトストレージを使用した_vm_のデプロイ"><a class="anchor" href="#_ステップ_6_デフォルトストレージを使用した_vm_のデプロイ"></a>ステップ 6: デフォルトストレージを使用した VM のデプロイ</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>今度は、データボリューム用にデフォルトのストレージクラスを自動的に使用する仮想マシンをデプロイできます：</p>
+<p>これで、データボリュームにデフォルトストレージクラスを自動的に使用する仮想マシンをデプロイできます。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -608,11 +617,11 @@ EOF</code></pre>
 <h2 id="_トラブルシューティング"><a class="anchor" href="#_トラブルシューティング"></a>トラブルシューティング</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_一般的な問題"><a class="anchor" href="#_一般的な問題"></a>一般的な問題</h3>
+<h3 id="_よくある問題"><a class="anchor" href="#_よくある問題"></a>よくある問題</h3>
 <div class="sect3">
-<h4 id="_複数のデフォルトのストレージクラス"><a class="anchor" href="#_複数のデフォルトのストレージクラス"></a>複数のデフォルトのストレージクラス</h4>
+<h4 id="_複数のデフォルトストレージクラス"><a class="anchor" href="#_複数のデフォルトストレージクラス"></a>複数のデフォルトストレージクラス</h4>
 <div class="paragraph">
-<p>複数のストレージクラスがデフォルトとしてマークされている場合は、すべてのストレージクラスからアノテーションを削除してください：</p>
+<p>複数のストレージクラスがデフォルトとしてマークされている場合は、1つを除くすべてのアノテーションを削除します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -623,7 +632,7 @@ EOF</code></pre>
 <div class="sect3">
 <h4 id="_ストレージクラスが見つからない"><a class="anchor" href="#_ストレージクラスが見つからない"></a>ストレージクラスが見つからない</h4>
 <div class="paragraph">
-<p>ストレージクラスをアノテーションする前に、その存在を確認してください：</p>
+<p>アノテーションを適用する前に、ストレージクラスが存在することを確認してください。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -632,9 +641,9 @@ EOF</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_パーミッションが拒否された"><a class="anchor" href="#_パーミッションが拒否された"></a>パーミッションが拒否された</h4>
+<h4 id="_権限拒否"><a class="anchor" href="#_権限拒否"></a>権限拒否</h4>
 <div class="paragraph">
-<p>クラスター管理者権限を持っていることを確認してください：</p>
+<p>クラスター管理者権限があることを確認してください。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -646,7 +655,7 @@ EOF</code></pre>
 <div class="sect2">
 <h3 id="_確認コマンド"><a class="anchor" href="#_確認コマンド"></a>確認コマンド</h3>
 <div class="paragraph">
-<p>すべてのストレージクラスとそのデフォルトステータスを確認します：</p>
+<p>すべてのストレージクラスとそのデフォルトステータスを確認します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -654,7 +663,7 @@ EOF</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>特定のストレージクラスの詳細情報を表示します：</p>
+<p>特定のストレージクラスに関する詳細情報を表示します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -662,7 +671,7 @@ EOF</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>すべての名前空間の PVC とそのストレージクラスをリスト表示します：</p>
+<p>PVC とそのストレージクラスを一覧表示します。</p>
 </div>
 <div class="listingblock execute">
 <div class="content">
@@ -678,26 +687,26 @@ EOF</code></pre>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><strong>適切なストレージの選択</strong>：VM に必要なパフォーマンスと機能（例：高速 I/O、スナップショット、暗号化）を提供するストレージクラスを選択します。</p>
+<p><strong>適切なストレージの選択</strong>: VM に必要なパフォーマンスと機能 (例: 高速 I/O、スナップショット、暗号化) を提供するストレージクラスを選択します。</p>
 </li>
 <li>
-<p><strong>ワークロードの要件を考慮する</strong>：異なるワークロードには異なるストレージ特性が必要になる場合があります。重要なワークロードには特定のストレージクラスを使用することを検討してください。</p>
+<p><strong>ワークロード要件の考慮</strong>: 異なるワークロードでは、異なるストレージ特性が必要になる場合があります。デフォルトに依存するのではなく、重要なワークロードには特定のストレージクラスを使用することを検討してください。</p>
 </li>
 <li>
-<p><strong>ストレージ使用量の監視</strong>：ストレージ使用量とパフォーマンスを定期的に監視して、デフォルトのストレージクラスが必要に満たしていることを確認します。</p>
+<p><strong>ストレージ使用状況の監視</strong>: デフォルトストレージクラスがニーズを満たしていることを確認するために、ストレージの使用状況とパフォーマンスを定期的に監視します。</p>
 </li>
 <li>
-<p><strong>選択を文書化する</strong>：将来の参照やトラブルシューティングのために、特定のストレージクラスをデフォルトとして選択した理由を文書化します。</p>
+<p><strong>選択内容の文書化</strong>: 将来の参照とトラブルシューティングのために、特定のストレージクラスをデフォルトとして選択した理由を文書化します。</p>
 </li>
 </ol>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_要約"><a class="anchor" href="#_要約"></a>要約</h2>
+<h2 id="_まとめ"><a class="anchor" href="#_まとめ"></a>まとめ</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>このチュートリアルで学んだこと：</p>
+<p>このチュートリアルでは、次のことを学びました。</p>
 </div>
 <div class="ulist">
 <ul>
@@ -705,36 +714,39 @@ EOF</code></pre>
 <p>利用可能なストレージクラスを表示し、既存のデフォルトを特定する方法</p>
 </li>
 <li>
-<p><code>storageclass.kubernetes.io/is-default-class</code> アノテーションを使用してストレージクラスをデフォルトとしてアノテーションする方法</p>
+<p>既存のデフォルトストレージクラスアノテーションを削除する方法</p>
 </li>
 <li>
-<p>デフォルトのストレージクラスが正しく機能していることを確認するためのテスト PVC と VM のデプロイ方法</p>
+<p><code>storageclass.kubernetes.io/is-default-class</code> を使用してストレージクラスをデフォルトとしてアノテーションを付ける方法</p>
 </li>
 <li>
-<p>OpenShift Virtualization でデフォルトのストレージクラスを選択および管理するためのベストプラクティス</p>
+<p>テスト PVC を作成し、VM をデプロイしてデフォルトストレージクラスを確認する方法</p>
+</li>
+<li>
+<p>OpenShift Virtualization でデフォルトストレージクラスを選択および管理するためのベストプラクティス</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_参照"><a class="anchor" href="#_参照"></a>参照</h2>
+<h2 id="_関連項目"><a class="anchor" href="#_関連項目"></a>関連項目</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/storage/understanding-persistent-storage#persistent-storage-overview_storage-classes">OpenShift - 持続可能なストレージ、新しいタブ</a></p>
+<p><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/understanding-persistent-storage#persistent-storage-overview_storage-classes" target="_blank" rel="noopener">OpenShift - 永続ストレージ</a></p>
 </li>
 <li>
-<p><a href="https://docs.redhat.com/ja/documentation/openshift_container_platform/4.20/html/virtualization/storage">OpenShift Virtualization - ストレージ、新しいタブ</a></p>
+<p><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/virtualization/storage" target="_blank" rel="noopener">OpenShift Virtualization - ストレージ</a></p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="install-openshift-virtualization.html">OpenShift仮想化のインストール</a></span>
-  <span class="next"><a href="create-vm-web-console.html">WebコンソールからのVMの作成</a></span>
+  <span class="prev"><a href="install-openshift-virtualization.html">OpenShift Virtualization をインストール</a></span>
+  <span class="next"><a href="create-vm-web-console.html">ウェブコンソールからのVM作成</a></span>
 </nav>
 </article>
   </div>
